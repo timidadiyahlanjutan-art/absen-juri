@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absen Juri - Tes Lisan</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --hijau: #1a6b4a;
+    --hijau-muda: #2e9b6e;
+    --hijau-pale: #e8f5f0;
+    --emas: #c8952a;
+    --emas-pale: #fef8ed;
+    --merah: #c0392b;
+    --merah-pale: #fdf0ee;
+    --abu: #64748b;
+    --abu-pale: #f1f5f9;
+    --putih: #ffffff;
+    --teks: #1e293b;
+    --border: #e2e8f0;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f0f4f8;
+    color: var(--teks);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--hijau) 0%, #0f4f35 100%);
+    color: white;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-lg);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px 10px;
+  }
+  .logo-icon {
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .header-title { font-size: 18px; font-weight: 700; line-height: 1.2; }
+  .header-sub { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+  .header-stats {
+    display: flex;
+    background: rgba(0,0,0,0.15);
+    padding: 10px 20px;
+    gap: 0;
+  }
+  .stat-item {
+    flex: 1; text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.15);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num { font-size: 22px; font-weight: 700; line-height: 1; }
+  .stat-label { font-size: 10px; opacity: 0.75; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-item.hadir .stat-num { color: #7effc4; }
+  .stat-item.izin .stat-num { color: #ffd97e; }
+  .stat-item.alpa .stat-num { color: #ff8a80; }
+
+  /* NAV TABS */
+  .nav-tabs {
+    display: flex;
+    background: white;
+    border-bottom: 2px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: sticky;
+    top: 112px;
+    z-index: 90;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex-shrink: 0;
+    padding: 12px 18px;
+    border: none;
+    background: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--abu);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn.active {
+    color: var(--hijau);
+    border-bottom-color: var(--hijau);
+    font-weight: 600;
+  }
+  .tab-btn:hover:not(.active) { color: var(--teks); background: var(--abu-pale); }
+
+  /* MAIN CONTENT */
+  .main { padding: 16px; max-width: 700px; margin: 0 auto; }
+
+  /* SEARCH BAR */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 14px;
+  }
+  .search-input {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 14px;
+    background: white;
+    color: var(--teks);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .search-input:focus { border-color: var(--hijau); box-shadow: 0 0 0 3px rgba(26,107,74,0.1); }
+  .search-icon {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--abu);
+    font-size: 16px;
+  }
+
+  /* FILTER ROW */
+  .filter-row {
+    display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: white;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    color: var(--abu);
+  }
+  .filter-btn.active { background: var(--hijau); color: white; border-color: var(--hijau); }
+  .filter-btn:hover:not(.active) { border-color: var(--hijau); color: var(--hijau); }
+
+  /* JURI CARD */
+  .juri-list { display: flex; flex-direction: column; gap: 8px; }
+  .juri-card {
+    background: white;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: var(--shadow);
+    border: 1.5px solid transparent;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .juri-card:hover { border-color: var(--hijau-muda); transform: translateY(-1px); }
+  .juri-card.hadir { border-left: 4px solid #2e9b6e; }
+  .juri-card.izin { border-left: 4px solid var(--emas); }
+  .juri-card.alpa { border-left: 4px solid var(--merah); }
+
+  .avatar {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+    background: var(--hijau-pale);
+    color: var(--hijau);
+  }
+  .juri-card.hadir .avatar { background: var(--hijau-pale); color: var(--hijau); }
+  .juri-card.izin .avatar { background: var(--emas-pale); color: var(--emas); }
+  .juri-card.alpa .avatar { background: var(--merah-pale); color: var(--merah); }
+
+  .juri-info { flex: 1; min-width: 0; }
+  .juri-nama { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .juri-meta { font-size: 12px; color: var(--abu); margin-top: 2px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .badge-id {
+    background: var(--abu-pale);
+    border-radius: 6px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--abu);
+    font-family: monospace;
+  }
+
+  .status-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+  .status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .status-badge.hadir { background: #dcfce7; color: #166534; }
+  .status-badge.izin { background: #fef3c7; color: #92400e; }
+  .status-badge.alpa { background: #fee2e2; color: #991b1b; }
+  .status-badge.belum { background: var(--abu-pale); color: var(--abu); }
+
+  .btn-group { display: flex; gap: 5px; }
+  .btn-absen {
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1.5px solid;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-hadir { border-color: var(--hijau-muda); color: var(--hijau); background: white; }
+  .btn-hadir:hover, .btn-hadir.aktif { background: var(--hijau); color: white; }
+  .btn-izin { border-color: var(--emas); color: var(--emas); background: white; }
+  .btn-izin:hover, .btn-izin.aktif { background: var(--emas); color: white; }
+  .btn-alpa { border-color: var(--merah); color: var(--merah); background: white; }
+  .btn-alpa:hover, .btn-alpa.aktif { background: var(--merah); color: white; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--abu);
+    padding: 6px 4px;
+    margin-top: 4px;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--abu);
+  }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px 36px;
+    width: 100%;
+    max-width: 500px;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 4px; margin: 0 auto 20px; }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .modal-sub { font-size: 13px; color: var(--abu); margin-bottom: 20px; }
+  .modal-btn-row { display: flex; gap: 10px; }
+  .modal-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .modal-btn-hadir { background: var(--hijau); color: white; }
+  .modal-btn-hadir:hover { background: #145d3d; }
+  .modal-btn-izin { background: var(--emas-pale); color: var(--emas); border: 1.5px solid var(--emas); }
+  .modal-btn-izin:hover { background: var(--emas); color: white; }
+  .modal-btn-alpa { background: var(--merah-pale); color: var(--merah); border: 1.5px solid var(--merah); }
+  .modal-btn-alpa:hover { background: var(--merah); color: white; }
+  .modal-btn-cancel { background: var(--abu-pale); color: var(--abu); }
+  .modal-btn-cancel:hover { background: var(--border); }
+  .modal-info-row { 
+    display: flex; gap: 10px; margin-bottom: 20px; 
+    background: var(--abu-pale); 
+    border-radius: 12px; padding: 12px 14px; 
+    align-items: center;
+  }
+  .modal-avatar {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--hijau-pale); color: var(--hijau);
+    font-size: 18px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-info-nama { font-weight: 600; font-size: 15px; }
+  .modal-info-id { font-size: 12px; color: var(--abu); margin-top: 2px; }
+
+  /* REKAP PANEL */
+  .rekap-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+  }
+  .rekap-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--hijau); }
+  .rekap-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .rekap-row:last-child { border-bottom: none; }
+  .rekap-nama { font-size: 13px; color: var(--teks); }
+  .rekap-count { font-size: 13px; font-weight: 700; }
+  .progress-bar-wrap { background: var(--abu-pale); border-radius: 20px; height: 8px; margin-top: 10px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--hijau), var(--hijau-muda)); transition: width 0.5s ease; }
+
+  /* ACTION BAR */
+  .action-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    padding: 12px 20px 24px;
+    border-top: 1px solid var(--border);
+    display: flex; gap: 10px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    z-index: 80;
+  }
+  .btn-reset {
+    padding: 13px 18px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--abu);
+  }
+  .btn-export {
+    flex: 1;
+    padding: 13px;
+    border-radius: 12px;
+    border: none;
+    background: var(--hijau);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.18s;
+  }
+  .btn-export:hover { background: #145d3d; }
+
+  .pb-bar { padding-bottom: 80px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    top: 130px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--teks);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 300;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* TIME DISPLAY */
+  .time-display {
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    padding: 6px 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  @media (max-width: 400px) {
+    .btn-absen { padding: 4px 7px; font-size: 10px; }
+    .juri-nama { font-size: 13px; }
+    .stat-num { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo-icon">📋</div>
+    <div>
+      <div class="header-title">Absen Juri Tes Lisan</div>
+      <div class="header-sub" id="eventLabel">Malam Kamis · 15 Shafar 1448 H</div>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="stat-item hadir">
+      <div class="stat-num" id="statHadir">0</div>
+      <div class="stat-label">✓ Hadir</div>
+    </div>
+    <div class="stat-item izin">
+      <div class="stat-num" id="statIzin">0</div>
+      <div class="stat-label">⚠ Izin</div>
+    </div>
+    <div class="stat-item alpa">
+      <div class="stat-num" id="statAlpa">0</div>
+      <div class="stat-label">✗ Alpa</div>
+    </div>
+    <div class="stat-item" style="color: rgba(255,255,255,0.7)">
+      <div class="stat-num" id="statBelum">0</div>
+      <div class="stat-label">– Belum</div>
+    </div>
+  </div>
+  <div class="time-display" id="clockDisplay"></div>
+</div>
+
+<div class="nav-tabs">
+  <button class="tab-btn active" onclick="switchTab('semua')">Semua</button>
+  <button class="tab-btn" onclick="switchTab('belum')">Belum Absen</button>
+  <button class="tab-btn" onclick="switchTab('hadir')">Hadir</button>
+  <button class="tab-btn" onclick="switchTab('izin')">Izin</button>
+  <button class="tab-btn" onclick="switchTab('alpa')">Alpa</button>
+  <button class="tab-btn" onclick="switchTab('rekap')">📊 Rekap</button>
+</div>
+
+<div class="main pb-bar">
+  <div id="panelAbsen">
+    <div class="search-wrap" style="margin-top:14px">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-input" id="searchInput" placeholder="Cari nama atau ID juri..." oninput="renderList()">
+    </div>
+    <div class="filter-row" id="filterRow"></div>
+    <div id="juriList" class="juri-list"></div>
+  </div>
+
+  <div id="panelRekap" style="display:none; margin-top:14px">
+    <div class="rekap-card">
+      <h3>📊 Ringkasan Kehadiran</h3>
+      <div class="rekap-row">
+        <span class="rekap-nama">✅ Hadir</span>
+        <span class="rekap-count" style="color:var(--hijau)" id="rekHadir">0</span>
+      </div>
+      <div class="rekap-row">
+        <span class="rekap-nama">⚠️ Izin</span>
+        <span class="rekap-count" style="color:var(--emas)" id="rekIzin">0</span>
+      </div>
+      <div class="rekap-row">
+        <span class="rekap-nama">❌ Alpa</span>
+        <span class="rekap-count" style="color:var(--merah)" id="rekAlpa">0</span>
+      </div>
+      <div class="rekap-row">
+        <span class="rekap-nama">⬜ Belum Absen</span>
+        <span class="rekap-count" style="color:var(--abu)" id="rekBelum">0</span>
+      </div>
+      <div style="margin-top:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:12px;color:var(--abu)">Progress kehadiran</span>
+          <span style="font-size:12px;font-weight:700;color:var(--hijau)" id="rekPersen">0%</span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="rekBar" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rekap-card">
+      <h3>🕐 Log Absensi Terakhir</h3>
+      <div id="logList" style="font-size:13px;color:var(--abu);line-height:2"></div>
+    </div>
+  </div>
+</div>
+
+<div class="action-bar">
+  <button class="btn-reset" onclick="confirmReset()">🔄 Reset</button>
+  <button class="btn-export" onclick="exportCSV()">📥 Ekspor CSV</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-info-row">
+      <div class="modal-avatar" id="modalAvatar"></div>
+      <div>
+        <div class="modal-info-nama" id="modalNama"></div>
+        <div class="modal-info-id" id="modalId"></div>
+      </div>
+    </div>
+    <div class="modal-title">Tandai Kehadiran</div>
+    <div class="modal-sub">Pilih status kehadiran untuk juri ini</div>
+    <div class="modal-btn-row" style="margin-bottom:10px">
+      <button class="modal-btn modal-btn-hadir" onclick="absenFromModal('hadir')">✅ Hadir</button>
+      <button class="modal-btn modal-btn-izin" onclick="absenFromModal('izin')">⚠️ Izin</button>
+    </div>
+    <div class="modal-btn-row">
+      <button class="modal-btn modal-btn-alpa" onclick="absenFromModal('alpa')">❌ Alpa</button>
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Batal</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+// ============================================================
+// DATA JURI (dari file juri_abadi.xlsx)
+// ============================================================
+const rawJuri = [
+  [1,266864,"ABD ROHIM","6288235563817"],
+  [2,263349,"ABDUL FAHAD ALMAGROBI","6281717363495"],
+  [3,264808,"ABDUL ROSID","6281328085788"],
+  [4,269875,"ABDUL WARIS","6281358525110"],
+  [5,265995,"ABDULLOH SA'DUDDIN","6281334279693"],
+  [6,263295,"ACH HUSAERI","6285895306445"],
+  [7,263959,"ACHNAD DIMYATI","6285954077608"],
+  [8,267302,"ACHNAD FACHRUDDIN","6283831172248"],
+  [9,262627,"ACHNAD FATONI","6281216331212"],
+  [10,263456,"ACHNAD MUKAFI","85852093168"],
+  [11,267912,"ACHNAD ROIHAN","6281215029454"],
+  [12,263684,"ACHNAD SAFRI ZAIM FAIDILLA","6285975455575"],
+  [13,263768,"ADIB ZAINUL FATA","6285893146871"],
+  [14,261240,"AHMAD IMAMUL HAROMAIN","6285232345376"],
+  [15,264634,"AHMAD MISBAHUL MUNIR","6287833701088"],
+  [16,262548,"AHMAD NURUL HUDA","6285755415213"],
+  [17,269806,"AHMAD ROHMATULLOH","6281325323906"],
+  [18,266594,"AHMAD SIDDIK","85748338146"],
+  [19,261022,"AHMAD WAHYU HIDAYAT","6289689524041"],
+  [20,268855,"AHMAD ZAKI","6283117254604"],
+  [21,264537,"AINUL YAKIN","85748796125"],
+  [22,262634,"AINUL YAQIN","6285777727912"],
+  [23,261424,"AINUN NOFAL","6281217665170"],
+  [24,267819,"ALI GOJALI","6285705763632"],
+  [25,269335,"ALI MA'RUF","6281217296154"],
+  [26,269796,"AMIRUL MUKMININ","6285859004581"],
+  [27,265437,"AMRUL FIKRI","6281615041943"],
+  [28,261347,"AS'AD ROMDHONI","628133713501"],
+  [29,261762,"FATHURROHMAN","6285730617961"],
+  [30,262949,"GHUFRON","6281225925511"],
+  [31,261423,"HADIYATULLOH","6287776603219"],
+  [32,263119,"HAFID YAQIN","6282337192082"],
+  [33,263457,"HASBI SIDDIQI","6285748248010"],
+  [34,261773,"HAYATULLOH","82233386910"],
+  [35,266360,"IHSANUL LUBAB","6281392295617"],
+  [36,269160,"IMAM SYAFII","6285718237158"],
+  [37,263895,"IMRON ROSADI","628559999727"],
+  [38,264809,"KHOLIL","6285855608883"],
+  [39,264139,"LUKMAN HANAFI","81336204774"],
+  [40,262286,"LUTFILLAH","6285607511320"],
+  [41,266881,"M AKROMULLOH HANIN","6283856307455"],
+  [42,267061,"M CHOIRUL ANWAR","6281334630421"],
+  [43,264834,"M FAILUSSUBHI","625159757188"],
+  [44,261981,"M HUDI","6285733280486"],
+  [45,267683,"M MASDUQI",""],
+  [46,262961,"M MUSTOFA","6281511431455"],
+  [47,264457,"M ZAINUL ALIM","6285791485548"],
+  [48,268402,"M. ALEX FIRDAUS","6281217656341"],
+  [49,263598,"M. ARIF","6285784494262"],
+  [50,264936,"M. ZAINUL ARIFIN","6283823300479"],
+  [51,265031,"M.ATHO'ILLAH","6285733534542"],
+  [52,263735,"M.FAYDLUL KHAKIM","6287898432765"],
+  [53,267334,"M.KHOTIBUL UMAM","62085602507651"],
+  [54,261870,"M.SAMSUL ARIFIN","6285791656244"],
+  [55,266631,"M.UMAR FARUQ. S.PD","6287881485905"],
+  [56,269065,"MAHMUD","6285755465540"],
+  [57,266389,"MANSYUR","6285755346958"],
+  [58,268188,"MASDUKI","6285608719594"],
+  [59,261992,"MASHUDI","6285929089001"],
+  [60,263582,"MIRZA ABDULLAH","628139291415"],
+  [61,268258,"MISBACHUL MUNIR","6285777703902"],
+  [62,268374,"MISBAHUL ULUM","85182286970"],
+  [63,262250,"MISBAHUSSURUR","6285606373627"],
+  [64,269739,"MOCH. NOVEL MAULANA","6285736551927"],
+  [65,264263,"MOCHAMAD MUSTAIN","6287888523373"],
+  [66,268143,"MOHAMMAD AJI MAULANA","6285755555694"],
+  [67,262768,"MOH BUSTOMI","6285784817921"],
+  [68,269794,"MOH LUTHFI","6285746012017"],
+  [69,265072,"MOH RIFQI ALMAHMUDY","6282276975628"],
+  [70,267553,"MOHAMAD NURSALIM","6285329610255"],
+  [71,265099,"MOHAMMAD AINUL YAQIN","6285865703833"],
+  [72,262897,"MUCHAMAD ALI MACHFUD","6283140650416"],
+  [73,267470,"MUDZAKKIR","6285706659633"],
+  [74,261234,"MUFTI ALI","6281933836205"],
+  [75,267311,"MUHAJIRIN","6287722778895"],
+  [76,264124,"MUHAMAD SOLEH","6285791270135"],
+  [77,261113,"MUHAMMAD (I)","6287787213686"],
+  [78,269997,"MUHAMMAD (II)","6285258235709"],
+  [79,267004,"MUHAMMAD AENUR ROFIK","6283894356438"],
+  [80,262850,"MUHAMMAD AMINULLOH","6285211480783"],
+  [81,269719,"MUHAMMAD AS'AD","6285708117275"],
+  [82,267687,"MUHAMMAD ASROFIL ASFIYAK","6285716547311"],
+  [83,263026,"MUHAMMAD ASROR","6281259005978"],
+  [84,261871,"MUHAMMAD CHOIROL WARO","6282234841725"],
+  [85,268956,"MUHAMMAD HASAN BISRI","6285791431996"],
+  [86,263367,"MUHAMMAD HUSNI MUBAROK","6285812824714"],
+  [87,265913,"MUHAMMAD IMAM HANAFI","6281234008754"],
+  [88,269325,"MUHAMMAD KHOIRUL ANWAR","6282301234143"],
+  [89,262395,"MUHAMMAD MAHMUD","82232716896"],
+  [90,265462,"MUHAMMAD MUHYIDDIN","6287890660589"],
+  [91,261223,"MUHAMMAD MUSLIH","6285743291533"],
+  [92,263483,"MUHAMMAD MUSYAFFA'","6287864579719"],
+  [93,261496,"MUHAMMAD MUSYAFFA ZIDNY","6282334121956"],
+  [94,263795,"MUHAMMAD NUR ALI WAFA","6282231647207"],
+  [95,268745,"MUHAMMAD NUR HIDAYATULLAH","62085336329456"],
+  [96,268392,"MUHAMMAD RIFKI","6285136772833"],
+  [97,264892,"MUHAMMAD ZAINUL MAKRUF","6287838248956"],
+  [98,264024,"MUJIB ABD ROHMAN","625607920503"],
+  [99,265406,"MUKHAMMAD MISBAHUL MUNIR","6282245640232"],
+  [100,264152,"MUKHAMMAD NIR ISLAM","6285645550170"],
+  [101,269949,"MUKHAMMAD SUKADI","85850764335"],
+  [102,265903,"MUKHLASHIN","6285649372001"],
+  [103,265117,"MUSLIMIN","6285693359700"],
+  [104,263356,"NABILUL MUROBBI","6285808807737"],
+  [105,261071,"NANANG QOSIM","6285815421339"],
+  [106,269256,"NASIHIN","6281272276747"],
+  [107,269157,"NASIHUL AMIN","6285692838957"],
+  [108,269578,"NASIRUDDIN","6283134958800"],
+  [109,269894,"NURUL HUDA","6287798394434"],
+  [110,265096,"SAHRULLOH","6285708753040"],
+  [111,266087,"SAIFUL ISLAM","6282180995859"],
+  [112,267725,"SAMSUL ARIFIN","6285854448495"],
+  [113,264125,"SHOHIBUL QODAM","6285232807209"],
+  [114,262126,"SONI IKROMILLAH","6282140091654"],
+  [115,263217,"SUHAEMI","85895226221"],
+  [116,266979,"SYIRRUL MUN'IM","6281234967503"],
+  [117,266375,"ZAINAL ABIDIN","628813274233"],
+];
+
+// Build master data
+const juriData = rawJuri.map(([no, id, nama, hp]) => ({
+  no, id, nama: nama.trim(), hp,
+  status: 'belum',
+  waktu: null,
+}));
+
+let modalTarget = null;
+let currentTab = 'semua';
+let logAbsen = [];
+
+// ============================================================
+// CLOCK
+// ============================================================
+function updateClock() {
+  const now = new Date();
+  const options = { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' };
+  document.getElementById('clockDisplay').textContent = now.toLocaleString('id-ID', options);
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ============================================================
+// RENDER
+// ============================================================
+function getInitials(nama) {
+  return nama.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+}
+
+function getFiltered() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  return juriData.filter(j => {
+    const matchQ = !q || j.nama.toLowerCase().includes(q) || String(j.id).includes(q);
+    const matchTab = currentTab === 'semua' || j.status === currentTab;
+    return matchQ && matchTab;
+  });
+}
+
+function renderList() {
+  const list = document.getElementById('juriList');
+  const filtered = getFiltered();
+  updateStats();
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>Tidak ada juri ditemukan</p></div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(j => {
+    const init = getInitials(j.nama);
+    const statusLabel = { hadir:'✅ Hadir', izin:'⚠️ Izin', alpa:'❌ Alpa', belum:'Belum Absen' }[j.status];
+    const timeStr = j.waktu ? `<span style="font-size:10px;color:var(--abu)">· ${j.waktu}</span>` : '';
+    return `
+    <div class="juri-card ${j.status}" onclick="openModal(${j.id})">
+      <div class="avatar">${init}</div>
+      <div class="juri-info">
+        <div class="juri-nama">${j.nama}</div>
+        <div class="juri-meta">
+          <span class="badge-id">${j.id}</span>
+          ${j.hp ? `<span>📱 ${j.hp}</span>` : ''}
+        </div>
+      </div>
+      <div class="status-actions">
+        <span class="status-badge ${j.status}">${statusLabel}</span>
+        ${timeStr}
+        <div class="btn-group" onclick="event.stopPropagation()">
+          <button class="btn-absen btn-hadir ${j.status==='hadir'?'aktif':''}" onclick="quickAbsen(${j.id},'hadir')">H</button>
+          <button class="btn-absen btn-izin ${j.status==='izin'?'aktif':''}" onclick="quickAbsen(${j.id},'izin')">I</button>
+          <button class="btn-absen btn-alpa ${j.status==='alpa'?'aktif':''}" onclick="quickAbsen(${j.id},'alpa')">A</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateStats() {
+  const counts = { hadir:0, izin:0, alpa:0, belum:0 };
+  juriData.forEach(j => counts[j.status]++);
+  document.getElementById('statHadir').textContent = counts.hadir;
+  document.getElementById('statIzin').textContent = counts.izin;
+  document.getElementById('statAlpa').textContent = counts.alpa;
+  document.getElementById('statBelum').textContent = counts.belum;
+}
+
+// ============================================================
+// TAB
+// ============================================================
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.remove('active'));
+  const tabs = ['semua','belum','hadir','izin','alpa','rekap'];
+  const idx = tabs.indexOf(tab);
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+
+  if (tab === 'rekap') {
+    document.getElementById('panelAbsen').style.display = 'none';
+    document.getElementById('panelRekap').style.display = 'block';
+    renderRekap();
+  } else {
+    document.getElementById('panelAbsen').style.display = 'block';
+    document.getElementById('panelRekap').style.display = 'none';
+    renderList();
+  }
+}
+
+// ============================================================
+// REKAP
+// ============================================================
+function renderRekap() {
+  const counts = { hadir:0, izin:0, alpa:0, belum:0 };
+  juriData.forEach(j => counts[j.status]++);
+  const total = juriData.length;
+  const persen = total ? Math.round((counts.hadir / total) * 100) : 0;
+
+  document.getElementById('rekHadir').textContent = counts.hadir;
+  document.getElementById('rekIzin').textContent = counts.izin;
+  document.getElementById('rekAlpa').textContent = counts.alpa;
+  document.getElementById('rekBelum').textContent = counts.belum;
+  document.getElementById('rekPersen').textContent = persen + '%';
+  document.getElementById('rekBar').style.width = persen + '%';
+
+  const logEl = document.getElementById('logList');
+  if (!logAbsen.length) {
+    logEl.innerHTML = '<span style="color:var(--abu)">Belum ada log absensi</span>';
+    return;
+  }
+  logEl.innerHTML = logAbsen.slice().reverse().slice(0, 20).map(l => {
+    const dot = { hadir:'🟢', izin:'🟡', alpa:'🔴' }[l.status];
+    return `<div style="padding:5px 0;border-bottom:1px solid var(--border)">${dot} <b>${l.nama}</b> — ${l.status.toUpperCase()} <span style="float:right;font-size:11px">${l.waktu}</span></div>`;
+  }).join('');
+}
+
+// ============================================================
+// ABSEN ACTIONS
+// ============================================================
+function quickAbsen(id, status) {
+  const j = juriData.find(x => x.id === id);
+  if (!j) return;
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+  
+  if (j.status === status) {
+    j.status = 'belum';
+    j.waktu = null;
+    showToast(`${j.nama} dikembalikan ke Belum Absen`);
+    logAbsen = logAbsen.filter(l => l.id !== id || l.status !== status);
+  } else {
+    j.status = status;
+    j.waktu = timeStr;
+    const label = { hadir:'HADIR', izin:'IZIN', alpa:'ALPA' }[status];
+    showToast(`${j.nama} — ${label} · ${timeStr}`);
+    logAbsen.push({ id, nama: j.nama, status, waktu: timeStr });
+  }
+  renderList();
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(id) {
+  modalTarget = id;
+  const j = juriData.find(x => x.id === id);
+  document.getElementById('modalNama').textContent = j.nama;
+  document.getElementById('modalId').textContent = `ID: ${j.id}${j.hp ? ' · ' + j.hp : ''}`;
+  document.getElementById('modalAvatar').textContent = getInitials(j.nama);
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modalOverlay')) {
+    document.getElementById('modalOverlay').classList.remove('show');
+    modalTarget = null;
+  }
+}
+
+function absenFromModal(status) {
+  if (!modalTarget) return;
+  quickAbsen(modalTarget, status);
+  closeModal();
+}
+
+// ============================================================
+// EXPORT CSV
+// ============================================================
+function exportCSV() {
+  const now = new Date();
+  const tgl = now.toLocaleDateString('id-ID');
+  const rows = [['NO','ID JURI','NAMA','NO HP','STATUS','WAKTU ABSEN','TANGGAL']];
+  juriData.forEach(j => {
+    rows.push([j.no, j.id, j.nama, j.hp, j.status.toUpperCase(), j.waktu || '-', tgl]);
+  });
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `absen_juri_${tgl.replace(/\//g,'_')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV berhasil diunduh!');
+}
+
+// ============================================================
+// RESET
+// ============================================================
+function confirmReset() {
+  if (confirm('Reset semua absensi? Data akan dihapus.')) {
+    juriData.forEach(j => { j.status = 'belum'; j.waktu = null; });
+    logAbsen = [];
+    renderList();
+    showToast('Absensi direset');
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toastEl');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderList();
+updateStats();
+</script>
+</body>
+</html>
