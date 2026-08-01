@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Ujian & Scoring Juri</title>
+    <title>Sistem Ujian & Scoring Juri - Multi-Role Dashboard</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
@@ -13,6 +13,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- SheetJS (XLSX) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        .sidebar-active {
+            background-color: #059669;
+            color: #ffffff;
+            font-weight: 700;
+        }
+    </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
@@ -40,219 +47,244 @@
         </div>
     </div>
 
-    <!-- MAIN APP CONTAINER -->
-    <div id="app-screen" class="hidden min-h-screen flex flex-col">
-        <!-- NAVBAR -->
-        <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-                <div class="flex items-center space-x-3">
-                    <span class="bg-emerald-500 text-white text-xs px-2.5 py-1 rounded-full font-bold uppercase" id="badge-role">ADMIN</span>
-                    <h1 class="text-lg font-bold tracking-wide hidden md:block">Sistem Ujian & Scoring Juri</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-xs text-emerald-400 hidden md:flex items-center gap-1" id="storage-indicator" title="Data tersimpan di browser ini">
-                        <i class="fa-solid fa-circle-check text-xs"></i> Data Tersimpan
-                    </span>
-                    <span class="text-sm font-medium text-slate-300" id="user-display-name">User</span>
-                    <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition">
-                        <i class="fa-solid fa-power-off mr-1"></i> Keluar
-                    </button>
-                </div>
-            </div>
-        </header>
+    <!-- MAIN APP CONTAINER (WITH SIDEBAR) -->
+    <div id="app-screen" class="hidden min-h-screen flex flex-col md:flex-row">
 
-        <!-- CONTENT VIEWS -->
-        <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
-            
-            <!-- ADMIN DASHBOARD VIEW -->
-            <div id="view-admin" class="space-y-6 hidden">
-                <!-- Action Header -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-wrap gap-3 justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800">Dashboard Administrator</h2>
-                        <p class="text-sm text-slate-500">Kelola penugasan juri, hitung durasi jam kerja, impor/ekspor data peserta & juri, serta rekap nilai.</p>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <!-- Impor/Ekspor Juri -->
-                        <label class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition flex items-center shadow-sm">
-                            <i class="fa-solid fa-user-plus mr-1.5"></i> Impor Juri (.xlsx)
-                            <input type="file" accept=".xlsx, .xls" onchange="importJuri(event)" class="hidden">
-                        </label>
-                        <button onclick="exportJuriOnly()" class="bg-amber-700 hover:bg-amber-800 text-white px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center shadow-sm">
-                            <i class="fa-solid fa-address-book mr-1.5"></i> Ekspor Juri (.xlsx)
-                        </button>
-                        
-                        <!-- Impor/Ekspor Peserta -->
-                        <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition flex items-center shadow-sm">
-                            <i class="fa-solid fa-file-import mr-1.5"></i> Impor Peserta (.xlsx)
-                            <input type="file" accept=".xlsx, .xls" onchange="importPeserta(event)" class="hidden">
-                        </label>
-                        <button onclick="exportPesertaOnly()" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center shadow-sm">
-                            <i class="fa-solid fa-file-excel mr-1.5"></i> Ekspor Peserta (.xlsx)
-                        </button>
-
-                        <!-- Ekspor Nilai -->
-                        <button onclick="exportNilai()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center shadow-sm">
-                            <i class="fa-solid fa-download mr-1.5"></i> Ekspor Rekap Nilai (.xlsx)
-                        </button>
-
-                        <!-- Reset Data -->
-                        <button onclick="clearStorage()" class="bg-rose-700 hover:bg-rose-800 text-white px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center shadow-sm" title="Reset semua data ke kondisi awal">
-                            <i class="fa-solid fa-rotate-left mr-1.5"></i> Reset Data
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Penugasan Juri Section -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
-                        <i class="fa-solid fa-user-gear text-emerald-600 mr-2"></i> Penugasan Juri, Ruangan & Durasi Jam Kerja
-                    </h3>
-                    <div class="mb-4 max-w-md">
-                        <div class="relative">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
-                            <input type="text" id="search-juri" oninput="renderAdminJuriTable()" placeholder="Cari Nama Juri..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+        <!-- SIDEBAR NAVIGATION -->
+        <aside id="sidebar-nav" class="w-full md:w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col justify-between shadow-xl sticky top-0 md:h-screen z-40">
+            <div>
+                <!-- Brand Header -->
+                <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 bg-emerald-500 rounded-xl flex items-center justify-center text-white font-black text-lg">
+                            <i class="fa-solid fa-graduation-cap"></i>
                         </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="bg-slate-100 text-slate-700 uppercase text-xs">
-                                <tr>
-                                    <th class="p-3">ID Juri</th>
-                                    <th class="p-3">Nama Juri</th>
-                                    <th class="p-3">Kode / Ruang</th>
-                                    <th class="p-3">Jam Masuk</th>
-                                    <th class="p-3">Jam Pulang</th>
-                                    <th class="p-3 text-center">Durasi Tugas</th>
-                                    <th class="p-3 text-center">Aksi / Penugasan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-admin-juri" class="divide-y divide-slate-200">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Tabel Master Peserta -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
-                        <i class="fa-solid fa-users text-indigo-600 mr-2"></i> Data Peserta Ujian
-                    </h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="bg-slate-100 text-slate-700 uppercase text-xs">
-                                <tr>
-                                    <th class="p-3">NO</th>
-                                    <th class="p-3">IDPPS</th>
-                                    <th class="p-3">Nama Peserta</th>
-                                    <th class="p-3">Kelas / Dom</th>
-                                    <th class="p-3">Guru</th>
-                                    <th class="p-3">Ruang Sore</th>
-                                    <th class="p-3">Tes</th>
-                                    <th class="p-3">Kode Juri</th>
-                                    <th class="p-3">Ruang Tes</th>
-                                    <th class="p-3">Status</th>
-                                    <th class="p-3 text-center">Total Err</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-admin-peserta" class="divide-y divide-slate-200">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- OPERATOR DASHBOARD VIEW -->
-            <div id="view-operator" class="space-y-6 hidden">
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800">Dashboard Monitoring Operator</h2>
-                        <p class="text-sm text-slate-500">Memantau jalannya ujian, scan QR presensi juri, mengganti juri, serta menandai alpa peserta.</p>
-                    </div>
-                    <!-- STATS STATISTIK JURI BERTUGAS -->
-                    <div class="flex items-center space-x-2">
-                        <div class="bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-center">
-                            <p class="text-[9px] font-bold text-emerald-600 uppercase">Hadir</p>
-                            <p class="text-base font-black text-emerald-700" id="stat-juri-hadir">0</p>
-                        </div>
-                        <div class="bg-amber-50 border border-amber-200 px-2.5 py-1.5 rounded-lg text-center">
-                            <p class="text-[9px] font-bold text-amber-600 uppercase">Izin</p>
-                            <p class="text-base font-black text-amber-700" id="stat-juri-izin">0</p>
-                        </div>
-                        <div class="bg-rose-50 border border-rose-200 px-2.5 py-1.5 rounded-lg text-center">
-                            <p class="text-[9px] font-bold text-rose-600 uppercase">Alpa</p>
-                            <p class="text-base font-black text-rose-700" id="stat-juri-alpa">0</p>
-                        </div>
-                        <div class="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg text-center">
-                            <p class="text-[9px] font-bold text-slate-500 uppercase">Belum</p>
-                            <p class="text-base font-black text-slate-700" id="stat-juri-belum">0</p>
-                        </div>
-                        <div class="bg-indigo-50 border border-indigo-200 px-2.5 py-1.5 rounded-lg text-center">
-                            <p class="text-[9px] font-bold text-indigo-600 uppercase">Total</p>
-                            <p class="text-base font-black text-indigo-700" id="stat-juri-total">0</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SCANNER QR CODE & OPERATOR CONTROLS -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- CAMERA QR SCANNER WIDGET -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 md:col-span-1 flex flex-col justify-between">
                         <div>
-                            <h3 class="text-base font-bold text-slate-800 mb-2 flex items-center">
-                                <i class="fa-solid fa-qrcode text-emerald-600 mr-2"></i> Scan QR Absensi Juri
-                            </h3>
-                            <p class="text-xs text-slate-500 mb-3">Arahkan kamera ke Kartu QR Juri atau ketik ID Juri untuk absensi otomatis.</p>
-                            
-                            <!-- Area Video Scanner -->
-                            <div id="qr-reader" class="w-full bg-slate-900 rounded-lg overflow-hidden border border-slate-300 min-h-[220px]"></div>
-                            
-                            <!-- Alternative Manual ID Input -->
-                            <div class="mt-3 flex space-x-2">
-                                <input type="text" id="manual-qr-input" placeholder="Atau ketik ID Juri..." class="w-full border rounded-lg p-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
-                                <button onclick="processQrCode(document.getElementById('manual-qr-input').value)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition">
-                                    Absen
-                                </button>
-                            </div>
+                            <h1 class="text-sm font-bold tracking-wide text-white">SISTEM UJIAN</h1>
+                            <p class="text-[10px] text-emerald-400 font-semibold" id="sidebar-role-badge">ADMIN</p>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Info Notifikasi Scan -->
-                        <div id="scan-result-box" class="mt-3 p-3 rounded-lg text-xs bg-slate-100 text-slate-600 hidden font-semibold">
-                            <i class="fa-solid fa-info-circle mr-1"></i> <span id="scan-result-msg">Menunggu scan...</span>
+                <!-- Navigation Links -->
+                <nav class="p-3 space-y-1 text-xs font-medium">
+                    <p class="px-3 pt-3 pb-1 text-[10px] uppercase font-bold text-slate-500 tracking-wider">Menu Utama</p>
+                    
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-slate-300">
+                        <span class="text-base">🏠</span>
+                        <span>Dashboard</span>
+                    </button>
+
+                    <button onclick="switchTab('juri')" id="nav-juri" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-slate-300">
+                        <span class="text-base">👨‍⚖️</span>
+                        <span>Data Juri</span>
+                    </button>
+
+                    <button onclick="switchTab('peserta')" id="nav-peserta" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-slate-300">
+                        <span class="text-base">👥</span>
+                        <span>Data Peserta</span>
+                    </button>
+
+                    <button onclick="switchTab('penugasan')" id="nav-penugasan" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-slate-300">
+                        <span class="text-base">📋</span>
+                        <span>Penugasan Juri</span>
+                    </button>
+
+                    <button onclick="switchTab('penilaian')" id="nav-penilaian" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-slate-300">
+                        <span class="text-base">📝</span>
+                        <span>Penilaian Ujian</span>
+                    </button>
+
+                    <button onclick="switchTab('presensi')" id="nav-presensi" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-slate-300">
+                        <span class="text-base">🕒</span>
+                        <span>Presensi Juri</span>
+                    </button>
+
+                    <button onclick="switchTab('rekap')" id="nav-rekap" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-slate-300">
+                        <span class="text-base">📊</span>
+                        <span>Rekap Nilai</span>
+                    </button>
+
+                    <button onclick="switchTab('importexport')" id="nav-importexport" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-slate-300">
+                        <span class="text-base">📁</span>
+                        <span>Import / Export</span>
+                    </button>
+
+                    <button onclick="switchTab('pengaturan')" id="nav-pengaturan" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-slate-300">
+                        <span class="text-base">⚙️</span>
+                        <span>Pengaturan</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- User Footer & Logout -->
+            <div class="p-3 border-t border-slate-800 bg-slate-950/50 space-y-2">
+                <div class="px-3 py-2 bg-slate-800/80 rounded-lg flex items-center justify-between">
+                    <div class="truncate">
+                        <p class="text-xs font-bold text-white truncate" id="sidebar-user-name">User Name</p>
+                        <p class="text-[10px] text-emerald-400 font-mono" id="sidebar-user-id">ID: 000000</p>
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Online"></span>
+                </div>
+                <button onclick="handleLogout()" class="w-full bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-xs font-bold py-2 rounded-lg transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-power-off"></i>
+                    <span>Keluar Sistem</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <!-- TOP TOOLBAR -->
+            <header class="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center sticky top-0 z-30 shadow-sm">
+                <div>
+                    <h2 class="text-base font-bold text-slate-800" id="page-title">🏠 Dashboard</h2>
+                    <p class="text-[11px] text-slate-400" id="page-subtitle">Ringkasan statistik dan aktivitas sistem</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-xs text-emerald-600 font-semibold bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full flex items-center gap-1.5" id="storage-indicator">
+                        <i class="fa-solid fa-cloud-check text-xs"></i> <span>Cloud Sync Active</span>
+                    </span>
+                </div>
+            </header>
+
+            <!-- TAB CONTENT VIEWS -->
+            <main class="p-6 flex-1 overflow-y-auto space-y-6">
+
+                <!-- TAB 1: 🏠 DASHBOARD -->
+                <div id="tab-dashboard" class="tab-pane space-y-6">
+                    <div class="bg-gradient-to-r from-emerald-800 to-slate-900 rounded-2xl p-6 text-white shadow-md flex flex-wrap justify-between items-center gap-4">
+                        <div>
+                            <span class="bg-emerald-500/30 text-emerald-300 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-400/30 uppercase tracking-wide">Ringkasan Sistem Ujian</span>
+                            <h3 class="text-xl font-extrabold mt-2">Selamat Datang, <span id="dash-user-title">User</span></h3>
+                            <p class="text-xs text-slate-300 mt-1">Pantau seluruh jalannya ujian lisan, kehadiran dewan juri, dan progress penilaian peserta secara real-time.</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="switchTab('presensi')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow transition flex items-center gap-2">
+                                <i class="fa-solid fa-qrcode"></i> Scan Presensi Juri
+                            </button>
+                            <button onclick="switchTab('rekap')" class="bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2 rounded-xl text-xs transition border border-white/20 flex items-center gap-2">
+                                <i class="fa-solid fa-chart-line"></i> Rekap Nilai
+                            </button>
                         </div>
                     </div>
 
-                    <!-- MONITORING TABEL ABSENSI JURI BERTUGAS -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 md:col-span-2">
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="text-base font-bold text-slate-800">
-                                <i class="fa-solid fa-clipboard-user mr-2 text-emerald-600"></i> Monitoring Absensi Juri Bertugas
-                            </h3>
-                            <div class="space-x-1">
-                                <button onclick="filterJuriStatus('all')" class="px-2 py-1 text-[10px] font-bold rounded bg-slate-200 hover:bg-slate-300 text-slate-700">Semua</button>
-                                <button onclick="filterJuriStatus('hadir')" class="px-2 py-1 text-[10px] font-bold rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-800">Hadir</button>
-                                <button onclick="filterJuriStatus('izin')" class="px-2 py-1 text-[10px] font-bold rounded bg-amber-100 hover:bg-amber-200 text-amber-800">Izin</button>
-                                <button onclick="filterJuriStatus('alpa')" class="px-2 py-1 text-[10px] font-bold rounded bg-rose-100 hover:bg-rose-200 text-rose-800">Alpa</button>
-                                <button onclick="filterJuriStatus('belum')" class="px-2 py-1 text-[10px] font-bold rounded bg-slate-100 hover:bg-slate-200 text-slate-600">Belum</button>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Peserta</p>
+                                <h3 class="text-2xl font-black text-slate-800 mt-0.5" id="dash-total-peserta">0</h3>
                             </div>
                         </div>
 
-                        <div class="overflow-x-auto max-h-[320px] overflow-y-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead class="bg-slate-100 uppercase sticky top-0 z-10">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                                <i class="fa-solid fa-user-shield"></i>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Juri Bertugas</p>
+                                <h3 class="text-2xl font-black text-emerald-600 mt-0.5" id="dash-total-juri">0</h3>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                                <i class="fa-solid fa-user-check"></i>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Juri Hadir</p>
+                                <h3 class="text-2xl font-black text-amber-600 mt-0.5" id="dash-juri-hadir">0</h3>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                                <i class="fa-solid fa-door-open"></i>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Ruang Ujian</p>
+                                <h3 class="text-2xl font-black text-sky-600 mt-0.5" id="dash-total-ruang">0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                            <div class="flex justify-between items-center border-b pb-3">
+                                <h4 class="font-bold text-sm text-slate-800 flex items-center">
+                                    <i class="fa-solid fa-chart-pie text-emerald-600 mr-2"></i> Kehadiran Dewan Juri
+                                </h4>
+                                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full" id="dash-juri-pct">0% Hadir</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden flex">
+                                <div id="bar-hadir" class="bg-emerald-500 h-full" style="width: 0%" title="Hadir"></div>
+                                <div id="bar-izin" class="bg-amber-400 h-full" style="width: 0%" title="Izin"></div>
+                                <div id="bar-alpa" class="bg-rose-500 h-full" style="width: 0%" title="Alpa"></div>
+                            </div>
+                            <div class="grid grid-cols-4 gap-2 text-center text-xs pt-1">
+                                <div class="bg-emerald-50 p-2 rounded-lg">
+                                    <p class="text-[10px] text-emerald-600 font-bold uppercase">Hadir</p>
+                                    <p class="font-black text-emerald-800 text-sm" id="stat-hdr-val">0</p>
+                                </div>
+                                <div class="bg-amber-50 p-2 rounded-lg">
+                                    <p class="text-[10px] text-amber-600 font-bold uppercase">Izin</p>
+                                    <p class="font-black text-amber-800 text-sm" id="stat-izn-val">0</p>
+                                </div>
+                                <div class="bg-rose-50 p-2 rounded-lg">
+                                    <p class="text-[10px] text-rose-600 font-bold uppercase">Alpa</p>
+                                    <p class="font-black text-rose-800 text-sm" id="stat-alp-val">0</p>
+                                </div>
+                                <div class="bg-slate-100 p-2 rounded-lg">
+                                    <p class="text-[10px] text-slate-500 font-bold uppercase">Belum</p>
+                                    <p class="font-black text-slate-700 text-sm" id="stat-blm-val">0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                            <div class="flex justify-between items-center border-b pb-3">
+                                <h4 class="font-bold text-sm text-slate-800 flex items-center">
+                                    <i class="fa-solid fa-clipboard-check text-indigo-600 mr-2"></i> Status Penilaian Peserta
+                                </h4>
+                                <span class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full" id="dash-peserta-pct">0% Dinilai</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                                <div id="bar-peserta-scored" class="bg-indigo-600 h-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 text-center text-xs pt-1">
+                                <div class="bg-indigo-50 p-2.5 rounded-xl">
+                                    <p class="text-[10px] text-indigo-600 font-bold uppercase">Sudah Dinilai</p>
+                                    <p class="font-black text-indigo-800 text-base" id="stat-scored-val">0 Peserta</p>
+                                </div>
+                                <div class="bg-slate-100 p-2.5 rounded-xl">
+                                    <p class="text-[10px] text-slate-500 font-bold uppercase">Belum Dinilai</p>
+                                    <p class="font-black text-slate-700 text-base" id="stat-unscored-val">0 Peserta</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="font-bold text-sm text-slate-800"><i class="fa-solid fa-clock-rotate-left text-amber-600 mr-2"></i> Kehadiran Juri Terkini</h4>
+                            <button onclick="switchTab('presensi')" class="text-xs font-bold text-emerald-600 hover:text-emerald-700">Lihat Semua Presensi &rarr;</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-50 text-slate-700 uppercase">
                                     <tr>
-                                        <th class="p-2">ID</th>
-                                        <th class="p-2">Nama Juri</th>
-                                        <th class="p-2">Kode / Ruang</th>
-                                        <th class="p-2">Datang</th>
-                                        <th class="p-2">Pulang</th>
-                                        <th class="p-2">Status</th>
-                                        <th class="p-2 text-center">Aksi</th>
+                                        <th class="p-2.5">ID</th>
+                                        <th class="p-2.5">Nama Juri</th>
+                                        <th class="p-2.5">Ruang</th>
+                                        <th class="p-2.5">Jam Masuk</th>
+                                        <th class="p-2.5">Jam Pulang</th>
+                                        <th class="p-2.5">Status</th>
                                     </tr>
                                 </thead>
-                                <tbody id="table-operator-juri-status" class="divide-y divide-slate-200">
+                                <tbody id="dash-table-juri-body" class="divide-y divide-slate-100">
                                     <!-- Populated dynamically -->
                                 </tbody>
                             </table>
@@ -260,136 +292,349 @@
                     </div>
                 </div>
 
-
-            </div>
-
-            <!-- JURI DASHBOARD VIEW -->
-            <div id="view-juri" class="space-y-6 hidden">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800" id="juri-profile-name">Nama Juri</h2>
-                        <p class="text-sm text-slate-500">Ruang Ujian: <span id="juri-profile-ruang" class="font-bold text-emerald-700">ALGHOZALI 1.02</span> | Kode Juri: <span id="juri-profile-kode" class="font-bold text-slate-700">A</span></p>
-                    </div>
-
-                    <!-- Absensi Juri Widget -->
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center space-x-3">
-                        <div>
-                            <p class="text-xs text-slate-500 font-semibold uppercase">Absensi Presence Juri</p>
-                            <div class="text-xs space-x-2 mt-1">
-                                <span id="absen-masuk-badge" class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-medium">Datang: Belum</span>
-                                <span id="absen-pulang-badge" class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-medium">Pulang: Belum</span>
+                <!-- TAB 2: 👨‍⚖️ DATA JURI -->
+                <div id="tab-juri" class="tab-pane space-y-6 hidden">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+                            <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-user-shield text-emerald-600 mr-2"></i> Master Data Juri Ujian</h3>
+                            <div class="relative w-full md:w-64">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
+                                <input type="text" id="search-juri" oninput="renderAdminJuriTable()" placeholder="Cari Nama Juri..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
                             </div>
                         </div>
-                        <div class="flex space-x-1">
-                            <button onclick="recordAbsenJuri('masuk')" id="btn-absen-masuk" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded font-semibold transition">
-                                Absen Datang
-                            </button>
-                            <button onclick="recordAbsenJuri('pulang')" id="btn-absen-pulang" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded font-semibold transition">
-                                Absen Pulang
-                            </button>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-100 text-slate-700 uppercase">
+                                    <tr>
+                                        <th class="p-3">ID Juri</th>
+                                        <th class="p-3">Nama Juri</th>
+                                        <th class="p-3">Kode / Ruang</th>
+                                        <th class="p-3">Jam Masuk</th>
+                                        <th class="p-3">Jam Pulang</th>
+                                        <th class="p-3 text-center">Durasi Tugas</th>
+                                        <th class="p-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-admin-juri" class="divide-y divide-slate-200">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Input Nilai Kesalahan -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 mb-2">Penilaian Ujian Lisan (Hitung Kesalahan)</h3>
-                    <p class="text-xs text-slate-500 mb-4">*Cukup nilai kesalahan saja pakai angka.*</p>
+                <!-- TAB 3: 👥 DATA PESERTA -->
+                <div id="tab-peserta" class="tab-pane space-y-6 hidden">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 class="text-base font-bold text-slate-800 mb-4"><i class="fa-solid fa-users text-indigo-600 mr-2"></i> Master Data Peserta Ujian</h3>
+                        <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-100 text-slate-700 uppercase sticky top-0 z-10">
+                                    <tr>
+                                        <th class="p-3">NO</th>
+                                        <th class="p-3">IDPPS</th>
+                                        <th class="p-3">Nama Peserta</th>
+                                        <th class="p-3">Kelas / Dom</th>
+                                        <th class="p-3">Guru</th>
+                                        <th class="p-3">Ruang Sore</th>
+                                        <th class="p-3">Kode Juri</th>
+                                        <th class="p-3">Ruang Tes</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3 text-center">Total Err</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-admin-peserta" class="divide-y divide-slate-200">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- List Peserta -->
-                        <div class="border rounded-lg p-4 bg-slate-50">
-                            <h4 class="font-bold text-sm text-slate-700 mb-3 uppercase">Daftar Peserta di Ruang Ini</h4>
-                            <div id="juri-peserta-list" class="space-y-2 max-h-96 overflow-y-auto">
-                                <!-- Populated dynamically -->
+                <!-- TAB 4: 📋 PENUGASAN JURI -->
+                <div id="tab-penugasan" class="tab-pane space-y-6 hidden">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 class="text-base font-bold text-slate-800 mb-2"><i class="fa-solid fa-clipboard-list text-emerald-600 mr-2"></i> Penugasan Kode Abjad Juri & Ruang Ujian</h3>
+                        <p class="text-xs text-slate-500 mb-4">Pilih juri lalu masukkan kode abjad (Contoh: A, B, AD, AL) untuk pemetaan ruangan otomatis.</p>
+                        <div id="penugasan-container-list" class="space-y-3">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: 📝 PENILAIAN UJIAN (JURI VIEW) -->
+                <div id="tab-penilaian" class="tab-pane space-y-6 hidden">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800" id="juri-profile-name">Nama Juri</h3>
+                                <p class="text-xs text-slate-500">Ruang: <span id="juri-profile-ruang" class="font-bold text-emerald-700">-</span> | Kode Juri: <span id="juri-profile-kode" class="font-bold text-slate-700">-</span></p>
                             </div>
                         </div>
 
-                        <!-- Form Input Nilai -->
-                        <div class="md:col-span-2 border rounded-lg p-5 bg-white" id="scoring-form-container">
-                            <div id="scoring-form-empty" class="text-center py-12 text-slate-400">
-                                <i class="fa-solid fa-clipboard-list text-4xl mb-2"></i>
-                                <p>Pilih peserta dari daftar di samping untuk mulai mengisi nilai kesalahan.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- List Peserta -->
+                            <div class="border rounded-xl p-4 bg-slate-50">
+                                <h4 class="font-bold text-xs text-slate-700 mb-3 uppercase">Daftar Peserta Ruangan Ini</h4>
+                                <div id="juri-peserta-list" class="space-y-2 max-h-96 overflow-y-auto">
+                                    <!-- Populated dynamically -->
+                                </div>
                             </div>
 
-                            <div id="scoring-form-active" class="hidden space-y-6">
-                                <div class="border-b pb-3 flex justify-between items-center">
-                                    <div>
-                                        <h4 class="font-bold text-slate-800 text-lg" id="score-active-nama">NAMA PESERTA</h4>
-                                        <p class="text-xs text-slate-500">ID: <span id="score-active-id">00000</span> | Kelas: <span id="score-active-kelas">-</span></p>
-                                    </div>
-                                    <span id="score-active-status" class="px-2.5 py-1 text-xs rounded-full font-bold bg-emerald-100 text-emerald-800">HADIR</span>
+                            <!-- Form Scoring -->
+                            <div class="md:col-span-2 border rounded-xl p-5 bg-white" id="scoring-form-container">
+                                <div id="scoring-form-empty" class="text-center py-12 text-slate-400">
+                                    <i class="fa-solid fa-clipboard-list text-4xl mb-2"></i>
+                                    <p>Pilih peserta dari daftar di samping untuk mulai mengisi nilai kesalahan.</p>
                                 </div>
 
-                                <form id="form-nilai" onsubmit="saveScores(event)" class="space-y-6">
-                                    <!-- KITAB 1 -->
-                                    <div>
-                                        <h5 class="text-sm font-bold text-indigo-700 uppercase tracking-wide border-b border-indigo-100 pb-1 mb-3">KITAB 1 (Kesalahan)</h5>
-                                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                                            <div>
-                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Lafadz</label>
-                                                <input type="number" min="0" value="0" id="k1-lafadz" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Makna</label>
-                                                <input type="number" min="0" value="0" id="k1-makna" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Terjemah</label>
-                                                <input type="number" min="0" value="0" id="k1-terjemah" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Tasrif</label>
-                                                <input type="number" min="0" value="0" id="k1-tasrif" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Taktek</label>
-                                                <input type="number" min="0" value="0" id="k1-taktek" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
-                                            </div>
+                                <div id="scoring-form-active" class="hidden space-y-6">
+                                    <div class="border-b pb-3 flex justify-between items-center">
+                                        <div>
+                                            <h4 class="font-bold text-slate-800 text-base" id="score-active-nama">NAMA PESERTA</h4>
+                                            <p class="text-xs text-slate-500">ID: <span id="score-active-id">00000</span> | Kelas: <span id="score-active-kelas">-</span></p>
                                         </div>
+                                        <span id="score-active-status" class="px-2.5 py-1 text-xs rounded-full font-bold bg-emerald-100 text-emerald-800">HADIR</span>
                                     </div>
 
-                                    <!-- KITAB 2 -->
-                                    <div>
-                                        <h5 class="text-sm font-bold text-emerald-700 uppercase tracking-wide border-b border-emerald-100 pb-1 mb-3">KITAB 2 (Kesalahan)</h5>
-                                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                                            <div>
-                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Lafadz</label>
-                                                <input type="number" min="0" value="0" id="k2-lafadz" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Makna</label>
-                                                <input type="number" min="0" value="0" id="k2-makna" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Terjemah</label>
-                                                <input type="number" min="0" value="0" id="k2-terjemah" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Tasrif</label>
-                                                <input type="number" min="0" value="0" id="k2-tasrif" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Nadhom</label>
-                                                <input type="number" min="0" value="0" id="k2-nadhom" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                    <form id="form-nilai" onsubmit="saveScores(event)" class="space-y-6">
+                                        <!-- KITAB 1 -->
+                                        <div>
+                                            <h5 class="text-xs font-bold text-indigo-700 uppercase tracking-wide border-b border-indigo-100 pb-1 mb-3">KITAB 1 (Kesalahan)</h5>
+                                            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                                <div>
+                                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Lafadz</label>
+                                                    <input type="number" min="0" value="0" id="k1-lafadz" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Makna</label>
+                                                    <input type="number" min="0" value="0" id="k1-makna" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Terjemah</label>
+                                                    <input type="number" min="0" value="0" id="k1-terjemah" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tasrif</label>
+                                                    <input type="number" min="0" value="0" id="k1-tasrif" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Taktek</label>
+                                                    <input type="number" min="0" value="0" id="k1-taktek" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow transition">
-                                        <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Nilai Kesalahan
-                                    </button>
-                                </form>
+                                        <!-- KITAB 2 -->
+                                        <div>
+                                            <h5 class="text-xs font-bold text-emerald-700 uppercase tracking-wide border-b border-emerald-100 pb-1 mb-3">KITAB 2 (Kesalahan)</h5>
+                                            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                                <div>
+                                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Lafadz</label>
+                                                    <input type="number" min="0" value="0" id="k2-lafadz" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Makna</label>
+                                                    <input type="number" min="0" value="0" id="k2-makna" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Terjemah</label>
+                                                    <input type="number" min="0" value="0" id="k2-terjemah" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tasrif</label>
+                                                    <input type="number" min="0" value="0" id="k2-tasrif" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nadhom</label>
+                                                    <input type="number" min="0" value="0" id="k2-nadhom" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow transition text-xs">
+                                            <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Nilai Kesalahan
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-        </main>
+                <!-- TAB 6: 🕒 PRESENSI JURI (SCANNER QR & STATS OPERATOR) -->
+                <div id="tab-presensi" class="tab-pane space-y-6 hidden">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 flex flex-wrap justify-between items-center gap-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Presensi & Monitoring Absensi Juri</h3>
+                            <p class="text-xs text-slate-500">Scan QR Code atau ketik ID Juri untuk absensi otomatis.</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-center">
+                                <p class="text-[9px] font-bold text-emerald-600 uppercase">Hadir</p>
+                                <p class="text-base font-black text-emerald-700" id="stat-juri-hadir">0</p>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-200 px-2.5 py-1.5 rounded-lg text-center">
+                                <p class="text-[9px] font-bold text-amber-600 uppercase">Izin</p>
+                                <p class="text-base font-black text-amber-700" id="stat-juri-izin">0</p>
+                            </div>
+                            <div class="bg-rose-50 border border-rose-200 px-2.5 py-1.5 rounded-lg text-center">
+                                <p class="text-[9px] font-bold text-rose-600 uppercase">Alpa</p>
+                                <p class="text-base font-black text-rose-700" id="stat-juri-alpa">0</p>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg text-center">
+                                <p class="text-[9px] font-bold text-slate-500 uppercase">Belum</p>
+                                <p class="text-base font-black text-slate-700" id="stat-juri-belum">0</p>
+                            </div>
+                            <div class="bg-indigo-50 border border-indigo-200 px-2.5 py-1.5 rounded-lg text-center">
+                                <p class="text-[9px] font-bold text-indigo-600 uppercase">Total</p>
+                                <p class="text-base font-black text-indigo-700" id="stat-juri-total">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- CAMERA SCANNER -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 md:col-span-1 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800 mb-2 flex items-center">
+                                    <i class="fa-solid fa-qrcode text-emerald-600 mr-2"></i> Scan QR Absensi Juri
+                                </h4>
+                                <div id="qr-reader" class="w-full bg-slate-900 rounded-lg overflow-hidden border border-slate-300 min-h-[200px]"></div>
+                                
+                                <div class="mt-3 flex space-x-2">
+                                    <input type="text" id="manual-qr-input" onkeypress="if(event.key==='Enter') processQrCode(this.value)" placeholder="Ketik ID Juri lalu Tekan Enter..." class="w-full border rounded-lg p-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none font-mono font-bold">
+                                    <button onclick="processQrCode(document.getElementById('manual-qr-input').value)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition">
+                                        Absen
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="scan-result-box" class="mt-3 p-3 rounded-lg text-xs bg-slate-100 text-slate-600 hidden font-semibold">
+                                <i class="fa-solid fa-info-circle mr-1"></i> <span id="scan-result-msg">Menunggu scan...</span>
+                            </div>
+                        </div>
+
+                        <!-- TABEL ABSENSI -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 md:col-span-2">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="text-xs font-bold text-slate-800">Status Absensi Juri Bertugas</h4>
+                                <div class="space-x-1">
+                                    <button onclick="filterJuriStatus('all')" class="px-2 py-1 text-[10px] font-bold rounded bg-slate-200 hover:bg-slate-300 text-slate-700">Semua</button>
+                                    <button onclick="filterJuriStatus('hadir')" class="px-2 py-1 text-[10px] font-bold rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-800">Hadir</button>
+                                    <button onclick="filterJuriStatus('izin')" class="px-2 py-1 text-[10px] font-bold rounded bg-amber-100 hover:bg-amber-200 text-amber-800">Izin</button>
+                                    <button onclick="filterJuriStatus('alpa')" class="px-2 py-1 text-[10px] font-bold rounded bg-rose-100 hover:bg-rose-200 text-rose-800">Alpa</button>
+                                    <button onclick="filterJuriStatus('belum')" class="px-2 py-1 text-[10px] font-bold rounded bg-slate-100 hover:bg-slate-200 text-slate-600">Belum</button>
+                                </div>
+                            </div>
+
+                            <div class="overflow-x-auto max-h-[320px] overflow-y-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-100 uppercase sticky top-0 z-10">
+                                        <tr>
+                                            <th class="p-2">ID</th>
+                                            <th class="p-2">Nama Juri</th>
+                                            <th class="p-2">Kode / Ruang</th>
+                                            <th class="p-2">Datang</th>
+                                            <th class="p-2">Pulang</th>
+                                            <th class="p-2">Status</th>
+                                            <th class="p-2 text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-operator-juri-status" class="divide-y divide-slate-200">
+                                        <!-- Populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 7: 📊 REKAP NILAI -->
+                <div id="tab-rekap" class="tab-pane space-y-6 hidden">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-chart-simple text-indigo-600 mr-2"></i> Rekapitulasi Nilai Akhir Peserta</h3>
+                            <button onclick="exportNilai()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition">
+                                <i class="fa-solid fa-download mr-1.5"></i> Export Rekap Excel
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-100 text-slate-700 uppercase sticky top-0 z-10">
+                                    <tr>
+                                        <th class="p-2.5">NO</th>
+                                        <th class="p-2.5">IDPPS</th>
+                                        <th class="p-2.5">Nama Peserta</th>
+                                        <th class="p-2.5">Kelas / Dom</th>
+                                        <th class="p-2.5">Juri</th>
+                                        <th class="p-2.5">Ruang</th>
+                                        <th class="p-2.5 text-center">Kitab 1 Err</th>
+                                        <th class="p-2.5 text-center">Kitab 2 Err</th>
+                                        <th class="p-2.5 text-center">Total Err</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-rekap-nilai-body" class="divide-y divide-slate-200">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 8: 📁 IMPORT / EXPORT -->
+                <div id="tab-importexport" class="tab-pane space-y-6 hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Impor/Ekspor Juri -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                            <h4 class="font-bold text-sm text-slate-800 border-b pb-2"><i class="fa-solid fa-user-gear text-amber-600 mr-2"></i> Kelola Data Juri (Excel)</h4>
+                            <div class="flex space-x-2">
+                                <label class="flex-1 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold cursor-pointer text-center transition">
+                                    <i class="fa-solid fa-file-import mr-1.5"></i> Impor Juri (.xlsx)
+                                    <input type="file" accept=".xlsx, .xls" onchange="importJuri(event)" class="hidden">
+                                </label>
+                                <button onclick="exportJuriOnly()" class="flex-1 bg-amber-800 hover:bg-amber-900 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition">
+                                    <i class="fa-solid fa-file-excel mr-1.5"></i> Ekspor Juri (.xlsx)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Impor/Ekspor Peserta -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                            <h4 class="font-bold text-sm text-slate-800 border-b pb-2"><i class="fa-solid fa-users text-emerald-600 mr-2"></i> Kelola Data Peserta (Excel)</h4>
+                            <div class="flex space-x-2">
+                                <label class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold cursor-pointer text-center transition">
+                                    <i class="fa-solid fa-file-import mr-1.5"></i> Impor Peserta (.xlsx)
+                                    <input type="file" accept=".xlsx, .xls" onchange="importPeserta(event)" class="hidden">
+                                </label>
+                                <button onclick="exportPesertaOnly()" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition">
+                                    <i class="fa-solid fa-file-excel mr-1.5"></i> Ekspor Peserta (.xlsx)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 9: ⚙️ PENGATURAN -->
+                <div id="tab-pengaturan" class="tab-pane space-y-6 hidden">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 max-w-xl">
+                        <h4 class="font-bold text-sm text-slate-800 border-b pb-2"><i class="fa-solid fa-sliders text-slate-600 mr-2"></i> Pengaturan Aplikasi & Sistem</h4>
+                        <div class="space-y-3 text-xs">
+                            <button onclick="forceSyncOnline()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 rounded-lg transition">
+                                <i class="fa-solid fa-rotate mr-2"></i> Paksa Sinkronisasi Cloud
+                            </button>
+                            <button onclick="clearStorage()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-lg transition">
+                                <i class="fa-solid fa-trash-can mr-2"></i> Reset Seluruh Data Lokal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
     </div>
 
-    <!-- MODAL PENUGASAN JURI (AUTO RUANG VIA KODE ABJAD) -->
+    <!-- MODAL PENUGASAN JURI -->
     <div id="modal-assign" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full">
             <h3 class="text-lg font-bold text-slate-800 mb-2">Tugaskan Juri</h3>
@@ -413,7 +658,6 @@
         </div>
     </div>
 
-    
     <!-- MODAL QR CODE KARTU JURI -->
     <div id="modal-qr-card" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full text-center">
@@ -432,7 +676,7 @@
         </div>
     </div>
 
-    <!-- MODAL GANTI JURI (OPERATOR) -->
+    <!-- MODAL GANTI JURI -->
     <div id="modal-ganti-juri" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full">
             <h3 class="text-lg font-bold text-slate-800 mb-2">Ganti Juri Ruangan</h3>
@@ -454,29 +698,209 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT APP LOGIC -->
+    <!-- JAVASCRIPT APP LOGIC & SIDEBAR NAVIGATION -->
     <script>
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_GANTI_DENGAN_URL_DEPLOY_ANDA/exec";
+
         let currentUser = null;
         let activeSelectedPesertaId = null;
         let selectedJuriIdForModal = null;
         let selectedRuangForGantiModal = null;
+        let activeTab = 'dashboard';
 
-        // =============================================
-        // LOCALSTORAGE: SIMPAN & MUAT DATA
-        // =============================================
         const STORAGE_KEY_JURI    = 'ujian_dataJuri';
         const STORAGE_KEY_PESERTA = 'ujian_dataPeserta';
+
+        function applyRoleSidebarPermissions() {
+            if (!currentUser) return;
+
+            const isJuri = currentUser.role === 'juri';
+            const isOperator = currentUser.role === 'operator';
+            const isAdmin = currentUser.role === 'admin';
+
+            const allNavs = ['dashboard', 'juri', 'peserta', 'penugasan', 'penilaian', 'presensi', 'rekap', 'importexport', 'pengaturan'];
+
+            allNavs.forEach(navId => {
+                const btn = document.getElementById(`nav-${navId}`);
+                if (!btn) return;
+
+                if (isJuri) {
+                    if (navId === 'penilaian') {
+                        btn.classList.remove('hidden');
+                    } else {
+                        btn.classList.add('hidden');
+                    }
+                } else if (isOperator) {
+                    if (['dashboard', 'presensi', 'juri', 'peserta'].includes(navId)) {
+                        btn.classList.remove('hidden');
+                    } else {
+                        btn.classList.add('hidden');
+                    }
+                } else {
+                    btn.classList.remove('hidden');
+                }
+            });
+        }
+
+        // --- SIDEBAR SWITCH TAB FUNCTION ---
+        function switchTab(tabName) {
+            activeTab = tabName;
+
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+
+            const navIds = ['dashboard', 'juri', 'peserta', 'penugasan', 'penilaian', 'presensi', 'rekap', 'importexport', 'pengaturan'];
+            navIds.forEach(id => {
+                const btn = document.getElementById(`nav-${id}`);
+                if (btn) btn.classList.remove('sidebar-active');
+            });
+
+            const targetTab = document.getElementById(`tab-${tabName}`);
+            const targetBtn = document.getElementById(`nav-${tabName}`);
+            if (targetTab) targetTab.classList.remove('hidden');
+            if (targetBtn) targetBtn.classList.add('sidebar-active');
+
+            const pageTitles = {
+                'dashboard': ['🏠 Dashboard Utama', 'Ringkasan statistik data juri, peserta, dan aktivitas ujian'],
+                'juri': ['👨‍⚖️ Master Data Juri', 'Daftar lengkap juri ujian beserta status dan durasi kerja'],
+                'peserta': ['👥 Master Data Peserta', 'Daftar data peserta ujian serta juri penanggung jawab'],
+                'penugasan': ['📋 Penugasan Juri & Ruangan', 'Atur kode abjad juri untuk pemetaan ruang ujian otomatis'],
+                'penilaian': ['📝 Form Penilaian Kesalahan', 'Input angka kesalahan peserta ujian lisan oleh Dewan Juri'],
+                'presensi': ['🕒 Presensi & Scanner QR Juri', 'Absensi QR Code kamera dan monitoring kehadiran juri'],
+                'rekap': ['📊 Rekapitulasi Nilai Ujian', 'Laporan akhir rekap nilai kesalahan peserta ujian'],
+                'importexport': ['📁 Impor & Ekspor Data', 'Kelola file master data Juri dan Peserta berbasis Excel'],
+                'pengaturan': ['⚙️ Pengaturan Sistem', 'Opsi sinkronisasi database online dan reset data']
+            };
+
+            if (pageTitles[tabName]) {
+                document.getElementById('page-title').innerText = pageTitles[tabName][0];
+                document.getElementById('page-subtitle').innerText = pageTitles[tabName][1];
+            }
+
+            if (tabName === 'dashboard') updateDashboardStats();
+            if (tabName === 'juri') renderAdminJuriTable();
+            if (tabName === 'peserta') renderAdminPesertaTable();
+            if (tabName === 'penugasan') renderPenugasanList();
+            if (tabName === 'presensi') renderOperatorViews();
+            if (tabName === 'penilaian') renderJuriDashboard();
+            if (tabName === 'rekap') renderRekapTable();
+        }
+
+        function updateDashboardStats() {
+            if (currentUser) {
+                document.getElementById('dash-user-title').innerText = currentUser.nama || currentUser.name || 'User';
+            }
+
+            document.getElementById('dash-total-peserta').innerText = dataPeserta.length;
+            const juriBertugas = dataJuri.filter(j => j.status === 'JURI' && (j.ruang || j.kode));
+            document.getElementById('dash-total-juri').innerText = juriBertugas.length;
+
+            const totalJuriBertugas = juriBertugas.length;
+            const cntHadir = juriBertugas.filter(j => j.absenMasuk && !j.manualStatus).length;
+            const cntIzin  = juriBertugas.filter(j => j.manualStatus === 'IZIN').length;
+            const cntAlpa  = juriBertugas.filter(j => j.manualStatus === 'ALPA').length;
+            const cntBelum = totalJuriBertugas - (cntHadir + cntIzin + cntAlpa);
+
+            document.getElementById('dash-juri-hadir').innerText = cntHadir;
+
+            const uniqueRuang = new Set(dataPeserta.map(p => p.ruangTes).filter(r => r && r !== '-'));
+            document.getElementById('dash-total-ruang').innerText = uniqueRuang.size;
+
+            const pctHadir = totalJuriBertugas > 0 ? Math.round((cntHadir / totalJuriBertugas) * 100) : 0;
+            document.getElementById('dash-juri-pct').innerText = `${pctHadir}% Hadir`;
+
+            document.getElementById('bar-hadir').style.width = totalJuriBertugas > 0 ? `${(cntHadir/totalJuriBertugas)*100}%` : '0%';
+            document.getElementById('bar-izin').style.width  = totalJuriBertugas > 0 ? `${(cntIzin/totalJuriBertugas)*100}%`  : '0%';
+            document.getElementById('bar-alpa').style.width  = totalJuriBertugas > 0 ? `${(cntAlpa/totalJuriBertugas)*100}%`  : '0%';
+
+            document.getElementById('stat-hdr-val').innerText = cntHadir;
+            document.getElementById('stat-izn-val').innerText = cntIzin;
+            document.getElementById('stat-alp-val').innerText = cntAlpa;
+            document.getElementById('stat-blm-val').innerText = cntBelum;
+
+            const cntScored = dataPeserta.filter(p => {
+                const k1Sum = Object.values(p.scores.k1 || {}).reduce((a, b) => a + b, 0);
+                const k2Sum = Object.values(p.scores.k2 || {}).reduce((a, b) => a + b, 0);
+                return (k1Sum + k2Sum) > 0;
+            }).length;
+
+            const totalPeserta = dataPeserta.length;
+            const pctScored = totalPeserta > 0 ? Math.round((cntScored / totalPeserta) * 100) : 0;
+
+            document.getElementById('dash-peserta-pct').innerText = `${pctScored}% Dinilai`;
+            document.getElementById('bar-peserta-scored').style.width = totalPeserta > 0 ? `${pctScored}%` : '0%';
+
+            document.getElementById('stat-scored-val').innerText = `${cntScored} Peserta`;
+            document.getElementById('stat-unscored-val').innerText = `${totalPeserta - cntScored} Peserta`;
+
+            const tbodyDash = document.getElementById('dash-table-juri-body');
+            if (tbodyDash) {
+                const recentJuri = juriBertugas.slice(0, 5);
+                if (recentJuri.length === 0) {
+                    tbodyDash.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-400 italic">Belum ada penugasan juri.</td></tr>`;
+                } else {
+                    tbodyDash.innerHTML = recentJuri.map(j => {
+                        let stBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">BELUM HADIR</span>';
+                        if (j.manualStatus === 'IZIN') stBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">IZIN</span>';
+                        else if (j.manualStatus === 'ALPA') stBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800">ALPA</span>';
+                        else if (j.absenMasuk) stBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">HADIR</span>';
+
+                        return `
+                        <tr>
+                            <td class="p-2.5 font-mono font-bold text-slate-700">${j.id}</td>
+                            <td class="p-2.5 font-bold text-slate-800">${j.nama}</td>
+                            <td class="p-2.5 text-emerald-700 font-semibold"><span class="px-1.5 py-0.5 bg-slate-100 text-slate-800 rounded font-bold">${j.kode || '-'}</span> ${j.ruang || '-'}</td>
+                            <td class="p-2.5 font-bold text-emerald-600">${j.absenMasuk || '--:--'}</td>
+                            <td class="p-2.5 font-bold text-indigo-600">${j.absenPulang || '--:--'}</td>
+                            <td class="p-2.5">${stBadge}</td>
+                        </tr>
+                    `}).join('');
+                }
+            }
+        }
+
+        function renderPenugasanList() {
+            const container = document.getElementById('penugasan-container-list');
+            const juriList = dataJuri.filter(j => j.status === 'JURI');
+            
+            container.innerHTML = juriList.map(j => `
+                <div class="p-3 bg-slate-50 rounded-xl border flex justify-between items-center text-xs">
+                    <div>
+                        <p class="font-bold text-slate-800 text-sm">${j.nama}</p>
+                        <p class="text-slate-500">ID: ${j.id} | Ruang: <span class="font-bold text-emerald-700">${j.ruang || 'Belum Ada'}</span></p>
+                    </div>
+                    <button onclick="openAssignModal('${j.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition">
+                        ${j.ruang ? 'Ubah Kode' : 'Tugaskan'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderRekapTable() {
+            const tbody = document.getElementById('table-rekap-nilai-body');
+            tbody.innerHTML = dataPeserta.map((p, idx) => {
+                const k1Sum = Object.values(p.scores.k1 || {}).reduce((a, b) => a + b, 0);
+                const k2Sum = Object.values(p.scores.k2 || {}).reduce((a, b) => a + b, 0);
+                const totalErr = k1Sum + k2Sum;
+                return `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-2.5">${p.no || (idx + 1)}</td>
+                    <td class="p-2.5 font-mono">${p.idpps}</td>
+                    <td class="p-2.5 font-bold text-slate-800">${p.nama}</td>
+                    <td class="p-2.5 text-slate-500">${p.kelas} (${p.dom})</td>
+                    <td class="p-2.5 font-bold text-indigo-600">${p.juriKode || '-'}</td>
+                    <td class="p-2.5 text-slate-700">${p.ruangTes || '-'}</td>
+                    <td class="p-2.5 text-center font-bold text-slate-700">${k1Sum}</td>
+                    <td class="p-2.5 text-center font-bold text-slate-700">${k2Sum}</td>
+                    <td class="p-2.5 text-center font-black text-rose-600">${totalErr} Err</td>
+                </tr>
+            `}).join('');
+        }
 
         function saveToStorage() {
             try {
                 localStorage.setItem(STORAGE_KEY_JURI,    JSON.stringify(dataJuri));
                 localStorage.setItem(STORAGE_KEY_PESERTA, JSON.stringify(dataPeserta));
-                const ind = document.getElementById('storage-indicator');
-                if (ind) {
-                    ind.classList.remove('hidden');
-                    ind.innerHTML = '<i class="fa-solid fa-circle-check text-xs"></i> Tersimpan';
-                    setTimeout(() => { ind.innerHTML = '<i class="fa-solid fa-circle-check text-xs"></i> Data Tersimpan'; }, 1500);
-                }
+                syncToCloud();
             } catch(e) {
                 console.warn('Gagal menyimpan ke localStorage:', e);
             }
@@ -489,7 +913,7 @@
                 if (savedJuri)    dataJuri    = JSON.parse(savedJuri);
                 if (savedPeserta) dataPeserta = JSON.parse(savedPeserta);
             } catch(e) {
-                console.warn('Gagal memuat dari localStorage:', e);
+                console.warn('Gagal memuat lokal:', e);
             }
         }
 
@@ -501,7 +925,47 @@
             }
         }
 
-        // PEMETAAN OTOMATIS: KODE JURI (ABJAD) -> RUANG TES
+        async function syncToCloud() {
+            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("GANTI_DENGAN_URL")) return;
+            const ind = document.getElementById('storage-indicator');
+            if (ind) ind.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Syncing...';
+
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "syncAll", dataJuri: dataJuri, dataPeserta: dataPeserta })
+                });
+                if (ind) ind.innerHTML = '<i class="fa-solid fa-cloud-check text-xs"></i> Cloud Tersinkron';
+            } catch(e) {
+                if (ind) ind.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-xs text-amber-400"></i> Offline Sync';
+            }
+        }
+
+        async function fetchFromCloud() {
+            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("GANTI_DENGAN_URL")) return;
+            try {
+                const res = await fetch(GOOGLE_SCRIPT_URL);
+                const json = await res.json();
+                
+                if (json.juri && json.juri.length > 1) {
+                    switchTab(activeTab);
+                }
+            } catch(e) {
+                console.warn("Gagal mengambil data cloud:", e);
+            }
+        }
+
+        function forceSyncOnline() {
+            syncToCloud();
+            alert("Memulai sinkronisasi data online ke Cloud...");
+        }
+
+        setInterval(() => {
+            if (currentUser) fetchFromCloud();
+        }, 10000);
+
         const mapKodeToRuang = {
             'A': 'AL-GHAZALI 1.02', 'B': 'AL-GHAZALI 1.02', 'C': 'AL-GHAZALI 1.02', 'D': 'AL-GHAZALI 1.02', 'E': 'AL-GHAZALI 1.02', 'F': 'AL-GHAZALI 1.02',
             'G': 'AL-GHAZALI 1.05', 'H': 'AL-GHAZALI 1.05', 'I': 'AL-GHAZALI 1.05', 'J': 'AL-GHAZALI 1.05', 'K': 'AL-GHAZALI 1.05', 'L': 'AL-GHAZALI 1.05',
@@ -512,7 +976,6 @@
             'AK': 'AL-GHAZALI 3.01', 'AL': 'AL-GHAZALI 3.01'
         };
 
-        // INITIAL DATASET JURI (SESUAI MENTAHAN JURI) — akan di-override oleh localStorage jika ada
         let dataJuri = [
             { id: "14340216", nama: "MAJID", status: "ADMIN", telepon: "--------", kode: "", ruang: "", absenMasuk: null, absenPulang: null },
             { id: "14461212", nama: "HAFIDUDDIN", status: "ADMIN", telepon: "-------------", kode: "", ruang: "", absenMasuk: null, absenPulang: null },
@@ -523,7 +986,6 @@
             { id: "269875", nama: "ABDUL WARIS", status: "JURI", telepon: "6281358525110", kode: "AD", ruang: "AL-GHAZALI 1.08", absenMasuk: null, absenPulang: null }
         ];
 
-        // INITIAL DATASET PESERTA (SESUAI MENTAHAN PESERTA)
         let dataPeserta = [
             { no: 1, idpps: "14461622", nama: "MUHAMMAD EFAN FADHILAH", dom: "N-02", kelas: "Tathbiq 1-BC", guru: "UST.ROY HAMDANI", ruangSore: "DAERAH M-12 A", tes: "TES LISAN TATHBIQ-", jmlKetTes: 1, juriKode: "AL", ruangTes: "AL-GHAZALI 3.01", status: "HADIR", scores: { k1: {lafadz:0, makna:1, terjemah:0, tasrif:2, taktek:0}, k2: {lafadz:0, makna:0, terjemah:1, tasrif:0, nadhom:0} } },
             { no: 2, idpps: "14462204", nama: "DZIKRI NAYLUL JAWWAD", dom: "N-06", kelas: "Tathbiq 1-AA", guru: "UST.ISUDIN", ruangSore: "DAERAH L-01 A", tes: "TES LISAN TATHBIQ 1", jmlKetTes: 1, juriKode: "AD", ruangTes: "AL-GHAZALI 1.08", status: "HADIR", scores: { k1: {lafadz:0, makna:0, terjemah:0, tasrif:0, taktek:0}, k2: {lafadz:0, makna:0, terjemah:0, tasrif:0, nadhom:0} } },
@@ -531,10 +993,8 @@
             { no: 4, idpps: "14461563", nama: "MUHAMMAD ZIYADATUN NOER", dom: "R-11", kelas: "Tathbiq 1-BB", guru: "UST.ACHMAD AFIFUDIN ILMI", ruangSore: "DAERAH M-14 B", tes: "TES LISAN TATHBIQ 1", jmlKetTes: 3, juriKode: "AL", ruangTes: "AL-GHAZALI 3.01", status: "HADIR", scores: { k1: {lafadz:0, makna:0, terjemah:0, tasrif:0, taktek:0}, k2: {lafadz:0, makna:0, terjemah:0, tasrif:0, nadhom:0} } }
         ];
 
-        // Muat data tersimpan dari localStorage (menimpa data hardcode di atas jika ada)
         loadFromStorage();
 
-        // --- AUTHENTICATION (CUKUP MASUKKAN ID/PIN) ---
         function handleLogin(e) {
             e.preventDefault();
             const inputId = document.getElementById('login-password').value.trim();
@@ -559,24 +1019,18 @@
 
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('hidden');
+            document.getElementById('app-screen').classList.add('flex');
             
-            document.getElementById('badge-role').innerText = currentUser.role.toUpperCase();
-            document.getElementById('user-display-name').innerText = currentUser.nama || currentUser.name;
+            document.getElementById('sidebar-role-badge').innerText = currentUser.role.toUpperCase();
+            document.getElementById('sidebar-user-name').innerText = currentUser.nama || currentUser.name;
+            document.getElementById('sidebar-user-id').innerText = "ID: " + currentUser.id;
 
-            document.getElementById('view-admin').classList.add('hidden');
-            document.getElementById('view-operator').classList.add('hidden');
-            document.getElementById('view-juri').classList.add('hidden');
+            applyRoleSidebarPermissions();
 
-            if (currentUser.role === 'admin') {
-                document.getElementById('view-admin').classList.remove('hidden');
-                renderAdminJuriTable();
-                renderAdminPesertaTable();
-            } else if (currentUser.role === 'operator') {
-                document.getElementById('view-operator').classList.remove('hidden');
-                renderOperatorViews();
+            if (currentUser.role === 'admin' || currentUser.role === 'operator') {
+                switchTab('dashboard');
             } else if (currentUser.role === 'juri') {
-                document.getElementById('view-juri').classList.remove('hidden');
-                renderJuriDashboard();
+                switchTab('penilaian');
             }
         }
 
@@ -584,10 +1038,10 @@
             currentUser = null;
             document.getElementById('login-password').value = '';
             document.getElementById('app-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('flex');
             document.getElementById('login-screen').classList.remove('hidden');
         }
 
-        // --- OTOMATISASI RUANG BERDASARKAN ABJAD ---
         function autoDetectRuang() {
             const kodeInput = document.getElementById('assign-kode').value.trim().toUpperCase();
             const ruangField = document.getElementById('assign-ruang');
@@ -599,7 +1053,6 @@
             }
         }
 
-
         function calculateDuration(masuk, pulang) {
             if (!masuk || !pulang) return masuk ? '<span class="text-amber-600 font-medium">Sedang Bertugas</span>' : '<span class="text-slate-400">-</span>';
             try {
@@ -609,7 +1062,7 @@
                 };
                 let mMin = parseTime(masuk);
                 let pMin = parseTime(pulang);
-                if (pMin < mMin) pMin += 24 * 60; // Penanganan lewat tengah malam
+                if (pMin < mMin) pMin += 24 * 60;
                 const diff = pMin - mMin;
                 const hrs = Math.floor(diff / 60);
                 const mins = diff % 60;
@@ -619,10 +1072,11 @@
             }
         }
 
-        // --- ADMIN FUNCTIONS ---
         function renderAdminJuriTable() {
-            const query = document.getElementById('search-juri').value.toLowerCase();
+            const query = document.getElementById('search-juri') ? document.getElementById('search-juri').value.toLowerCase() : '';
             const tbody = document.getElementById('table-admin-juri');
+            if (!tbody) return;
+
             const filtered = dataJuri.filter(j => j.status === 'JURI' && j.nama.toLowerCase().includes(query));
 
             tbody.innerHTML = filtered.map(j => {
@@ -649,6 +1103,8 @@
 
         function renderAdminPesertaTable() {
             const tbody = document.getElementById('table-admin-peserta');
+            if (!tbody) return;
+
             tbody.innerHTML = dataPeserta.map((p, idx) => {
                 const totalErr = calculateTotalErrors(p.scores);
                 return `
@@ -659,7 +1115,6 @@
                     <td class="p-3 text-xs">${p.kelas} (${p.dom})</td>
                     <td class="p-3 text-xs text-slate-500">${p.guru || '-'}</td>
                     <td class="p-3 text-xs text-slate-500">${p.ruangSore || '-'}</td>
-                    <td class="p-3 text-xs text-slate-500">${p.tes || '-'}</td>
                     <td class="p-3"><span class="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-bold rounded">${p.juriKode || '-'}</span></td>
                     <td class="p-3 text-xs font-semibold text-slate-700">${p.ruangTes || '-'}</td>
                     <td class="p-3">
@@ -698,7 +1153,6 @@
             juri.kode = kode;
             juri.ruang = ruang;
 
-            // Sinkronkan data peserta jika kode juri sesuai
             dataPeserta.forEach(p => {
                 if (p.juriKode === kode) {
                     p.ruangTes = ruang;
@@ -707,8 +1161,7 @@
 
             saveToStorage();
             closeAssignModal();
-            renderAdminJuriTable();
-            renderAdminPesertaTable();
+            switchTab(activeTab);
         }
 
         function cancelAssignment(juriId) {
@@ -717,11 +1170,10 @@
                 juri.kode = "";
                 juri.ruang = "";
                 saveToStorage();
-                renderAdminJuriTable();
+                switchTab(activeTab);
             }
         }
 
-        // --- IMPOR & EKSPOR DATA JURI (SESUAI MENTAHAN JURI) ---
         function importJuri(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -745,7 +1197,7 @@
                         absenPulang: null
                     }));
                     saveToStorage();
-                    renderAdminJuriTable();
+                    switchTab('juri');
                     alert("Berhasil mengimpor " + json.length + " data juri!");
                 }
             };
@@ -783,7 +1235,6 @@
             XLSX.writeFile(workbook, "MENTAHAN_JURI.xlsx");
         }
 
-        // --- IMPOR & EKSPOR DATA PESERTA (SESUAI MENTAHAN PESERTA) ---
         function importPeserta(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -812,7 +1263,7 @@
                         scores: { k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0}, k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0} }
                     }));
                     saveToStorage();
-                    renderAdminPesertaTable();
+                    switchTab('peserta');
                     alert("Berhasil mengimpor " + json.length + " data peserta!");
                 }
             };
@@ -873,16 +1324,16 @@
             XLSX.writeFile(workbook, "REKAP_NILAI_PESERTA.xlsx");
         }
 
-        
         // =============================================
-        // FITUR SCANNER QR CODE ABSENSI JURI (OPERATOR)
+        // SCANNER QR CODE & OPERATOR LOGIC
         // =============================================
         let html5QrcodeScanner = null;
         let currentJuriFilter = 'all';
+        let lastScannedId = null;
+        let scanCooldown = false;
 
         function initQrScanner() {
-            if (html5QrcodeScanner) return; // sudah aktif
-            
+            if (html5QrcodeScanner) return;
             try {
                 html5QrcodeScanner = new Html5QrcodeScanner(
                     "qr-reader", 
@@ -896,16 +1347,19 @@
         }
 
         function onScanSuccess(decodedText, decodedResult) {
+            if (scanCooldown && lastScannedId === decodedText.trim()) return;
             processQrCode(decodedText);
         }
 
-        function onScanFailure(error) {
-            // scan berjalan mencari QR...
-        }
+        function onScanFailure(error) {}
 
         function processQrCode(scannedText) {
             const cleanId = String(scannedText).trim();
             if (!cleanId) return;
+
+            scanCooldown = true;
+            lastScannedId = cleanId;
+            setTimeout(() => { scanCooldown = false; }, 2500);
 
             const box = document.getElementById('scan-result-box');
             const msg = document.getElementById('scan-result-msg');
@@ -919,7 +1373,7 @@
             }
 
             const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            juri.manualStatus = null; // Reset alpa/izin jika melakukan scan
+            juri.manualStatus = null;
             if (!juri.absenMasuk) {
                 juri.absenMasuk = timeNow;
                 box.className = "mt-3 p-3 rounded-lg text-xs bg-emerald-100 text-emerald-800 font-semibold";
@@ -965,7 +1419,6 @@
             renderOperatorViews();
         }
 
-        // --- OPERATOR FUNCTIONS ---
         function setJuriManualStatus(juriId, statusType) {
             const juri = dataJuri.find(j => j.id === juriId);
             if (!juri) return;
@@ -989,7 +1442,7 @@
         }
 
         function renderOperatorViews() {
-            initQrScanner(); // Aktifkan scanner saat operator membuka dashboard
+            initQrScanner();
 
             const juriBertugas = dataJuri.filter(j => j.status === 'JURI' && (j.ruang || j.kode));
             const totalBertugas = juriBertugas.length;
@@ -998,13 +1451,14 @@
             const statusAlpa = juriBertugas.filter(j => j.manualStatus === 'ALPA').length;
             const belumHadir = totalBertugas - (sudahHadir + statusIzin + statusAlpa);
 
-            document.getElementById('stat-juri-total').innerText = totalBertugas;
-            document.getElementById('stat-juri-hadir').innerText = sudahHadir;
-            document.getElementById('stat-juri-izin').innerText = statusIzin;
-            document.getElementById('stat-juri-alpa').innerText = statusAlpa;
-            document.getElementById('stat-juri-belum').innerText = belumHadir;
+            if (document.getElementById('stat-juri-total')) {
+                document.getElementById('stat-juri-total').innerText = totalBertugas;
+                document.getElementById('stat-juri-hadir').innerText = sudahHadir;
+                document.getElementById('stat-juri-izin').innerText = statusIzin;
+                document.getElementById('stat-juri-alpa').innerText = statusAlpa;
+                document.getElementById('stat-juri-belum').innerText = belumHadir;
+            }
 
-            // Filter data juri untuk tabel
             let filteredJuri = juriBertugas;
             if (currentJuriFilter === 'hadir') filteredJuri = juriBertugas.filter(j => j.absenMasuk && !j.manualStatus);
             if (currentJuriFilter === 'izin') filteredJuri = juriBertugas.filter(j => j.manualStatus === 'IZIN');
@@ -1012,6 +1466,8 @@
             if (currentJuriFilter === 'belum') filteredJuri = juriBertugas.filter(j => !j.absenMasuk && !j.manualStatus);
 
             const tbodyJuri = document.getElementById('table-operator-juri-status');
+            if (!tbodyJuri) return;
+
             if (filteredJuri.length === 0) {
                 tbodyJuri.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Tidak ada data juri untuk kategori ini.</td></tr>`;
             } else {
@@ -1047,15 +1503,6 @@
             }
         }
 
-        function toggleStatusPeserta(idpps) {
-            const p = dataPeserta.find(item => item.idpps === idpps);
-            if (p) {
-                p.status = p.status === 'HADIR' ? 'ALPA' : 'HADIR';
-                saveToStorage();
-                renderOperatorViews();
-            }
-        }
-
         function openGantiJuriModal(ruang) {
             selectedRuangForGantiModal = ruang;
             document.getElementById('modal-ganti-ruang').innerText = ruang || 'Semua';
@@ -1079,13 +1526,15 @@
                 saveToStorage();
                 alert(`Juri ${newJuri.nama} berhasil ditempatkan di ruang ${selectedRuangForGantiModal}`);
                 closeGantiJuriModal();
-                renderOperatorViews();
+                switchTab(activeTab);
             }
         }
 
         // --- JURI DASHBOARD & SCORING LOGIC ---
         function renderJuriDashboard() {
             const juri = currentUser;
+            if (!juri) return;
+
             document.getElementById('juri-profile-name').innerText = juri.nama;
             document.getElementById('juri-profile-ruang').innerText = juri.ruang || 'Belum Ditentukan';
             document.getElementById('juri-profile-kode').innerText = juri.kode || '-';
@@ -1093,14 +1542,19 @@
             const mBadge = document.getElementById('absen-masuk-badge');
             const pBadge = document.getElementById('absen-pulang-badge');
 
-            mBadge.innerText = `Datang: ${juri.absenMasuk || 'Belum'}`;
-            mBadge.className = `px-2 py-0.5 rounded text-xs font-medium ${juri.absenMasuk ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`;
+            if (mBadge) {
+                mBadge.innerText = `Datang: ${juri.absenMasuk || 'Belum'}`;
+                mBadge.className = `px-2 py-0.5 rounded text-xs font-medium ${juri.absenMasuk ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`;
+            }
 
-            pBadge.innerText = `Pulang: ${juri.absenPulang || 'Belum'}`;
-            pBadge.className = `px-2 py-0.5 rounded text-xs font-medium ${juri.absenPulang ? 'bg-indigo-100 text-indigo-800' : 'bg-amber-100 text-amber-800'}`;
+            if (pBadge) {
+                pBadge.innerText = `Pulang: ${juri.absenPulang || 'Belum'}`;
+                pBadge.className = `px-2 py-0.5 rounded text-xs font-medium ${juri.absenPulang ? 'bg-indigo-100 text-indigo-800' : 'bg-amber-100 text-amber-800'}`;
+            }
 
             const filteredPeserta = dataPeserta.filter(p => p.juriKode === juri.kode || p.ruangTes === juri.ruang);
             const container = document.getElementById('juri-peserta-list');
+            if (!container) return;
 
             if (filteredPeserta.length === 0) {
                 container.innerHTML = `<p class="text-xs text-slate-400 italic">Tidak ada peserta di ruang ini.</p>`;
@@ -1109,9 +1563,9 @@
 
             container.innerHTML = filteredPeserta.map(p => `
                 <div onclick="selectPesertaForScoring('${p.idpps}')" class="p-3 bg-white rounded-lg border hover:border-emerald-500 cursor-pointer transition ${activeSelectedPesertaId === p.idpps ? 'ring-2 ring-emerald-500 border-transparent bg-emerald-50/30' : ''}">
-                    <p class="font-bold text-sm text-slate-800">${p.nama}</p>
+                    <p class="font-bold text-xs text-slate-800">${p.nama}</p>
                     <div class="flex justify-between items-center mt-1">
-                        <span class="text-xs text-slate-500">ID: ${p.idpps}</span>
+                        <span class="text-[10px] text-slate-500">ID: ${p.idpps}</span>
                         <span class="text-xs font-bold text-rose-600">${calculateTotalErrors(p.scores)} Err</span>
                     </div>
                 </div>
