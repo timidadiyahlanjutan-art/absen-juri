@@ -1,876 +1,1199 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Absen Juri - Tes Lisan</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
-
-  :root {
-    --hijau: #1a6b4a;
-    --hijau-muda: #2e9b6e;
-    --hijau-pale: #e8f5f0;
-    --emas: #c8952a;
-    --emas-pale: #fef8ed;
-    --merah: #c0392b;
-    --merah-pale: #fdf0ee;
-    --abu: #64748b;
-    --abu-pale: #f1f5f9;
-    --putih: #ffffff;
-    --teks: #1e293b;
-    --border: #e2e8f0;
-    --shadow: 0 2px 12px rgba(0,0,0,0.08);
-    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Inter', sans-serif;
-    background: #f0f4f8;
-    color: var(--teks);
-    min-height: 100vh;
-  }
-
-  /* HEADER */
-  .header {
-    background: linear-gradient(135deg, var(--hijau) 0%, #0f4f35 100%);
-    color: white;
-    padding: 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: var(--shadow-lg);
-  }
-  .header-top {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 20px 10px;
-  }
-  .logo-icon {
-    width: 44px; height: 44px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    flex-shrink: 0;
-  }
-  .header-title { font-size: 18px; font-weight: 700; line-height: 1.2; }
-  .header-sub { font-size: 12px; opacity: 0.8; margin-top: 2px; }
-  .header-stats {
-    display: flex;
-    background: rgba(0,0,0,0.15);
-    padding: 10px 20px;
-    gap: 0;
-  }
-  .stat-item {
-    flex: 1; text-align: center;
-    border-right: 1px solid rgba(255,255,255,0.15);
-  }
-  .stat-item:last-child { border-right: none; }
-  .stat-num { font-size: 22px; font-weight: 700; line-height: 1; }
-  .stat-label { font-size: 10px; opacity: 0.75; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .stat-item.hadir .stat-num { color: #7effc4; }
-  .stat-item.izin .stat-num { color: #ffd97e; }
-  .stat-item.alpa .stat-num { color: #ff8a80; }
-
-  /* NAV TABS */
-  .nav-tabs {
-    display: flex;
-    background: white;
-    border-bottom: 2px solid var(--border);
-    overflow-x: auto;
-    scrollbar-width: none;
-    position: sticky;
-    top: 112px;
-    z-index: 90;
-  }
-  .nav-tabs::-webkit-scrollbar { display: none; }
-  .tab-btn {
-    flex-shrink: 0;
-    padding: 12px 18px;
-    border: none;
-    background: none;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--abu);
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .tab-btn.active {
-    color: var(--hijau);
-    border-bottom-color: var(--hijau);
-    font-weight: 600;
-  }
-  .tab-btn:hover:not(.active) { color: var(--teks); background: var(--abu-pale); }
-
-  /* MAIN CONTENT */
-  .main { padding: 16px; max-width: 700px; margin: 0 auto; }
-
-  /* SEARCH BAR */
-  .search-wrap {
-    position: relative;
-    margin-bottom: 14px;
-  }
-  .search-input {
-    width: 100%;
-    padding: 12px 16px 12px 44px;
-    border: 1.5px solid var(--border);
-    border-radius: 12px;
-    font-size: 14px;
-    background: white;
-    color: var(--teks);
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    box-shadow: var(--shadow);
-  }
-  .search-input:focus { border-color: var(--hijau); box-shadow: 0 0 0 3px rgba(26,107,74,0.1); }
-  .search-icon {
-    position: absolute;
-    left: 14px; top: 50%;
-    transform: translateY(-50%);
-    color: var(--abu);
-    font-size: 16px;
-  }
-
-  /* FILTER ROW */
-  .filter-row {
-    display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
-  }
-  .filter-btn {
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1.5px solid var(--border);
-    background: white;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.18s;
-    color: var(--abu);
-  }
-  .filter-btn.active { background: var(--hijau); color: white; border-color: var(--hijau); }
-  .filter-btn:hover:not(.active) { border-color: var(--hijau); color: var(--hijau); }
-
-  /* JURI CARD */
-  .juri-list { display: flex; flex-direction: column; gap: 8px; }
-  .juri-card {
-    background: white;
-    border-radius: 14px;
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    box-shadow: var(--shadow);
-    border: 1.5px solid transparent;
-    transition: all 0.2s;
-    cursor: pointer;
-  }
-  .juri-card:hover { border-color: var(--hijau-muda); transform: translateY(-1px); }
-  .juri-card.hadir { border-left: 4px solid #2e9b6e; }
-  .juri-card.izin { border-left: 4px solid var(--emas); }
-  .juri-card.alpa { border-left: 4px solid var(--merah); }
-
-  .avatar {
-    width: 46px; height: 46px;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700;
-    font-size: 16px;
-    flex-shrink: 0;
-    background: var(--hijau-pale);
-    color: var(--hijau);
-  }
-  .juri-card.hadir .avatar { background: var(--hijau-pale); color: var(--hijau); }
-  .juri-card.izin .avatar { background: var(--emas-pale); color: var(--emas); }
-  .juri-card.alpa .avatar { background: var(--merah-pale); color: var(--merah); }
-
-  .juri-info { flex: 1; min-width: 0; }
-  .juri-nama { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .juri-meta { font-size: 12px; color: var(--abu); margin-top: 2px; display: flex; gap: 10px; flex-wrap: wrap; }
-  .badge-id {
-    background: var(--abu-pale);
-    border-radius: 6px;
-    padding: 1px 7px;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--abu);
-    font-family: monospace;
-  }
-
-  .status-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
-  .status-badge {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-  }
-  .status-badge.hadir { background: #dcfce7; color: #166534; }
-  .status-badge.izin { background: #fef3c7; color: #92400e; }
-  .status-badge.alpa { background: #fee2e2; color: #991b1b; }
-  .status-badge.belum { background: var(--abu-pale); color: var(--abu); }
-
-  .btn-group { display: flex; gap: 5px; }
-  .btn-absen {
-    padding: 5px 10px;
-    border-radius: 8px;
-    border: 1.5px solid;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .btn-hadir { border-color: var(--hijau-muda); color: var(--hijau); background: white; }
-  .btn-hadir:hover, .btn-hadir.aktif { background: var(--hijau); color: white; }
-  .btn-izin { border-color: var(--emas); color: var(--emas); background: white; }
-  .btn-izin:hover, .btn-izin.aktif { background: var(--emas); color: white; }
-  .btn-alpa { border-color: var(--merah); color: var(--merah); background: white; }
-  .btn-alpa:hover, .btn-alpa.aktif { background: var(--merah); color: white; }
-
-  /* SECTION LABEL */
-  .section-label {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--abu);
-    padding: 6px 4px;
-    margin-top: 4px;
-  }
-
-  /* EMPTY STATE */
-  .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--abu);
-  }
-  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
-  .empty-state p { font-size: 14px; }
-
-  /* MODAL */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 200;
-    align-items: flex-end;
-    justify-content: center;
-  }
-  .modal-overlay.show { display: flex; }
-  .modal {
-    background: white;
-    border-radius: 20px 20px 0 0;
-    padding: 24px 20px 36px;
-    width: 100%;
-    max-width: 500px;
-    animation: slideUp 0.25s ease;
-  }
-  @keyframes slideUp {
-    from { transform: translateY(100%); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 4px; margin: 0 auto 20px; }
-  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .modal-sub { font-size: 13px; color: var(--abu); margin-bottom: 20px; }
-  .modal-btn-row { display: flex; gap: 10px; }
-  .modal-btn {
-    flex: 1;
-    padding: 14px;
-    border-radius: 12px;
-    border: none;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.18s;
-  }
-  .modal-btn-hadir { background: var(--hijau); color: white; }
-  .modal-btn-hadir:hover { background: #145d3d; }
-  .modal-btn-izin { background: var(--emas-pale); color: var(--emas); border: 1.5px solid var(--emas); }
-  .modal-btn-izin:hover { background: var(--emas); color: white; }
-  .modal-btn-alpa { background: var(--merah-pale); color: var(--merah); border: 1.5px solid var(--merah); }
-  .modal-btn-alpa:hover { background: var(--merah); color: white; }
-  .modal-btn-cancel { background: var(--abu-pale); color: var(--abu); }
-  .modal-btn-cancel:hover { background: var(--border); }
-  .modal-info-row { 
-    display: flex; gap: 10px; margin-bottom: 20px; 
-    background: var(--abu-pale); 
-    border-radius: 12px; padding: 12px 14px; 
-    align-items: center;
-  }
-  .modal-avatar {
-    width: 48px; height: 48px; border-radius: 12px;
-    background: var(--hijau-pale); color: var(--hijau);
-    font-size: 18px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .modal-info-nama { font-weight: 600; font-size: 15px; }
-  .modal-info-id { font-size: 12px; color: var(--abu); margin-top: 2px; }
-
-  /* REKAP PANEL */
-  .rekap-card {
-    background: white;
-    border-radius: 16px;
-    padding: 18px;
-    box-shadow: var(--shadow);
-    margin-bottom: 12px;
-  }
-  .rekap-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--hijau); }
-  .rekap-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
-  .rekap-row:last-child { border-bottom: none; }
-  .rekap-nama { font-size: 13px; color: var(--teks); }
-  .rekap-count { font-size: 13px; font-weight: 700; }
-  .progress-bar-wrap { background: var(--abu-pale); border-radius: 20px; height: 8px; margin-top: 10px; overflow: hidden; }
-  .progress-bar { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--hijau), var(--hijau-muda)); transition: width 0.5s ease; }
-
-  /* ACTION BAR */
-  .action-bar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: white;
-    padding: 12px 20px 24px;
-    border-top: 1px solid var(--border);
-    display: flex; gap: 10px;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
-    z-index: 80;
-  }
-  .btn-reset {
-    padding: 13px 18px;
-    border-radius: 12px;
-    border: 1.5px solid var(--border);
-    background: white;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    color: var(--abu);
-  }
-  .btn-export {
-    flex: 1;
-    padding: 13px;
-    border-radius: 12px;
-    border: none;
-    background: var(--hijau);
-    color: white;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.18s;
-  }
-  .btn-export:hover { background: #145d3d; }
-
-  .pb-bar { padding-bottom: 80px; }
-
-  /* TOAST */
-  .toast {
-    position: fixed;
-    top: 130px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-20px);
-    background: var(--teks);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 24px;
-    font-size: 13px;
-    font-weight: 500;
-    opacity: 0;
-    transition: all 0.3s;
-    z-index: 300;
-    white-space: nowrap;
-    pointer-events: none;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* TIME DISPLAY */
-  .time-display {
-    text-align: center;
-    font-size: 11px;
-    color: rgba(255,255,255,0.7);
-    padding: 6px 20px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-  }
-
-  @media (max-width: 400px) {
-    .btn-absen { padding: 4px 7px; font-size: 10px; }
-    .juri-nama { font-size: 13px; }
-    .stat-num { font-size: 20px; }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Ujian & Scoring Juri</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- HTML5 QR Code Scanner & QR Code Generator -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- SheetJS (XLSX) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
-<div class="header">
-  <div class="header-top">
-    <div class="logo-icon">📋</div>
-    <div>
-      <div class="header-title">Absen Juri Tes Lisan</div>
-      <div class="header-sub" id="eventLabel">Malam Kamis · 15 Shafar 1448 H</div>
-    </div>
-  </div>
-  <div class="header-stats">
-    <div class="stat-item hadir">
-      <div class="stat-num" id="statHadir">0</div>
-      <div class="stat-label">✓ Hadir</div>
-    </div>
-    <div class="stat-item izin">
-      <div class="stat-num" id="statIzin">0</div>
-      <div class="stat-label">⚠ Izin</div>
-    </div>
-    <div class="stat-item alpa">
-      <div class="stat-num" id="statAlpa">0</div>
-      <div class="stat-label">✗ Alpa</div>
-    </div>
-    <div class="stat-item" style="color: rgba(255,255,255,0.7)">
-      <div class="stat-num" id="statBelum">0</div>
-      <div class="stat-label">– Belum</div>
-    </div>
-  </div>
-  <div class="time-display" id="clockDisplay"></div>
-</div>
+    <!-- LOGIN CONTAINER (SANGAT SIMPEL & RAHASIA) -->
+    <div id="login-screen" class="flex items-center justify-center min-h-screen p-4 bg-slate-900">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-emerald-600 text-white rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold shadow-lg">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800">Akses Sistem Ujian</h2>
+                <p class="text-xs text-slate-500 mt-1">Masukkan ID / Sandi Akses Anda</p>
+            </div>
 
-<div class="nav-tabs">
-  <button class="tab-btn active" onclick="switchTab('semua')">Semua</button>
-  <button class="tab-btn" onclick="switchTab('belum')">Belum Absen</button>
-  <button class="tab-btn" onclick="switchTab('hadir')">Hadir</button>
-  <button class="tab-btn" onclick="switchTab('izin')">Izin</button>
-  <button class="tab-btn" onclick="switchTab('alpa')">Alpa</button>
-  <button class="tab-btn" onclick="switchTab('rekap')">📊 Rekap</button>
-</div>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">ID / Sandi Akses</label>
+                    <input type="text" id="login-password" autocomplete="off" required class="w-full border border-slate-300 rounded-lg p-3 bg-slate-50 text-center text-lg font-bold tracking-wider focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Masukkan ID">
+                </div>
 
-<div class="main pb-bar">
-  <div id="panelAbsen">
-    <div class="search-wrap" style="margin-top:14px">
-      <span class="search-icon">🔍</span>
-      <input type="text" class="search-input" id="searchInput" placeholder="Cari nama atau ID juri..." oninput="renderList()">
-    </div>
-    <div class="filter-row" id="filterRow"></div>
-    <div id="juriList" class="juri-list"></div>
-  </div>
-
-  <div id="panelRekap" style="display:none; margin-top:14px">
-    <div class="rekap-card">
-      <h3>📊 Ringkasan Kehadiran</h3>
-      <div class="rekap-row">
-        <span class="rekap-nama">✅ Hadir</span>
-        <span class="rekap-count" style="color:var(--hijau)" id="rekHadir">0</span>
-      </div>
-      <div class="rekap-row">
-        <span class="rekap-nama">⚠️ Izin</span>
-        <span class="rekap-count" style="color:var(--emas)" id="rekIzin">0</span>
-      </div>
-      <div class="rekap-row">
-        <span class="rekap-nama">❌ Alpa</span>
-        <span class="rekap-count" style="color:var(--merah)" id="rekAlpa">0</span>
-      </div>
-      <div class="rekap-row">
-        <span class="rekap-nama">⬜ Belum Absen</span>
-        <span class="rekap-count" style="color:var(--abu)" id="rekBelum">0</span>
-      </div>
-      <div style="margin-top:14px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-          <span style="font-size:12px;color:var(--abu)">Progress kehadiran</span>
-          <span style="font-size:12px;font-weight:700;color:var(--hijau)" id="rekPersen">0%</span>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg shadow-md transition duration-200">
+                    <i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk
+                </button>
+            </form>
         </div>
-        <div class="progress-bar-wrap">
-          <div class="progress-bar" id="rekBar" style="width:0%"></div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="app-screen" class="hidden min-h-screen flex flex-col">
+        <!-- NAVBAR -->
+        <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <span class="bg-emerald-500 text-white text-xs px-2.5 py-1 rounded-full font-bold uppercase" id="badge-role">ADMIN</span>
+                    <h1 class="text-lg font-bold tracking-wide hidden md:block">Sistem Ujian & Scoring Juri</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs text-emerald-400 hidden md:flex items-center gap-1" id="storage-indicator" title="Data tersimpan di browser ini">
+                        <i class="fa-solid fa-circle-check text-xs"></i> Data Tersimpan
+                    </span>
+                    <span class="text-sm font-medium text-slate-300" id="user-display-name">User</span>
+                    <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition">
+                        <i class="fa-solid fa-power-off mr-1"></i> Keluar
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENT VIEWS -->
+        <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
+            
+            <!-- ADMIN DASHBOARD VIEW -->
+            <div id="view-admin" class="space-y-6 hidden">
+                <!-- Action Header -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-wrap gap-3 justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Dashboard Administrator</h2>
+                        <p class="text-sm text-slate-500">Kelola penugasan juri, hitung durasi jam kerja, impor/ekspor data peserta & juri, serta rekap nilai.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <!-- Impor/Ekspor Juri -->
+                        <label class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition flex items-center shadow-sm">
+                            <i class="fa-solid fa-user-plus mr-1.5"></i> Impor Juri (.xlsx)
+                            <input type="file" accept=".xlsx, .xls" onchange="importJuri(event)" class="hidden">
+                        </label>
+                        <button onclick="exportJuriOnly()" class="bg-amber-700 hover:bg-amber-800 text-white px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center shadow-sm">
+                            <i class="fa-solid fa-address-book mr-1.5"></i> Ekspor Juri (.xlsx)
+                        </button>
+                        
+                        <!-- Impor/Ekspor Peserta -->
+                        <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition flex items-center shadow-sm">
+                            <i class="fa-solid fa-file-import mr-1.5"></i> Impor Peserta (.xlsx)
+                            <input type="file" accept=".xlsx, .xls" onchange="importPeserta(event)" class="hidden">
+                        </label>
+                        <button onclick="exportPesertaOnly()" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center shadow-sm">
+                            <i class="fa-solid fa-file-excel mr-1.5"></i> Ekspor Peserta (.xlsx)
+                        </button>
+
+                        <!-- Ekspor Nilai -->
+                        <button onclick="exportNilai()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center shadow-sm">
+                            <i class="fa-solid fa-download mr-1.5"></i> Ekspor Rekap Nilai (.xlsx)
+                        </button>
+
+                        <!-- Reset Data -->
+                        <button onclick="clearStorage()" class="bg-rose-700 hover:bg-rose-800 text-white px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center shadow-sm" title="Reset semua data ke kondisi awal">
+                            <i class="fa-solid fa-rotate-left mr-1.5"></i> Reset Data
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Penugasan Juri Section -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
+                        <i class="fa-solid fa-user-gear text-emerald-600 mr-2"></i> Penugasan Juri, Ruangan & Durasi Jam Kerja
+                    </h3>
+                    <div class="mb-4 max-w-md">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
+                            <input type="text" id="search-juri" oninput="renderAdminJuriTable()" placeholder="Cari Nama Juri..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead class="bg-slate-100 text-slate-700 uppercase text-xs">
+                                <tr>
+                                    <th class="p-3">ID Juri</th>
+                                    <th class="p-3">Nama Juri</th>
+                                    <th class="p-3">Kode / Ruang</th>
+                                    <th class="p-3">Jam Masuk</th>
+                                    <th class="p-3">Jam Pulang</th>
+                                    <th class="p-3 text-center">Durasi Tugas</th>
+                                    <th class="p-3 text-center">Aksi / Penugasan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-admin-juri" class="divide-y divide-slate-200">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tabel Master Peserta -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
+                        <i class="fa-solid fa-users text-indigo-600 mr-2"></i> Data Peserta Ujian
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead class="bg-slate-100 text-slate-700 uppercase text-xs">
+                                <tr>
+                                    <th class="p-3">NO</th>
+                                    <th class="p-3">IDPPS</th>
+                                    <th class="p-3">Nama Peserta</th>
+                                    <th class="p-3">Kelas / Dom</th>
+                                    <th class="p-3">Guru</th>
+                                    <th class="p-3">Ruang Sore</th>
+                                    <th class="p-3">Tes</th>
+                                    <th class="p-3">Kode Juri</th>
+                                    <th class="p-3">Ruang Tes</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 text-center">Total Err</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-admin-peserta" class="divide-y divide-slate-200">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OPERATOR DASHBOARD VIEW -->
+            <div id="view-operator" class="space-y-6 hidden">
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Dashboard Monitoring Operator</h2>
+                        <p class="text-sm text-slate-500">Memantau jalannya ujian, scan QR presensi juri, mengganti juri, serta menandai alpa peserta.</p>
+                    </div>
+                    <!-- STATS STATISTIK JURI BERTUGAS -->
+                    <div class="flex items-center space-x-2">
+                        <div class="bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-center">
+                            <p class="text-[9px] font-bold text-emerald-600 uppercase">Hadir</p>
+                            <p class="text-base font-black text-emerald-700" id="stat-juri-hadir">0</p>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 px-2.5 py-1.5 rounded-lg text-center">
+                            <p class="text-[9px] font-bold text-amber-600 uppercase">Izin</p>
+                            <p class="text-base font-black text-amber-700" id="stat-juri-izin">0</p>
+                        </div>
+                        <div class="bg-rose-50 border border-rose-200 px-2.5 py-1.5 rounded-lg text-center">
+                            <p class="text-[9px] font-bold text-rose-600 uppercase">Alpa</p>
+                            <p class="text-base font-black text-rose-700" id="stat-juri-alpa">0</p>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg text-center">
+                            <p class="text-[9px] font-bold text-slate-500 uppercase">Belum</p>
+                            <p class="text-base font-black text-slate-700" id="stat-juri-belum">0</p>
+                        </div>
+                        <div class="bg-indigo-50 border border-indigo-200 px-2.5 py-1.5 rounded-lg text-center">
+                            <p class="text-[9px] font-bold text-indigo-600 uppercase">Total</p>
+                            <p class="text-base font-black text-indigo-700" id="stat-juri-total">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SCANNER QR CODE & OPERATOR CONTROLS -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- CAMERA QR SCANNER WIDGET -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 md:col-span-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 mb-2 flex items-center">
+                                <i class="fa-solid fa-qrcode text-emerald-600 mr-2"></i> Scan QR Absensi Juri
+                            </h3>
+                            <p class="text-xs text-slate-500 mb-3">Arahkan kamera ke Kartu QR Juri atau ketik ID Juri untuk absensi otomatis.</p>
+                            
+                            <!-- Area Video Scanner -->
+                            <div id="qr-reader" class="w-full bg-slate-900 rounded-lg overflow-hidden border border-slate-300 min-h-[220px]"></div>
+                            
+                            <!-- Alternative Manual ID Input -->
+                            <div class="mt-3 flex space-x-2">
+                                <input type="text" id="manual-qr-input" placeholder="Atau ketik ID Juri..." class="w-full border rounded-lg p-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                                <button onclick="processQrCode(document.getElementById('manual-qr-input').value)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition">
+                                    Absen
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Info Notifikasi Scan -->
+                        <div id="scan-result-box" class="mt-3 p-3 rounded-lg text-xs bg-slate-100 text-slate-600 hidden font-semibold">
+                            <i class="fa-solid fa-info-circle mr-1"></i> <span id="scan-result-msg">Menunggu scan...</span>
+                        </div>
+                    </div>
+
+                    <!-- MONITORING TABEL ABSENSI JURI BERTUGAS -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 md:col-span-2">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-base font-bold text-slate-800">
+                                <i class="fa-solid fa-clipboard-user mr-2 text-emerald-600"></i> Monitoring Absensi Juri Bertugas
+                            </h3>
+                            <div class="space-x-1">
+                                <button onclick="filterJuriStatus('all')" class="px-2 py-1 text-[10px] font-bold rounded bg-slate-200 hover:bg-slate-300 text-slate-700">Semua</button>
+                                <button onclick="filterJuriStatus('hadir')" class="px-2 py-1 text-[10px] font-bold rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-800">Hadir</button>
+                                <button onclick="filterJuriStatus('izin')" class="px-2 py-1 text-[10px] font-bold rounded bg-amber-100 hover:bg-amber-200 text-amber-800">Izin</button>
+                                <button onclick="filterJuriStatus('alpa')" class="px-2 py-1 text-[10px] font-bold rounded bg-rose-100 hover:bg-rose-200 text-rose-800">Alpa</button>
+                                <button onclick="filterJuriStatus('belum')" class="px-2 py-1 text-[10px] font-bold rounded bg-slate-100 hover:bg-slate-200 text-slate-600">Belum</button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto max-h-[320px] overflow-y-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-100 uppercase sticky top-0 z-10">
+                                    <tr>
+                                        <th class="p-2">ID</th>
+                                        <th class="p-2">Nama Juri</th>
+                                        <th class="p-2">Kode / Ruang</th>
+                                        <th class="p-2">Datang</th>
+                                        <th class="p-2">Pulang</th>
+                                        <th class="p-2">Status</th>
+                                        <th class="p-2 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-operator-juri-status" class="divide-y divide-slate-200">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <!-- JURI DASHBOARD VIEW -->
+            <div id="view-juri" class="space-y-6 hidden">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800" id="juri-profile-name">Nama Juri</h2>
+                        <p class="text-sm text-slate-500">Ruang Ujian: <span id="juri-profile-ruang" class="font-bold text-emerald-700">ALGHOZALI 1.02</span> | Kode Juri: <span id="juri-profile-kode" class="font-bold text-slate-700">A</span></p>
+                    </div>
+
+                    <!-- Absensi Juri Widget -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center space-x-3">
+                        <div>
+                            <p class="text-xs text-slate-500 font-semibold uppercase">Absensi Presence Juri</p>
+                            <div class="text-xs space-x-2 mt-1">
+                                <span id="absen-masuk-badge" class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-medium">Datang: Belum</span>
+                                <span id="absen-pulang-badge" class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-medium">Pulang: Belum</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-1">
+                            <button onclick="recordAbsenJuri('masuk')" id="btn-absen-masuk" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded font-semibold transition">
+                                Absen Datang
+                            </button>
+                            <button onclick="recordAbsenJuri('pulang')" id="btn-absen-pulang" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded font-semibold transition">
+                                Absen Pulang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Nilai Kesalahan -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">Penilaian Ujian Lisan (Hitung Kesalahan)</h3>
+                    <p class="text-xs text-slate-500 mb-4">*Cukup nilai kesalahan saja pakai angka.*</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- List Peserta -->
+                        <div class="border rounded-lg p-4 bg-slate-50">
+                            <h4 class="font-bold text-sm text-slate-700 mb-3 uppercase">Daftar Peserta di Ruang Ini</h4>
+                            <div id="juri-peserta-list" class="space-y-2 max-h-96 overflow-y-auto">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Form Input Nilai -->
+                        <div class="md:col-span-2 border rounded-lg p-5 bg-white" id="scoring-form-container">
+                            <div id="scoring-form-empty" class="text-center py-12 text-slate-400">
+                                <i class="fa-solid fa-clipboard-list text-4xl mb-2"></i>
+                                <p>Pilih peserta dari daftar di samping untuk mulai mengisi nilai kesalahan.</p>
+                            </div>
+
+                            <div id="scoring-form-active" class="hidden space-y-6">
+                                <div class="border-b pb-3 flex justify-between items-center">
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 text-lg" id="score-active-nama">NAMA PESERTA</h4>
+                                        <p class="text-xs text-slate-500">ID: <span id="score-active-id">00000</span> | Kelas: <span id="score-active-kelas">-</span></p>
+                                    </div>
+                                    <span id="score-active-status" class="px-2.5 py-1 text-xs rounded-full font-bold bg-emerald-100 text-emerald-800">HADIR</span>
+                                </div>
+
+                                <form id="form-nilai" onsubmit="saveScores(event)" class="space-y-6">
+                                    <!-- KITAB 1 -->
+                                    <div>
+                                        <h5 class="text-sm font-bold text-indigo-700 uppercase tracking-wide border-b border-indigo-100 pb-1 mb-3">KITAB 1 (Kesalahan)</h5>
+                                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                            <div>
+                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Lafadz</label>
+                                                <input type="number" min="0" value="0" id="k1-lafadz" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Makna</label>
+                                                <input type="number" min="0" value="0" id="k1-makna" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Terjemah</label>
+                                                <input type="number" min="0" value="0" id="k1-terjemah" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Tasrif</label>
+                                                <input type="number" min="0" value="0" id="k1-tasrif" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Taktek</label>
+                                                <input type="number" min="0" value="0" id="k1-taktek" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- KITAB 2 -->
+                                    <div>
+                                        <h5 class="text-sm font-bold text-emerald-700 uppercase tracking-wide border-b border-emerald-100 pb-1 mb-3">KITAB 2 (Kesalahan)</h5>
+                                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                            <div>
+                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Lafadz</label>
+                                                <input type="number" min="0" value="0" id="k2-lafadz" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Makna</label>
+                                                <input type="number" min="0" value="0" id="k2-makna" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Terjemah</label>
+                                                <input type="number" min="0" value="0" id="k2-terjemah" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Tasrif</label>
+                                                <input type="number" min="0" value="0" id="k2-tasrif" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-semibold text-slate-600 mb-1">Nadhom</label>
+                                                <input type="number" min="0" value="0" id="k2-nadhom" class="w-full border rounded p-2 text-sm text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow transition">
+                                        <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Nilai Kesalahan
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL PENUGASAN JURI (AUTO RUANG VIA KODE ABJAD) -->
+    <div id="modal-assign" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Tugaskan Juri</h3>
+            <p class="text-sm text-slate-500 mb-4">Nama Juri: <span id="modal-juri-nama" class="font-bold text-slate-800"></span></p>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Kode Juri / Abjad (Ketik Ex: A, B, AD, AL)</label>
+                    <input type="text" id="assign-kode" oninput="autoDetectRuang()" class="w-full border rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none uppercase font-bold text-slate-800" placeholder="Ketik Kode Abjad...">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Ruang Ujian (Otomatis Terisi)</label>
+                    <input type="text" id="assign-ruang" class="w-full border rounded-lg p-2.5 bg-slate-100 focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-700" placeholder="Ruang akan otomatis muncul">
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2 mt-6">
+                <button onclick="closeAssignModal()" class="px-4 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 font-semibold">Batal</button>
+                <button onclick="submitAssignment()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold">Simpan Penugasan</button>
+            </div>
         </div>
-      </div>
     </div>
 
-    <div class="rekap-card">
-      <h3>🕐 Log Absensi Terakhir</h3>
-      <div id="logList" style="font-size:13px;color:var(--abu);line-height:2"></div>
-    </div>
-  </div>
-</div>
+    
+    <!-- MODAL QR CODE KARTU JURI -->
+    <div id="modal-qr-card" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full text-center">
+            <h3 class="text-lg font-bold text-slate-800 mb-1">Kartu Presensi QR Juri</h3>
+            <p class="text-xs text-slate-500 mb-4" id="qr-juri-nama">NAMA JURI</p>
 
-<div class="action-bar">
-  <button class="btn-reset" onclick="confirmReset()">🔄 Reset</button>
-  <button class="btn-export" onclick="exportCSV()">📥 Ekspor CSV</button>
-</div>
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 inline-block mb-4 shadow-inner">
+                <div id="qrcode-container" class="flex justify-center"></div>
+            </div>
 
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-info-row">
-      <div class="modal-avatar" id="modalAvatar"></div>
-      <div>
-        <div class="modal-info-nama" id="modalNama"></div>
-        <div class="modal-info-id" id="modalId"></div>
-      </div>
-    </div>
-    <div class="modal-title">Tandai Kehadiran</div>
-    <div class="modal-sub">Pilih status kehadiran untuk juri ini</div>
-    <div class="modal-btn-row" style="margin-bottom:10px">
-      <button class="modal-btn modal-btn-hadir" onclick="absenFromModal('hadir')">✅ Hadir</button>
-      <button class="modal-btn modal-btn-izin" onclick="absenFromModal('izin')">⚠️ Izin</button>
-    </div>
-    <div class="modal-btn-row">
-      <button class="modal-btn modal-btn-alpa" onclick="absenFromModal('alpa')">❌ Alpa</button>
-      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Batal</button>
-    </div>
-  </div>
-</div>
+            <p class="text-xs font-mono font-bold text-slate-600 mb-4" id="qr-juri-id">ID: 000000</p>
 
-<div class="toast" id="toastEl"></div>
-
-<script>
-// ============================================================
-// DATA JURI (dari file juri_abadi.xlsx)
-// ============================================================
-const rawJuri = [
-  [1,266864,"ABD ROHIM","6288235563817"],
-  [2,263349,"ABDUL FAHAD ALMAGROBI","6281717363495"],
-  [3,264808,"ABDUL ROSID","6281328085788"],
-  [4,269875,"ABDUL WARIS","6281358525110"],
-  [5,265995,"ABDULLOH SA'DUDDIN","6281334279693"],
-  [6,263295,"ACH HUSAERI","6285895306445"],
-  [7,263959,"ACHNAD DIMYATI","6285954077608"],
-  [8,267302,"ACHNAD FACHRUDDIN","6283831172248"],
-  [9,262627,"ACHNAD FATONI","6281216331212"],
-  [10,263456,"ACHNAD MUKAFI","85852093168"],
-  [11,267912,"ACHNAD ROIHAN","6281215029454"],
-  [12,263684,"ACHNAD SAFRI ZAIM FAIDILLA","6285975455575"],
-  [13,263768,"ADIB ZAINUL FATA","6285893146871"],
-  [14,261240,"AHMAD IMAMUL HAROMAIN","6285232345376"],
-  [15,264634,"AHMAD MISBAHUL MUNIR","6287833701088"],
-  [16,262548,"AHMAD NURUL HUDA","6285755415213"],
-  [17,269806,"AHMAD ROHMATULLOH","6281325323906"],
-  [18,266594,"AHMAD SIDDIK","85748338146"],
-  [19,261022,"AHMAD WAHYU HIDAYAT","6289689524041"],
-  [20,268855,"AHMAD ZAKI","6283117254604"],
-  [21,264537,"AINUL YAKIN","85748796125"],
-  [22,262634,"AINUL YAQIN","6285777727912"],
-  [23,261424,"AINUN NOFAL","6281217665170"],
-  [24,267819,"ALI GOJALI","6285705763632"],
-  [25,269335,"ALI MA'RUF","6281217296154"],
-  [26,269796,"AMIRUL MUKMININ","6285859004581"],
-  [27,265437,"AMRUL FIKRI","6281615041943"],
-  [28,261347,"AS'AD ROMDHONI","628133713501"],
-  [29,261762,"FATHURROHMAN","6285730617961"],
-  [30,262949,"GHUFRON","6281225925511"],
-  [31,261423,"HADIYATULLOH","6287776603219"],
-  [32,263119,"HAFID YAQIN","6282337192082"],
-  [33,263457,"HASBI SIDDIQI","6285748248010"],
-  [34,261773,"HAYATULLOH","82233386910"],
-  [35,266360,"IHSANUL LUBAB","6281392295617"],
-  [36,269160,"IMAM SYAFII","6285718237158"],
-  [37,263895,"IMRON ROSADI","628559999727"],
-  [38,264809,"KHOLIL","6285855608883"],
-  [39,264139,"LUKMAN HANAFI","81336204774"],
-  [40,262286,"LUTFILLAH","6285607511320"],
-  [41,266881,"M AKROMULLOH HANIN","6283856307455"],
-  [42,267061,"M CHOIRUL ANWAR","6281334630421"],
-  [43,264834,"M FAILUSSUBHI","625159757188"],
-  [44,261981,"M HUDI","6285733280486"],
-  [45,267683,"M MASDUQI",""],
-  [46,262961,"M MUSTOFA","6281511431455"],
-  [47,264457,"M ZAINUL ALIM","6285791485548"],
-  [48,268402,"M. ALEX FIRDAUS","6281217656341"],
-  [49,263598,"M. ARIF","6285784494262"],
-  [50,264936,"M. ZAINUL ARIFIN","6283823300479"],
-  [51,265031,"M.ATHO'ILLAH","6285733534542"],
-  [52,263735,"M.FAYDLUL KHAKIM","6287898432765"],
-  [53,267334,"M.KHOTIBUL UMAM","62085602507651"],
-  [54,261870,"M.SAMSUL ARIFIN","6285791656244"],
-  [55,266631,"M.UMAR FARUQ. S.PD","6287881485905"],
-  [56,269065,"MAHMUD","6285755465540"],
-  [57,266389,"MANSYUR","6285755346958"],
-  [58,268188,"MASDUKI","6285608719594"],
-  [59,261992,"MASHUDI","6285929089001"],
-  [60,263582,"MIRZA ABDULLAH","628139291415"],
-  [61,268258,"MISBACHUL MUNIR","6285777703902"],
-  [62,268374,"MISBAHUL ULUM","85182286970"],
-  [63,262250,"MISBAHUSSURUR","6285606373627"],
-  [64,269739,"MOCH. NOVEL MAULANA","6285736551927"],
-  [65,264263,"MOCHAMAD MUSTAIN","6287888523373"],
-  [66,268143,"MOHAMMAD AJI MAULANA","6285755555694"],
-  [67,262768,"MOH BUSTOMI","6285784817921"],
-  [68,269794,"MOH LUTHFI","6285746012017"],
-  [69,265072,"MOH RIFQI ALMAHMUDY","6282276975628"],
-  [70,267553,"MOHAMAD NURSALIM","6285329610255"],
-  [71,265099,"MOHAMMAD AINUL YAQIN","6285865703833"],
-  [72,262897,"MUCHAMAD ALI MACHFUD","6283140650416"],
-  [73,267470,"MUDZAKKIR","6285706659633"],
-  [74,261234,"MUFTI ALI","6281933836205"],
-  [75,267311,"MUHAJIRIN","6287722778895"],
-  [76,264124,"MUHAMAD SOLEH","6285791270135"],
-  [77,261113,"MUHAMMAD (I)","6287787213686"],
-  [78,269997,"MUHAMMAD (II)","6285258235709"],
-  [79,267004,"MUHAMMAD AENUR ROFIK","6283894356438"],
-  [80,262850,"MUHAMMAD AMINULLOH","6285211480783"],
-  [81,269719,"MUHAMMAD AS'AD","6285708117275"],
-  [82,267687,"MUHAMMAD ASROFIL ASFIYAK","6285716547311"],
-  [83,263026,"MUHAMMAD ASROR","6281259005978"],
-  [84,261871,"MUHAMMAD CHOIROL WARO","6282234841725"],
-  [85,268956,"MUHAMMAD HASAN BISRI","6285791431996"],
-  [86,263367,"MUHAMMAD HUSNI MUBAROK","6285812824714"],
-  [87,265913,"MUHAMMAD IMAM HANAFI","6281234008754"],
-  [88,269325,"MUHAMMAD KHOIRUL ANWAR","6282301234143"],
-  [89,262395,"MUHAMMAD MAHMUD","82232716896"],
-  [90,265462,"MUHAMMAD MUHYIDDIN","6287890660589"],
-  [91,261223,"MUHAMMAD MUSLIH","6285743291533"],
-  [92,263483,"MUHAMMAD MUSYAFFA'","6287864579719"],
-  [93,261496,"MUHAMMAD MUSYAFFA ZIDNY","6282334121956"],
-  [94,263795,"MUHAMMAD NUR ALI WAFA","6282231647207"],
-  [95,268745,"MUHAMMAD NUR HIDAYATULLAH","62085336329456"],
-  [96,268392,"MUHAMMAD RIFKI","6285136772833"],
-  [97,264892,"MUHAMMAD ZAINUL MAKRUF","6287838248956"],
-  [98,264024,"MUJIB ABD ROHMAN","625607920503"],
-  [99,265406,"MUKHAMMAD MISBAHUL MUNIR","6282245640232"],
-  [100,264152,"MUKHAMMAD NIR ISLAM","6285645550170"],
-  [101,269949,"MUKHAMMAD SUKADI","85850764335"],
-  [102,265903,"MUKHLASHIN","6285649372001"],
-  [103,265117,"MUSLIMIN","6285693359700"],
-  [104,263356,"NABILUL MUROBBI","6285808807737"],
-  [105,261071,"NANANG QOSIM","6285815421339"],
-  [106,269256,"NASIHIN","6281272276747"],
-  [107,269157,"NASIHUL AMIN","6285692838957"],
-  [108,269578,"NASIRUDDIN","6283134958800"],
-  [109,269894,"NURUL HUDA","6287798394434"],
-  [110,265096,"SAHRULLOH","6285708753040"],
-  [111,266087,"SAIFUL ISLAM","6282180995859"],
-  [112,267725,"SAMSUL ARIFIN","6285854448495"],
-  [113,264125,"SHOHIBUL QODAM","6285232807209"],
-  [114,262126,"SONI IKROMILLAH","6282140091654"],
-  [115,263217,"SUHAEMI","85895226221"],
-  [116,266979,"SYIRRUL MUN'IM","6281234967503"],
-  [117,266375,"ZAINAL ABIDIN","628813274233"],
-];
-
-// Build master data
-const juriData = rawJuri.map(([no, id, nama, hp]) => ({
-  no, id, nama: nama.trim(), hp,
-  status: 'belum',
-  waktu: null,
-}));
-
-let modalTarget = null;
-let currentTab = 'semua';
-let logAbsen = [];
-
-// ============================================================
-// CLOCK
-// ============================================================
-function updateClock() {
-  const now = new Date();
-  const options = { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' };
-  document.getElementById('clockDisplay').textContent = now.toLocaleString('id-ID', options);
-}
-updateClock();
-setInterval(updateClock, 1000);
-
-// ============================================================
-// RENDER
-// ============================================================
-function getInitials(nama) {
-  return nama.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
-}
-
-function getFiltered() {
-  const q = document.getElementById('searchInput').value.toLowerCase().trim();
-  return juriData.filter(j => {
-    const matchQ = !q || j.nama.toLowerCase().includes(q) || String(j.id).includes(q);
-    const matchTab = currentTab === 'semua' || j.status === currentTab;
-    return matchQ && matchTab;
-  });
-}
-
-function renderList() {
-  const list = document.getElementById('juriList');
-  const filtered = getFiltered();
-  updateStats();
-
-  if (!filtered.length) {
-    list.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>Tidak ada juri ditemukan</p></div>`;
-    return;
-  }
-
-  list.innerHTML = filtered.map(j => {
-    const init = getInitials(j.nama);
-    const statusLabel = { hadir:'✅ Hadir', izin:'⚠️ Izin', alpa:'❌ Alpa', belum:'Belum Absen' }[j.status];
-    const timeStr = j.waktu ? `<span style="font-size:10px;color:var(--abu)">· ${j.waktu}</span>` : '';
-    return `
-    <div class="juri-card ${j.status}" onclick="openModal(${j.id})">
-      <div class="avatar">${init}</div>
-      <div class="juri-info">
-        <div class="juri-nama">${j.nama}</div>
-        <div class="juri-meta">
-          <span class="badge-id">${j.id}</span>
-          ${j.hp ? `<span>📱 ${j.hp}</span>` : ''}
+            <div class="flex justify-center space-x-2">
+                <button onclick="closeQrModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold">Tutup</button>
+            </div>
         </div>
-      </div>
-      <div class="status-actions">
-        <span class="status-badge ${j.status}">${statusLabel}</span>
-        ${timeStr}
-        <div class="btn-group" onclick="event.stopPropagation()">
-          <button class="btn-absen btn-hadir ${j.status==='hadir'?'aktif':''}" onclick="quickAbsen(${j.id},'hadir')">H</button>
-          <button class="btn-absen btn-izin ${j.status==='izin'?'aktif':''}" onclick="quickAbsen(${j.id},'izin')">I</button>
-          <button class="btn-absen btn-alpa ${j.status==='alpa'?'aktif':''}" onclick="quickAbsen(${j.id},'alpa')">A</button>
+    </div>
+
+    <!-- MODAL GANTI JURI (OPERATOR) -->
+    <div id="modal-ganti-juri" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Ganti Juri Ruangan</h3>
+            <p class="text-sm text-slate-500 mb-4">Ruang: <span id="modal-ganti-ruang" class="font-bold text-slate-800"></span></p>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Juri Pengganti</label>
+                    <select id="select-juri-pengganti" class="w-full border rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2 mt-6">
+                <button onclick="closeGantiJuriModal()" class="px-4 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 font-semibold">Batal</button>
+                <button onclick="submitGantiJuri()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold">Proses Ganti Juri</button>
+            </div>
         </div>
-      </div>
-    </div>`;
-  }).join('');
-}
+    </div>
 
-function updateStats() {
-  const counts = { hadir:0, izin:0, alpa:0, belum:0 };
-  juriData.forEach(j => counts[j.status]++);
-  document.getElementById('statHadir').textContent = counts.hadir;
-  document.getElementById('statIzin').textContent = counts.izin;
-  document.getElementById('statAlpa').textContent = counts.alpa;
-  document.getElementById('statBelum').textContent = counts.belum;
-}
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        let currentUser = null;
+        let activeSelectedPesertaId = null;
+        let selectedJuriIdForModal = null;
+        let selectedRuangForGantiModal = null;
 
-// ============================================================
-// TAB
-// ============================================================
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.remove('active'));
-  const tabs = ['semua','belum','hadir','izin','alpa','rekap'];
-  const idx = tabs.indexOf(tab);
-  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+        // =============================================
+        // LOCALSTORAGE: SIMPAN & MUAT DATA
+        // =============================================
+        const STORAGE_KEY_JURI    = 'ujian_dataJuri';
+        const STORAGE_KEY_PESERTA = 'ujian_dataPeserta';
 
-  if (tab === 'rekap') {
-    document.getElementById('panelAbsen').style.display = 'none';
-    document.getElementById('panelRekap').style.display = 'block';
-    renderRekap();
-  } else {
-    document.getElementById('panelAbsen').style.display = 'block';
-    document.getElementById('panelRekap').style.display = 'none';
-    renderList();
-  }
-}
+        function saveToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY_JURI,    JSON.stringify(dataJuri));
+                localStorage.setItem(STORAGE_KEY_PESERTA, JSON.stringify(dataPeserta));
+                const ind = document.getElementById('storage-indicator');
+                if (ind) {
+                    ind.classList.remove('hidden');
+                    ind.innerHTML = '<i class="fa-solid fa-circle-check text-xs"></i> Tersimpan';
+                    setTimeout(() => { ind.innerHTML = '<i class="fa-solid fa-circle-check text-xs"></i> Data Tersimpan'; }, 1500);
+                }
+            } catch(e) {
+                console.warn('Gagal menyimpan ke localStorage:', e);
+            }
+        }
 
-// ============================================================
-// REKAP
-// ============================================================
-function renderRekap() {
-  const counts = { hadir:0, izin:0, alpa:0, belum:0 };
-  juriData.forEach(j => counts[j.status]++);
-  const total = juriData.length;
-  const persen = total ? Math.round((counts.hadir / total) * 100) : 0;
+        function loadFromStorage() {
+            try {
+                const savedJuri    = localStorage.getItem(STORAGE_KEY_JURI);
+                const savedPeserta = localStorage.getItem(STORAGE_KEY_PESERTA);
+                if (savedJuri)    dataJuri    = JSON.parse(savedJuri);
+                if (savedPeserta) dataPeserta = JSON.parse(savedPeserta);
+            } catch(e) {
+                console.warn('Gagal memuat dari localStorage:', e);
+            }
+        }
 
-  document.getElementById('rekHadir').textContent = counts.hadir;
-  document.getElementById('rekIzin').textContent = counts.izin;
-  document.getElementById('rekAlpa').textContent = counts.alpa;
-  document.getElementById('rekBelum').textContent = counts.belum;
-  document.getElementById('rekPersen').textContent = persen + '%';
-  document.getElementById('rekBar').style.width = persen + '%';
+        function clearStorage() {
+            if (confirm('Yakin ingin mereset SEMUA data ke kondisi awal? Data yang telah diinput akan hilang.')) {
+                localStorage.removeItem(STORAGE_KEY_JURI);
+                localStorage.removeItem(STORAGE_KEY_PESERTA);
+                location.reload();
+            }
+        }
 
-  const logEl = document.getElementById('logList');
-  if (!logAbsen.length) {
-    logEl.innerHTML = '<span style="color:var(--abu)">Belum ada log absensi</span>';
-    return;
-  }
-  logEl.innerHTML = logAbsen.slice().reverse().slice(0, 20).map(l => {
-    const dot = { hadir:'🟢', izin:'🟡', alpa:'🔴' }[l.status];
-    return `<div style="padding:5px 0;border-bottom:1px solid var(--border)">${dot} <b>${l.nama}</b> — ${l.status.toUpperCase()} <span style="float:right;font-size:11px">${l.waktu}</span></div>`;
-  }).join('');
-}
+        // PEMETAAN OTOMATIS: KODE JURI (ABJAD) -> RUANG TES
+        const mapKodeToRuang = {
+            'A': 'AL-GHAZALI 1.02', 'B': 'AL-GHAZALI 1.02', 'C': 'AL-GHAZALI 1.02', 'D': 'AL-GHAZALI 1.02', 'E': 'AL-GHAZALI 1.02', 'F': 'AL-GHAZALI 1.02',
+            'G': 'AL-GHAZALI 1.05', 'H': 'AL-GHAZALI 1.05', 'I': 'AL-GHAZALI 1.05', 'J': 'AL-GHAZALI 1.05', 'K': 'AL-GHAZALI 1.05', 'L': 'AL-GHAZALI 1.05',
+            'M': 'AL-GHAZALI 1.06', 'N': 'AL-GHAZALI 1.06', 'O': 'AL-GHAZALI 1.06', 'P': 'AL-GHAZALI 1.06', 'Q': 'AL-GHAZALI 1.06', 'R': 'AL-GHAZALI 1.06',
+            'S': 'AL-GHAZALI 1.07', 'T': 'AL-GHAZALI 1.07', 'U': 'AL-GHAZALI 1.07', 'V': 'AL-GHAZALI 1.07', 'W': 'AL-GHAZALI 1.07', 'X': 'AL-GHAZALI 1.07',
+            'Y': 'AL-GHAZALI 1.08', 'Z': 'AL-GHAZALI 1.08', 'AA': 'AL-GHAZALI 1.08', 'AB': 'AL-GHAZALI 1.08', 'AC': 'AL-GHAZALI 1.08', 'AD': 'AL-GHAZALI 1.08',
+            'AE': 'AL-GHAZALI 1.09', 'AF': 'AL-GHAZALI 1.09', 'AG': 'AL-GHAZALI 1.09', 'AH': 'AL-GHAZALI 1.09', 'AI': 'AL-GHAZALI 1.09', 'AJ': 'AL-GHAZALI 1.09',
+            'AK': 'AL-GHAZALI 3.01', 'AL': 'AL-GHAZALI 3.01'
+        };
 
-// ============================================================
-// ABSEN ACTIONS
-// ============================================================
-function quickAbsen(id, status) {
-  const j = juriData.find(x => x.id === id);
-  if (!j) return;
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
-  
-  if (j.status === status) {
-    j.status = 'belum';
-    j.waktu = null;
-    showToast(`${j.nama} dikembalikan ke Belum Absen`);
-    logAbsen = logAbsen.filter(l => l.id !== id || l.status !== status);
-  } else {
-    j.status = status;
-    j.waktu = timeStr;
-    const label = { hadir:'HADIR', izin:'IZIN', alpa:'ALPA' }[status];
-    showToast(`${j.nama} — ${label} · ${timeStr}`);
-    logAbsen.push({ id, nama: j.nama, status, waktu: timeStr });
-  }
-  renderList();
-}
+        // INITIAL DATASET JURI (SESUAI MENTAHAN JURI) — akan di-override oleh localStorage jika ada
+        let dataJuri = [
+            { id: "14340216", nama: "MAJID", status: "ADMIN", telepon: "--------", kode: "", ruang: "", absenMasuk: null, absenPulang: null },
+            { id: "14461212", nama: "HAFIDUDDIN", status: "ADMIN", telepon: "-------------", kode: "", ruang: "", absenMasuk: null, absenPulang: null },
+            { id: "14361507", nama: "HAMDI", status: "OPERATOR", telepon: "------------", kode: "", ruang: "", absenMasuk: null, absenPulang: null },
+            { id: "266864", nama: "ABD ROHIM", status: "JURI", telepon: "6288235563817", kode: "A", ruang: "AL-GHAZALI 1.02", absenMasuk: "07:30", absenPulang: null },
+            { id: "263349", nama: "ABDUL FAHAD ALMAGROBI", status: "JURI", telepon: "6281717363495", kode: "B", ruang: "AL-GHAZALI 1.02", absenMasuk: null, absenPulang: null },
+            { id: "264808", nama: "ABDUL ROSID", status: "JURI", telepon: "6281328085788", kode: "AL", ruang: "AL-GHAZALI 3.01", absenMasuk: "07:45", absenPulang: null },
+            { id: "269875", nama: "ABDUL WARIS", status: "JURI", telepon: "6281358525110", kode: "AD", ruang: "AL-GHAZALI 1.08", absenMasuk: null, absenPulang: null }
+        ];
 
-// ============================================================
-// MODAL
-// ============================================================
-function openModal(id) {
-  modalTarget = id;
-  const j = juriData.find(x => x.id === id);
-  document.getElementById('modalNama').textContent = j.nama;
-  document.getElementById('modalId').textContent = `ID: ${j.id}${j.hp ? ' · ' + j.hp : ''}`;
-  document.getElementById('modalAvatar').textContent = getInitials(j.nama);
-  document.getElementById('modalOverlay').classList.add('show');
-}
+        // INITIAL DATASET PESERTA (SESUAI MENTAHAN PESERTA)
+        let dataPeserta = [
+            { no: 1, idpps: "14461622", nama: "MUHAMMAD EFAN FADHILAH", dom: "N-02", kelas: "Tathbiq 1-BC", guru: "UST.ROY HAMDANI", ruangSore: "DAERAH M-12 A", tes: "TES LISAN TATHBIQ-", jmlKetTes: 1, juriKode: "AL", ruangTes: "AL-GHAZALI 3.01", status: "HADIR", scores: { k1: {lafadz:0, makna:1, terjemah:0, tasrif:2, taktek:0}, k2: {lafadz:0, makna:0, terjemah:1, tasrif:0, nadhom:0} } },
+            { no: 2, idpps: "14462204", nama: "DZIKRI NAYLUL JAWWAD", dom: "N-06", kelas: "Tathbiq 1-AA", guru: "UST.ISUDIN", ruangSore: "DAERAH L-01 A", tes: "TES LISAN TATHBIQ 1", jmlKetTes: 1, juriKode: "AD", ruangTes: "AL-GHAZALI 1.08", status: "HADIR", scores: { k1: {lafadz:0, makna:0, terjemah:0, tasrif:0, taktek:0}, k2: {lafadz:0, makna:0, terjemah:0, tasrif:0, nadhom:0} } },
+            { no: 3, idpps: "14462664", nama: "HADDAD ALI RAHMATULLAH", dom: "N-08", kelas: "Tathbiq 1-AA", guru: "UST.ISUDIN", ruangSore: "DAERAH L-01 A", tes: "TES LISAN TATHBIQ 1", jmlKetTes: 2, juriKode: "A", ruangTes: "AL-GHAZALI 1.02", status: "HADIR", scores: { k1: {lafadz:1, makna:0, terjemah:1, tasrif:0, taktek:0}, k2: {lafadz:0, makna:2, terjemah:0, tasrif:0, nadhom:0} } },
+            { no: 4, idpps: "14461563", nama: "MUHAMMAD ZIYADATUN NOER", dom: "R-11", kelas: "Tathbiq 1-BB", guru: "UST.ACHMAD AFIFUDIN ILMI", ruangSore: "DAERAH M-14 B", tes: "TES LISAN TATHBIQ 1", jmlKetTes: 3, juriKode: "AL", ruangTes: "AL-GHAZALI 3.01", status: "HADIR", scores: { k1: {lafadz:0, makna:0, terjemah:0, tasrif:0, taktek:0}, k2: {lafadz:0, makna:0, terjemah:0, tasrif:0, nadhom:0} } }
+        ];
 
-function closeModal(e) {
-  if (!e || e.target === document.getElementById('modalOverlay')) {
-    document.getElementById('modalOverlay').classList.remove('show');
-    modalTarget = null;
-  }
-}
+        // Muat data tersimpan dari localStorage (menimpa data hardcode di atas jika ada)
+        loadFromStorage();
 
-function absenFromModal(status) {
-  if (!modalTarget) return;
-  quickAbsen(modalTarget, status);
-  closeModal();
-}
+        // --- AUTHENTICATION (CUKUP MASUKKAN ID/PIN) ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const inputId = document.getElementById('login-password').value.trim();
 
-// ============================================================
-// EXPORT CSV
-// ============================================================
-function exportCSV() {
-  const now = new Date();
-  const tgl = now.toLocaleDateString('id-ID');
-  const rows = [['NO','ID JURI','NAMA','NO HP','STATUS','WAKTU ABSEN','TANGGAL']];
-  juriData.forEach(j => {
-    rows.push([j.no, j.id, j.nama, j.hp, j.status.toUpperCase(), j.waktu || '-', tgl]);
-  });
-  const csv = rows.map(r => r.join(',')).join('\n');
-  const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `absen_juri_${tgl.replace(/\//g,'_')}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('CSV berhasil diunduh!');
-}
+            if (inputId === '14340216' || inputId === '14461212') {
+                const adminUser = dataJuri.find(j => j.id === inputId) || { nama: 'Administrator' };
+                currentUser = { role: 'admin', ...adminUser };
+            } 
+            else if (inputId === '14361507') {
+                const opUser = dataJuri.find(j => j.id === inputId) || { nama: 'Operator' };
+                currentUser = { role: 'operator', ...opUser };
+            } 
+            else {
+                const juri = dataJuri.find(j => j.id === inputId && j.status === 'JURI');
+                if (juri) {
+                    currentUser = { role: 'juri', ...juri };
+                } else {
+                    alert("ID / Sandi Akses tidak terdaftar!");
+                    return;
+                }
+            }
 
-// ============================================================
-// RESET
-// ============================================================
-function confirmReset() {
-  if (confirm('Reset semua absensi? Data akan dihapus.')) {
-    juriData.forEach(j => { j.status = 'belum'; j.waktu = null; });
-    logAbsen = [];
-    renderList();
-    showToast('Absensi direset');
-  }
-}
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            
+            document.getElementById('badge-role').innerText = currentUser.role.toUpperCase();
+            document.getElementById('user-display-name').innerText = currentUser.nama || currentUser.name;
 
-// ============================================================
-// TOAST
-// ============================================================
-function showToast(msg) {
-  const t = document.getElementById('toastEl');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
+            document.getElementById('view-admin').classList.add('hidden');
+            document.getElementById('view-operator').classList.add('hidden');
+            document.getElementById('view-juri').classList.add('hidden');
 
-// ============================================================
-// INIT
-// ============================================================
-renderList();
-updateStats();
-</script>
+            if (currentUser.role === 'admin') {
+                document.getElementById('view-admin').classList.remove('hidden');
+                renderAdminJuriTable();
+                renderAdminPesertaTable();
+            } else if (currentUser.role === 'operator') {
+                document.getElementById('view-operator').classList.remove('hidden');
+                renderOperatorViews();
+            } else if (currentUser.role === 'juri') {
+                document.getElementById('view-juri').classList.remove('hidden');
+                renderJuriDashboard();
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('login-password').value = '';
+            document.getElementById('app-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+
+        // --- OTOMATISASI RUANG BERDASARKAN ABJAD ---
+        function autoDetectRuang() {
+            const kodeInput = document.getElementById('assign-kode').value.trim().toUpperCase();
+            const ruangField = document.getElementById('assign-ruang');
+
+            if (mapKodeToRuang[kodeInput]) {
+                ruangField.value = mapKodeToRuang[kodeInput];
+            } else if (kodeInput === '') {
+                ruangField.value = '';
+            }
+        }
+
+
+        function calculateDuration(masuk, pulang) {
+            if (!masuk || !pulang) return masuk ? '<span class="text-amber-600 font-medium">Sedang Bertugas</span>' : '<span class="text-slate-400">-</span>';
+            try {
+                const parseTime = (tStr) => {
+                    const parts = tStr.split(':');
+                    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+                };
+                let mMin = parseTime(masuk);
+                let pMin = parseTime(pulang);
+                if (pMin < mMin) pMin += 24 * 60; // Penanganan lewat tengah malam
+                const diff = pMin - mMin;
+                const hrs = Math.floor(diff / 60);
+                const mins = diff % 60;
+                return `<span class="px-2 py-1 bg-indigo-50 text-indigo-700 font-bold rounded text-xs">${hrs} Jam ${mins} Mnt</span>`;
+            } catch(e) {
+                return '<span class="text-slate-400">-</span>';
+            }
+        }
+
+        // --- ADMIN FUNCTIONS ---
+        function renderAdminJuriTable() {
+            const query = document.getElementById('search-juri').value.toLowerCase();
+            const tbody = document.getElementById('table-admin-juri');
+            const filtered = dataJuri.filter(j => j.status === 'JURI' && j.nama.toLowerCase().includes(query));
+
+            tbody.innerHTML = filtered.map(j => {
+                const durasiText = calculateDuration(j.absenMasuk, j.absenPulang);
+                return `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-mono text-xs font-bold text-slate-700">${j.id}</td>
+                    <td class="p-3 font-semibold text-slate-800">${j.nama}</td>
+                    <td class="p-3 text-emerald-700 font-semibold text-xs"><span class="px-1.5 py-0.5 bg-slate-100 text-slate-800 rounded font-bold">${j.kode || '-'}</span> ${j.ruang || '-'}</td>
+                    <td class="p-3 text-xs font-bold text-emerald-600">${j.absenMasuk ? j.absenMasuk : '<span class="text-slate-400 font-normal">--:--</span>'}</td>
+                    <td class="p-3 text-xs font-bold text-indigo-600">${j.absenPulang ? j.absenPulang : '<span class="text-slate-400 font-normal">--:--</span>'}</td>
+                    <td class="p-3 text-center text-xs">${durasiText}</td>
+                    <td class="p-3 text-center space-x-1">
+                        ${j.ruang ? `
+                            <button onclick="openAssignModal('${j.id}')" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-xs font-semibold">Edit</button>
+                            <button onclick="cancelAssignment('${j.id}')" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs font-semibold">Batalkan</button>
+                        ` : `
+                            <button onclick="openAssignModal('${j.id}')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold">Tugaskan Juri</button>
+                        `}
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        function renderAdminPesertaTable() {
+            const tbody = document.getElementById('table-admin-peserta');
+            tbody.innerHTML = dataPeserta.map((p, idx) => {
+                const totalErr = calculateTotalErrors(p.scores);
+                return `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3">${p.no || (idx + 1)}</td>
+                    <td class="p-3 font-mono text-xs">${p.idpps}</td>
+                    <td class="p-3 font-bold text-slate-800">${p.nama}</td>
+                    <td class="p-3 text-xs">${p.kelas} (${p.dom})</td>
+                    <td class="p-3 text-xs text-slate-500">${p.guru || '-'}</td>
+                    <td class="p-3 text-xs text-slate-500">${p.ruangSore || '-'}</td>
+                    <td class="p-3 text-xs text-slate-500">${p.tes || '-'}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-bold rounded">${p.juriKode || '-'}</span></td>
+                    <td class="p-3 text-xs font-semibold text-slate-700">${p.ruangTes || '-'}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-1 text-xs rounded-full font-bold ${p.status === 'HADIR' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                            ${p.status}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center font-bold text-rose-600">${totalErr} Err</td>
+                </tr>
+            `}).join('');
+        }
+
+        function openAssignModal(juriId) {
+            selectedJuriIdForModal = juriId;
+            const juri = dataJuri.find(j => j.id === juriId);
+            document.getElementById('modal-juri-nama').innerText = juri.nama;
+            document.getElementById('assign-kode').value = juri.kode || '';
+            document.getElementById('assign-ruang').value = juri.ruang || '';
+            document.getElementById('modal-assign').classList.remove('hidden');
+        }
+
+        function closeAssignModal() {
+            document.getElementById('modal-assign').classList.add('hidden');
+        }
+
+        function submitAssignment() {
+            const kode = document.getElementById('assign-kode').value.trim().toUpperCase();
+            const ruang = document.getElementById('assign-ruang').value.trim();
+
+            if (!kode || !ruang) {
+                alert("Harap isi kode juri!");
+                return;
+            }
+
+            const juri = dataJuri.find(j => j.id === selectedJuriIdForModal);
+            juri.kode = kode;
+            juri.ruang = ruang;
+
+            // Sinkronkan data peserta jika kode juri sesuai
+            dataPeserta.forEach(p => {
+                if (p.juriKode === kode) {
+                    p.ruangTes = ruang;
+                }
+            });
+
+            saveToStorage();
+            closeAssignModal();
+            renderAdminJuriTable();
+            renderAdminPesertaTable();
+        }
+
+        function cancelAssignment(juriId) {
+            if (confirm("Yakin ingin membatalkan penugasan juri ini?")) {
+                const juri = dataJuri.find(j => j.id === juriId);
+                juri.kode = "";
+                juri.ruang = "";
+                saveToStorage();
+                renderAdminJuriTable();
+            }
+        }
+
+        // --- IMPOR & EKSPOR DATA JURI (SESUAI MENTAHAN JURI) ---
+        function importJuri(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const json = XLSX.utils.sheet_to_json(worksheet);
+
+                if (json.length > 0) {
+                    dataJuri = json.map((row, idx) => ({
+                        id: String(row['ID'] || `J${idx+1}`),
+                        nama: row['NAMA'] || 'Juri Baru',
+                        telepon: String(row['No. TELEPON'] || row['TELEPON'] || '-'),
+                        status: row['STATUS'] || 'JURI',
+                        kode: row['KODE JURI'] || row['KODE'] || '',
+                        ruang: row['RUANG UJIAN'] || row['RUANG'] || '',
+                        absenMasuk: null,
+                        absenPulang: null
+                    }));
+                    saveToStorage();
+                    renderAdminJuriTable();
+                    alert("Berhasil mengimpor " + json.length + " data juri!");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function exportJuriOnly() {
+            const exportData = dataJuri.map((j, idx) => {
+                let durasi = "-";
+                if (j.absenMasuk && j.absenPulang) {
+                    const parseTime = (tStr) => { const p = tStr.split(':'); return parseInt(p[0])*60 + parseInt(p[1]); };
+                    let diff = parseTime(j.absenPulang) - parseTime(j.absenMasuk);
+                    if (diff < 0) diff += 24*60;
+                    durasi = `${Math.floor(diff/60)} Jam ${diff%60} Mnt`;
+                } else if (j.absenMasuk) {
+                    durasi = "Sedang Bertugas";
+                }
+                return {
+                    "No.": idx + 1,
+                    "ID": j.id,
+                    "NAMA": j.nama,
+                    "No. TELEPON": j.telepon,
+                    "STATUS": j.status,
+                    "KODE JURI": j.kode,
+                    "RUANG UJIAN": j.ruang,
+                    "JAM MASUK": j.absenMasuk || "-",
+                    "JAM PULANG": j.absenPulang || "-",
+                    "DURASI TUGAS": durasi
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "DATA JURI");
+            XLSX.writeFile(workbook, "MENTAHAN_JURI.xlsx");
+        }
+
+        // --- IMPOR & EKSPOR DATA PESERTA (SESUAI MENTAHAN PESERTA) ---
+        function importPeserta(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const json = XLSX.utils.sheet_to_json(worksheet);
+
+                if (json.length > 0) {
+                    dataPeserta = json.map((row, idx) => ({
+                        no: row['NO'] || (idx + 1),
+                        idpps: String(row['IDPPS'] || row['ID'] || `P${idx+1}`),
+                        nama: row['NAMA'] || 'Peserta Baru',
+                        dom: row['DOM'] || '-',
+                        kelas: row['KELAS'] || '-',
+                        guru: row['GURU'] || '-',
+                        ruangSore: row['RUANG SORE'] || '-',
+                        tes: row['TES'] || '-',
+                        jmlKetTes: row['jml ket tes'] || 1,
+                        juriKode: row['JURI'] || row['KODE JURI'] || '',
+                        ruangTes: row['RUANG TES'] || row['RUANG'] || '',
+                        status: 'HADIR',
+                        scores: { k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0}, k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0} }
+                    }));
+                    saveToStorage();
+                    renderAdminPesertaTable();
+                    alert("Berhasil mengimpor " + json.length + " data peserta!");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function exportPesertaOnly() {
+            const exportData = dataPeserta.map((p, idx) => ({
+                "NO": p.no || (idx + 1),
+                "IDPPS": p.idpps,
+                "NAMA": p.nama,
+                "DOM": p.dom,
+                "KELAS": p.kelas,
+                "GURU": p.guru,
+                "RUANG SORE": p.ruangSore,
+                "TES": p.tes,
+                "jml ket tes": p.jmlKetTes,
+                "JURI": p.juriKode,
+                "RUANG TES": p.ruangTes
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "DATA PESERTA");
+            XLSX.writeFile(workbook, "MENTAHAN_PESERTA.xlsx");
+        }
+
+        function exportNilai() {
+            const exportData = dataPeserta.map((p, idx) => ({
+                "NO": p.no || (idx + 1),
+                "IDPPS": p.idpps,
+                "NAMA": p.nama,
+                "DOM": p.dom,
+                "KELAS": p.kelas,
+                "GURU": p.guru,
+                "RUANG SORE": p.ruangSore,
+                "TES": p.tes,
+                "jml ket tes": p.jmlKetTes,
+                "JURI": p.juriKode,
+                "RUANG TES": p.ruangTes,
+                "STATUS": p.status,
+                "K1_LAFADZ": p.scores.k1.lafadz,
+                "K1_MAKNA": p.scores.k1.makna,
+                "K1_TERJEMAH": p.scores.k1.terjemah,
+                "K1_TASRIF": p.scores.k1.tasrif,
+                "K1_TAKTEK": p.scores.k1.taktek,
+                "K2_LAFADZ": p.scores.k2.lafadz,
+                "K2_MAKNA": p.scores.k2.makna,
+                "K2_TERJEMAH": p.scores.k2.terjemah,
+                "K2_TASRIF": p.scores.k2.tasrif,
+                "K2_NADHOM": p.scores.k2.nadhom,
+                "TOTAL_KESALAHAN": calculateTotalErrors(p.scores)
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "KOLOM NILAI");
+            XLSX.writeFile(workbook, "REKAP_NILAI_PESERTA.xlsx");
+        }
+
+        
+        // =============================================
+        // FITUR SCANNER QR CODE ABSENSI JURI (OPERATOR)
+        // =============================================
+        let html5QrcodeScanner = null;
+        let currentJuriFilter = 'all';
+
+        function initQrScanner() {
+            if (html5QrcodeScanner) return; // sudah aktif
+            
+            try {
+                html5QrcodeScanner = new Html5QrcodeScanner(
+                    "qr-reader", 
+                    { fps: 10, qrbox: { width: 180, height: 180 } },
+                    /* verbose= */ false
+                );
+                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            } catch(e) {
+                console.warn("Gagal inisialisasi QR Scanner:", e);
+            }
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            processQrCode(decodedText);
+        }
+
+        function onScanFailure(error) {
+            // scan berjalan mencari QR...
+        }
+
+        function processQrCode(scannedText) {
+            const cleanId = String(scannedText).trim();
+            if (!cleanId) return;
+
+            const box = document.getElementById('scan-result-box');
+            const msg = document.getElementById('scan-result-msg');
+            box.classList.remove('hidden');
+
+            const juri = dataJuri.find(j => j.id === cleanId && j.status === 'JURI');
+            if (!juri) {
+                box.className = "mt-3 p-3 rounded-lg text-xs bg-rose-100 text-rose-800 font-semibold";
+                msg.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> ID Juri (<b>${cleanId}</b>) tidak ditemukan!`;
+                return;
+            }
+
+            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            juri.manualStatus = null; // Reset alpa/izin jika melakukan scan
+            if (!juri.absenMasuk) {
+                juri.absenMasuk = timeNow;
+                box.className = "mt-3 p-3 rounded-lg text-xs bg-emerald-100 text-emerald-800 font-semibold";
+                msg.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Absen MASUK Berhasil: <b>${juri.nama}</b> (${timeNow})`;
+            } else if (!juri.absenPulang) {
+                juri.absenPulang = timeNow;
+                box.className = "mt-3 p-3 rounded-lg text-xs bg-indigo-100 text-indigo-800 font-semibold";
+                msg.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Absen PULANG Berhasil: <b>${juri.nama}</b> (${timeNow})`;
+            } else {
+                box.className = "mt-3 p-3 rounded-lg text-xs bg-amber-100 text-amber-800 font-semibold";
+                msg.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> <b>${juri.nama}</b> sudah absen Datang & Pulang!`;
+            }
+
+            saveToStorage();
+            renderOperatorViews();
+            document.getElementById('manual-qr-input').value = '';
+        }
+
+        function showJuriQrCode(juriId) {
+            const juri = dataJuri.find(j => j.id === juriId);
+            if (!juri) return;
+
+            document.getElementById('qr-juri-nama').innerText = juri.nama + (juri.ruang ? ` (${juri.ruang})` : '');
+            document.getElementById('qr-juri-id').innerText = "ID: " + juri.id;
+
+            const container = document.getElementById('qrcode-container');
+            container.innerHTML = "";
+            new QRCode(container, {
+                text: juri.id,
+                width: 150,
+                height: 150
+            });
+
+            document.getElementById('modal-qr-card').classList.remove('hidden');
+        }
+
+        function closeQrModal() {
+            document.getElementById('modal-qr-card').classList.add('hidden');
+        }
+
+        function filterJuriStatus(filterType) {
+            currentJuriFilter = filterType;
+            renderOperatorViews();
+        }
+
+        // --- OPERATOR FUNCTIONS ---
+        function setJuriManualStatus(juriId, statusType) {
+            const juri = dataJuri.find(j => j.id === juriId);
+            if (!juri) return;
+
+            if (statusType === 'IZIN') {
+                juri.manualStatus = 'IZIN';
+                juri.absenMasuk = null;
+                juri.absenPulang = null;
+            } else if (statusType === 'ALPA') {
+                juri.manualStatus = 'ALPA';
+                juri.absenMasuk = null;
+                juri.absenPulang = null;
+            } else if (statusType === 'RESET') {
+                juri.manualStatus = null;
+                juri.absenMasuk = null;
+                juri.absenPulang = null;
+            }
+
+            saveToStorage();
+            renderOperatorViews();
+        }
+
+        function renderOperatorViews() {
+            initQrScanner(); // Aktifkan scanner saat operator membuka dashboard
+
+            const juriBertugas = dataJuri.filter(j => j.status === 'JURI' && (j.ruang || j.kode));
+            const totalBertugas = juriBertugas.length;
+            const sudahHadir = juriBertugas.filter(j => j.absenMasuk && !j.manualStatus).length;
+            const statusIzin = juriBertugas.filter(j => j.manualStatus === 'IZIN').length;
+            const statusAlpa = juriBertugas.filter(j => j.manualStatus === 'ALPA').length;
+            const belumHadir = totalBertugas - (sudahHadir + statusIzin + statusAlpa);
+
+            document.getElementById('stat-juri-total').innerText = totalBertugas;
+            document.getElementById('stat-juri-hadir').innerText = sudahHadir;
+            document.getElementById('stat-juri-izin').innerText = statusIzin;
+            document.getElementById('stat-juri-alpa').innerText = statusAlpa;
+            document.getElementById('stat-juri-belum').innerText = belumHadir;
+
+            // Filter data juri untuk tabel
+            let filteredJuri = juriBertugas;
+            if (currentJuriFilter === 'hadir') filteredJuri = juriBertugas.filter(j => j.absenMasuk && !j.manualStatus);
+            if (currentJuriFilter === 'izin') filteredJuri = juriBertugas.filter(j => j.manualStatus === 'IZIN');
+            if (currentJuriFilter === 'alpa') filteredJuri = juriBertugas.filter(j => j.manualStatus === 'ALPA');
+            if (currentJuriFilter === 'belum') filteredJuri = juriBertugas.filter(j => !j.absenMasuk && !j.manualStatus);
+
+            const tbodyJuri = document.getElementById('table-operator-juri-status');
+            if (filteredJuri.length === 0) {
+                tbodyJuri.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Tidak ada data juri untuk kategori ini.</td></tr>`;
+            } else {
+                tbodyJuri.innerHTML = filteredJuri.map(j => {
+                    let statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">BELUM</span>';
+                    if (j.manualStatus === 'IZIN') {
+                        statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">IZIN</span>';
+                    } else if (j.manualStatus === 'ALPA') {
+                        statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800">ALPA</span>';
+                    } else if (j.absenMasuk) {
+                        statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">HADIR</span>';
+                    }
+
+                    return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-2 font-mono font-bold text-slate-700">${j.id}</td>
+                        <td class="p-2 font-bold text-slate-800">${j.nama}</td>
+                        <td class="p-2 text-emerald-700 font-semibold"><span class="px-1.5 py-0.5 bg-slate-100 text-slate-800 rounded font-bold">${j.kode || '-'}</span> ${j.ruang || '-'}</td>
+                        <td class="p-2">${j.absenMasuk ? `<span class="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded">${j.absenMasuk}</span>` : '<span class="text-slate-400">--:--</span>'}</td>
+                        <td class="p-2">${j.absenPulang ? `<span class="text-indigo-700 font-bold bg-indigo-50 px-2 py-0.5 rounded">${j.absenPulang}</span>` : '<span class="text-slate-400">--:--</span>'}</td>
+                        <td class="p-2">${statusBadge}</td>
+                        <td class="p-2 text-center">
+                            <div class="flex items-center justify-center space-x-1">
+                                <button onclick="setJuriManualStatus('${j.id}', 'IZIN')" class="px-1.5 py-1 ${j.manualStatus === 'IZIN' ? 'bg-amber-600 text-white' : 'bg-amber-100 hover:bg-amber-200 text-amber-800'} rounded text-[10px] font-bold" title="Tandai Izin">IZIN</button>
+                                <button onclick="setJuriManualStatus('${j.id}', 'ALPA')" class="px-1.5 py-1 ${j.manualStatus === 'ALPA' ? 'bg-rose-600 text-white' : 'bg-rose-100 hover:bg-rose-200 text-rose-800'} rounded text-[10px] font-bold" title="Tandai Alpa">ALPA</button>
+                                ${(j.manualStatus || j.absenMasuk) ? `<button onclick="setJuriManualStatus('${j.id}', 'RESET')" class="px-1.5 py-1 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded text-[10px] font-bold" title="Reset Status"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
+                                <button onclick="showJuriQrCode('${j.id}')" class="px-1.5 py-1 bg-slate-700 hover:bg-slate-800 text-white rounded text-[10px] font-bold" title="Lihat QR Code"><i class="fa-solid fa-qrcode"></i></button>
+                                <button onclick="openGantiJuriModal('${j.ruang}')" class="px-1.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-[10px] font-bold">Ganti</button>
+                            </div>
+                        </td>
+                    </tr>
+                `}).join('');
+            }
+        }
+
+        function toggleStatusPeserta(idpps) {
+            const p = dataPeserta.find(item => item.idpps === idpps);
+            if (p) {
+                p.status = p.status === 'HADIR' ? 'ALPA' : 'HADIR';
+                saveToStorage();
+                renderOperatorViews();
+            }
+        }
+
+        function openGantiJuriModal(ruang) {
+            selectedRuangForGantiModal = ruang;
+            document.getElementById('modal-ganti-ruang').innerText = ruang || 'Semua';
+            const select = document.getElementById('select-juri-pengganti');
+            select.innerHTML = dataJuri.filter(j => j.status === 'JURI').map(j => `
+                <option value="${j.id}">${j.nama} (${j.ruang ? 'Ruang: ' + j.ruang : 'Bebas'})</option>
+            `).join('');
+            document.getElementById('modal-ganti-juri').classList.remove('hidden');
+        }
+
+        function closeGantiJuriModal() {
+            document.getElementById('modal-ganti-juri').classList.add('hidden');
+        }
+
+        function submitGantiJuri() {
+            const newJuriId = document.getElementById('select-juri-pengganti').value;
+            const newJuri = dataJuri.find(j => j.id === newJuriId);
+
+            if (newJuri) {
+                newJuri.ruang = selectedRuangForGantiModal;
+                saveToStorage();
+                alert(`Juri ${newJuri.nama} berhasil ditempatkan di ruang ${selectedRuangForGantiModal}`);
+                closeGantiJuriModal();
+                renderOperatorViews();
+            }
+        }
+
+        // --- JURI DASHBOARD & SCORING LOGIC ---
+        function renderJuriDashboard() {
+            const juri = currentUser;
+            document.getElementById('juri-profile-name').innerText = juri.nama;
+            document.getElementById('juri-profile-ruang').innerText = juri.ruang || 'Belum Ditentukan';
+            document.getElementById('juri-profile-kode').innerText = juri.kode || '-';
+
+            const mBadge = document.getElementById('absen-masuk-badge');
+            const pBadge = document.getElementById('absen-pulang-badge');
+
+            mBadge.innerText = `Datang: ${juri.absenMasuk || 'Belum'}`;
+            mBadge.className = `px-2 py-0.5 rounded text-xs font-medium ${juri.absenMasuk ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`;
+
+            pBadge.innerText = `Pulang: ${juri.absenPulang || 'Belum'}`;
+            pBadge.className = `px-2 py-0.5 rounded text-xs font-medium ${juri.absenPulang ? 'bg-indigo-100 text-indigo-800' : 'bg-amber-100 text-amber-800'}`;
+
+            const filteredPeserta = dataPeserta.filter(p => p.juriKode === juri.kode || p.ruangTes === juri.ruang);
+            const container = document.getElementById('juri-peserta-list');
+
+            if (filteredPeserta.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic">Tidak ada peserta di ruang ini.</p>`;
+                return;
+            }
+
+            container.innerHTML = filteredPeserta.map(p => `
+                <div onclick="selectPesertaForScoring('${p.idpps}')" class="p-3 bg-white rounded-lg border hover:border-emerald-500 cursor-pointer transition ${activeSelectedPesertaId === p.idpps ? 'ring-2 ring-emerald-500 border-transparent bg-emerald-50/30' : ''}">
+                    <p class="font-bold text-sm text-slate-800">${p.nama}</p>
+                    <div class="flex justify-between items-center mt-1">
+                        <span class="text-xs text-slate-500">ID: ${p.idpps}</span>
+                        <span class="text-xs font-bold text-rose-600">${calculateTotalErrors(p.scores)} Err</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function recordAbsenJuri(type) {
+            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const juriInData = dataJuri.find(j => j.id === currentUser.id);
+            if (type === 'masuk') {
+                if (currentUser.absenMasuk) { alert("Anda sudah absen datang!"); return; }
+                currentUser.absenMasuk = timeNow;
+                if (juriInData) juriInData.absenMasuk = timeNow;
+            } else if (type === 'pulang') {
+                if (currentUser.absenPulang) { alert("Anda sudah absen pulang!"); return; }
+                currentUser.absenPulang = timeNow;
+                if (juriInData) juriInData.absenPulang = timeNow;
+            }
+            saveToStorage();
+            renderJuriDashboard();
+        }
+
+        function selectPesertaForScoring(idpps) {
+            activeSelectedPesertaId = idpps;
+            const p = dataPeserta.find(item => item.idpps === idpps);
+
+            document.getElementById('scoring-form-empty').classList.add('hidden');
+            document.getElementById('scoring-form-active').classList.remove('hidden');
+
+            document.getElementById('score-active-nama').innerText = p.nama;
+            document.getElementById('score-active-id').innerText = p.idpps;
+            document.getElementById('score-active-kelas').innerText = p.kelas;
+            document.getElementById('score-active-status').innerText = p.status;
+
+            document.getElementById('k1-lafadz').value = p.scores.k1.lafadz;
+            document.getElementById('k1-makna').value = p.scores.k1.makna;
+            document.getElementById('k1-terjemah').value = p.scores.k1.terjemah;
+            document.getElementById('k1-tasrif').value = p.scores.k1.tasrif;
+            document.getElementById('k1-taktek').value = p.scores.k1.taktek;
+
+            document.getElementById('k2-lafadz').value = p.scores.k2.lafadz;
+            document.getElementById('k2-makna').value = p.scores.k2.makna;
+            document.getElementById('k2-terjemah').value = p.scores.k2.terjemah;
+            document.getElementById('k2-tasrif').value = p.scores.k2.tasrif;
+            document.getElementById('k2-nadhom').value = p.scores.k2.nadhom;
+
+            renderJuriDashboard();
+        }
+
+        function saveScores(e) {
+            e.preventDefault();
+            if (!activeSelectedPesertaId) return;
+
+            const p = dataPeserta.find(item => item.idpps === activeSelectedPesertaId);
+            p.scores = {
+                k1: {
+                    lafadz: parseInt(document.getElementById('k1-lafadz').value) || 0,
+                    makna: parseInt(document.getElementById('k1-makna').value) || 0,
+                    terjemah: parseInt(document.getElementById('k1-terjemah').value) || 0,
+                    tasrif: parseInt(document.getElementById('k1-tasrif').value) || 0,
+                    taktek: parseInt(document.getElementById('k1-taktek').value) || 0
+                },
+                k2: {
+                    lafadz: parseInt(document.getElementById('k2-lafadz').value) || 0,
+                    makna: parseInt(document.getElementById('k2-makna').value) || 0,
+                    terjemah: parseInt(document.getElementById('k2-terjemah').value) || 0,
+                    tasrif: parseInt(document.getElementById('k2-tasrif').value) || 0,
+                    nadhom: parseInt(document.getElementById('k2-nadhom').value) || 0
+                }
+            };
+
+            saveToStorage();
+            alert("Nilai kesalahan berhasil disimpan!");
+            renderJuriDashboard();
+        }
+
+        function calculateTotalErrors(scores) {
+            if (!scores) return 0;
+            const k1Sum = Object.values(scores.k1 || {}).reduce((a, b) => a + b, 0);
+            const k2Sum = Object.values(scores.k2 || {}).reduce((a, b) => a + b, 0);
+            return k1Sum + k2Sum;
+        }
+    </script>
 </body>
 </html>
