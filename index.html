@@ -1081,14 +1081,16 @@
                 { no:4, idpps:"14461563", nama:"MUHAMMAD ZIYADATUN NOER", dom:"R-11", kelas:"Tathbiq 1-BB", guru:"UST.ACHMAD AFIFUDIN ILMI", ruangSore:"DAERAH M-14 B", tes:"TES LISAN TATHBIQ 1", jmlKetTes:3, juriKode:"AL", ruangTes:"AL-GHAZALI 3.01", status:"HADIR", scores:{k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0},k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0}} }
             ];
 
-            // Render ulang tab yang sedang aktif, JANGAN panggil switchTab agar tidak logout
-            if (activeTab === 'dashboard')    updateDashboardStats();
-            else if (activeTab === 'juri')    renderAdminJuriTable();
-            else if (activeTab === 'peserta') renderAdminPesertaTable();
-            else if (activeTab === 'penugasan') renderPenugasanList();
-            else if (activeTab === 'rekap')   renderRekapTable();
-            else if (activeTab === 'presensi') renderOperatorViews();
-            // tab pengaturan tidak perlu re-render khusus
+            // Simpan data baru ke localStorage agar benar-benar bersih
+            localStorage.setItem(STORAGE_KEY_JURI,    JSON.stringify(dataJuri));
+            localStorage.setItem(STORAGE_KEY_PESERTA, JSON.stringify(dataPeserta));
+
+            // Render ulang SEMUA tabel sekaligus agar tidak ada sisa data
+            updateDashboardStats();
+            renderAdminJuriTable();
+            renderAdminPesertaTable();
+            renderPenugasanList();
+            renderRekapTable();
 
             alert('✓ Data Juri & Peserta berhasil direset. Anda tetap login.');
         }
