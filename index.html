@@ -1059,40 +1059,31 @@
         }
 
         function clearStorage() {
-            if (!confirm('Yakin ingin mereset data Juri & Peserta ke kondisi awal? Anda tidak akan keluar dari sistem.')) return;
+            if (!confirm('Yakin ingin mengosongkan SEMUA data Juri & Peserta?\n\nAnda tidak akan keluar dari sistem.')) return;
 
-            localStorage.removeItem(STORAGE_KEY_JURI);
-            localStorage.removeItem(STORAGE_KEY_PESERTA);
+            // Hapus SEMUA key localStorage sekaligus (termasuk cache lama)
+            localStorage.clear();
 
-            // Reset data ke kondisi awal TANPA keluar / reload
-            dataJuri = [
-                { id:"14340216", nama:"MAJID",                   status:"ADMIN",    telepon:"--------",       kode:"",  ruang:"",                absenMasuk:null,    absenPulang:null },
-                { id:"14461212", nama:"HAFIDUDDIN",               status:"ADMIN",    telepon:"-------------",  kode:"",  ruang:"",                absenMasuk:null,    absenPulang:null },
-                { id:"14361507", nama:"HAMDI",                    status:"OPERATOR", telepon:"------------",   kode:"",  ruang:"",                absenMasuk:null,    absenPulang:null },
-                { id:"266864",   nama:"ABD ROHIM",                status:"JURI",     telepon:"6288235563817",  kode:"A", ruang:"AL-GHAZALI 1.02", absenMasuk:"07:30", absenPulang:null },
-                { id:"263349",   nama:"ABDUL FAHAD ALMAGROBI",    status:"JURI",     telepon:"6281717363495",  kode:"B", ruang:"AL-GHAZALI 1.02", absenMasuk:null,    absenPulang:null },
-                { id:"264808",   nama:"ABDUL ROSID",              status:"JURI",     telepon:"6281328085788",  kode:"AL",ruang:"AL-GHAZALI 3.01", absenMasuk:"07:45", absenPulang:null },
-                { id:"269875",   nama:"ABDUL WARIS",              status:"JURI",     telepon:"6281358525110",  kode:"AD",ruang:"AL-GHAZALI 1.08", absenMasuk:null,    absenPulang:null }
-            ];
-            dataPeserta = [
-                { no:1, idpps:"14461622", nama:"MUHAMMAD EFAN FADHILAH",  dom:"N-02", kelas:"Tathbiq 1-BC", guru:"UST.ROY HAMDANI",         ruangSore:"DAERAH M-12 A", tes:"TES LISAN TATHBIQ-",  jmlKetTes:1, juriKode:"AL", ruangTes:"AL-GHAZALI 3.01", status:"HADIR", scores:{k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0},k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0}} },
-                { no:2, idpps:"14462204", nama:"DZIKRI NAYLUL JAWWAD",    dom:"N-06", kelas:"Tathbiq 1-AA", guru:"UST.ISUDIN",               ruangSore:"DAERAH L-01 A", tes:"TES LISAN TATHBIQ 1", jmlKetTes:1, juriKode:"AD", ruangTes:"AL-GHAZALI 1.08", status:"HADIR", scores:{k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0},k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0}} },
-                { no:3, idpps:"14462664", nama:"HADDAD ALI RAHMATULLAH",  dom:"N-08", kelas:"Tathbiq 1-AA", guru:"UST.ISUDIN",               ruangSore:"DAERAH L-01 A", tes:"TES LISAN TATHBIQ 1", jmlKetTes:2, juriKode:"A",  ruangTes:"AL-GHAZALI 1.02", status:"HADIR", scores:{k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0},k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0}} },
-                { no:4, idpps:"14461563", nama:"MUHAMMAD ZIYADATUN NOER", dom:"R-11", kelas:"Tathbiq 1-BB", guru:"UST.ACHMAD AFIFUDIN ILMI", ruangSore:"DAERAH M-14 B", tes:"TES LISAN TATHBIQ 1", jmlKetTes:3, juriKode:"AL", ruangTes:"AL-GHAZALI 3.01", status:"HADIR", scores:{k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0},k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0}} }
-            ];
+            // Kosongkan array — benar-benar kosong, bukan data default
+            dataJuri    = [];
+            dataPeserta = [];
 
-            // Simpan data baru ke localStorage agar benar-benar bersih
-            localStorage.setItem(STORAGE_KEY_JURI,    JSON.stringify(dataJuri));
-            localStorage.setItem(STORAGE_KEY_PESERTA, JSON.stringify(dataPeserta));
+            // Tulis ulang ke localStorage dengan array kosong
+            localStorage.setItem(STORAGE_KEY_JURI,    JSON.stringify([]));
+            localStorage.setItem(STORAGE_KEY_PESERTA, JSON.stringify([]));
+            // Pertahankan config GitHub jika ada
+            if (ghConfig.token || ghConfig.gistId) {
+                localStorage.setItem(STORAGE_KEY_GH, JSON.stringify(ghConfig));
+            }
 
-            // Render ulang SEMUA tabel sekaligus agar tidak ada sisa data
+            // Render ulang semua tampilan
             updateDashboardStats();
             renderAdminJuriTable();
             renderAdminPesertaTable();
             renderPenugasanList();
             renderRekapTable();
 
-            alert('✓ Data Juri & Peserta berhasil direset. Anda tetap login.');
+            alert('✓ Semua data Juri & Peserta berhasil dikosongkan.\nSilakan impor data baru via menu Import / Export.');
         }
 
         // syncToCloud digantikan oleh GitHub Gist (githubPush/githubPull)
