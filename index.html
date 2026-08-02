@@ -1059,10 +1059,12 @@
         }
 
         function clearStorage() {
-            if (!confirm('Yakin ingin mereset SEMUA data ke kondisi awal? Data yang telah diinput akan hilang.')) return;
+            if (!confirm('Yakin ingin mereset data Juri & Peserta ke kondisi awal? Anda tidak akan keluar dari sistem.')) return;
+
             localStorage.removeItem(STORAGE_KEY_JURI);
             localStorage.removeItem(STORAGE_KEY_PESERTA);
-            // Reset ke data awal TANPA reload halaman
+
+            // Reset data ke kondisi awal TANPA keluar / reload
             dataJuri = [
                 { id:"14340216", nama:"MAJID",                   status:"ADMIN",    telepon:"--------",       kode:"",  ruang:"",                absenMasuk:null,    absenPulang:null },
                 { id:"14461212", nama:"HAFIDUDDIN",               status:"ADMIN",    telepon:"-------------",  kode:"",  ruang:"",                absenMasuk:null,    absenPulang:null },
@@ -1073,13 +1075,22 @@
                 { id:"269875",   nama:"ABDUL WARIS",              status:"JURI",     telepon:"6281358525110",  kode:"AD",ruang:"AL-GHAZALI 1.08", absenMasuk:null,    absenPulang:null }
             ];
             dataPeserta = [
-                { no:1, idpps:"14461622", nama:"MUHAMMAD EFAN FADHILAH",  dom:"N-02", kelas:"Tathbiq 1-BC", guru:"UST.ROY HAMDANI",         ruangSore:"DAERAH M-12 A", tes:"TES LISAN TATHBIQ-",  jmlKetTes:1, juriKode:"AL", ruangTes:"AL-GHAZALI 3.01", status:"HADIR", scores:{k1:{lafadz:0,makna:1,terjemah:0,tasrif:2,taktek:0},k2:{lafadz:0,makna:0,terjemah:1,tasrif:0,nadhom:0}} },
+                { no:1, idpps:"14461622", nama:"MUHAMMAD EFAN FADHILAH",  dom:"N-02", kelas:"Tathbiq 1-BC", guru:"UST.ROY HAMDANI",         ruangSore:"DAERAH M-12 A", tes:"TES LISAN TATHBIQ-",  jmlKetTes:1, juriKode:"AL", ruangTes:"AL-GHAZALI 3.01", status:"HADIR", scores:{k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0},k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0}} },
                 { no:2, idpps:"14462204", nama:"DZIKRI NAYLUL JAWWAD",    dom:"N-06", kelas:"Tathbiq 1-AA", guru:"UST.ISUDIN",               ruangSore:"DAERAH L-01 A", tes:"TES LISAN TATHBIQ 1", jmlKetTes:1, juriKode:"AD", ruangTes:"AL-GHAZALI 1.08", status:"HADIR", scores:{k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0},k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0}} },
-                { no:3, idpps:"14462664", nama:"HADDAD ALI RAHMATULLAH",  dom:"N-08", kelas:"Tathbiq 1-AA", guru:"UST.ISUDIN",               ruangSore:"DAERAH L-01 A", tes:"TES LISAN TATHBIQ 1", jmlKetTes:2, juriKode:"A",  ruangTes:"AL-GHAZALI 1.02", status:"HADIR", scores:{k1:{lafadz:1,makna:0,terjemah:1,tasrif:0,taktek:0},k2:{lafadz:0,makna:2,terjemah:0,tasrif:0,nadhom:0}} },
+                { no:3, idpps:"14462664", nama:"HADDAD ALI RAHMATULLAH",  dom:"N-08", kelas:"Tathbiq 1-AA", guru:"UST.ISUDIN",               ruangSore:"DAERAH L-01 A", tes:"TES LISAN TATHBIQ 1", jmlKetTes:2, juriKode:"A",  ruangTes:"AL-GHAZALI 1.02", status:"HADIR", scores:{k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0},k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0}} },
                 { no:4, idpps:"14461563", nama:"MUHAMMAD ZIYADATUN NOER", dom:"R-11", kelas:"Tathbiq 1-BB", guru:"UST.ACHMAD AFIFUDIN ILMI", ruangSore:"DAERAH M-14 B", tes:"TES LISAN TATHBIQ 1", jmlKetTes:3, juriKode:"AL", ruangTes:"AL-GHAZALI 3.01", status:"HADIR", scores:{k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0},k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0}} }
             ];
-            switchTab(activeTab);
-            alert('Data berhasil direset ke kondisi awal.');
+
+            // Render ulang tab yang sedang aktif, JANGAN panggil switchTab agar tidak logout
+            if (activeTab === 'dashboard')    updateDashboardStats();
+            else if (activeTab === 'juri')    renderAdminJuriTable();
+            else if (activeTab === 'peserta') renderAdminPesertaTable();
+            else if (activeTab === 'penugasan') renderPenugasanList();
+            else if (activeTab === 'rekap')   renderRekapTable();
+            else if (activeTab === 'presensi') renderOperatorViews();
+            // tab pengaturan tidak perlu re-render khusus
+
+            alert('✓ Data Juri & Peserta berhasil direset. Anda tetap login.');
         }
 
         // syncToCloud digantikan oleh GitHub Gist (githubPush/githubPull)
