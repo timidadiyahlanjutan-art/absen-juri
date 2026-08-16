@@ -1,17 +1,20 @@
-import { Client } from '@neondatabase/serverless';
-
 export async function onRequest(context) {
-    const client = new Client(context.env.DATABASE_URL);
-    await client.connect();
+    const { request, env } = context;
+    const dbUrl = env.DATABASE_URL;
 
-    const { request } = context;
+    async function sql(queryText, params = []) {
+        const response = await fetch(`${dbUrl.replace(/^postgres(ql)?:\/\//, 'https://').split('?')[0]}/sql`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: queryText, params: params })
+        });
+        const result = await response.json();
+        return result.rows || [];
+    }
 
     try {
-        // Ambil Data Juri (GET)
         if (request.method === "GET") {
-            const { rows } = await client.query('SELECT * FROM juri');
-            await client.end();
-            
+            const rows = await sql('SELECT * FROM juri');
             const formatted = rows.map(r => ({
                 id: r.id,
                 nama: r.nama,
@@ -29,13 +32,12 @@ export async function onRequest(context) {
             });
         }
 
-        // Simpan / Update Data Juri (POST)
         if (request.method === "POST") {
             const data = await request.json();
-            
             const juriList = Array.isArray(data) ? data : [data];
+
             for (const j of juriList) {
-                await client.query(`
+                await sql(`
                     INSERT INTO juri (id, nama, status, telepon, kode, ruang, absen_masuk, absen_pulang, manual_status)
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                     ON CONFLICT (id) DO UPDATE SET
@@ -50,13 +52,11 @@ export async function onRequest(context) {
                 `, [j.id, j.nama, j.status, j.telepon, j.kode, j.ruang, j.absenMasuk, j.absenPulang, j.manualStatus]);
             }
 
-            await client.end();
             return new Response(JSON.stringify({ status: "success" }), {
                 headers: { "Content-Type": "application/json" }
             });
         }
     } catch (err) {
-        await client.end();
         return new Response(JSON.stringify({ error: err.message }), { status: 500 });
     }
 }
