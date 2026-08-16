@@ -24,20 +24,20 @@ export async function onRequest(context) {
             });
         }
 
-        // Parsing alamat dan sandi dari DATABASE_URL Neon
-        const parsedUrl = new URL(dbUrl.replace(/^postgres(ql)?:\/\//, 'http://'));
+        // Ambil host Neon dari DATABASE_URL
+        const cleanDbUrl = dbUrl.trim();
+        const parsedUrl = new URL(cleanDbUrl.replace(/^postgres(ql)?:\/\//, 'http://'));
         const host = parsedUrl.hostname;
-        const password = decodeURIComponent(parsedUrl.password);
 
-        // Query ke Neon SQL API
+        // Query ke Neon HTTP API dengan header Neon-Connection-String
         const response = await fetch(`https://${host}/sql`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${password}`
+                'Neon-Connection-String': cleanDbUrl
             },
             body: JSON.stringify({
-                query: 'SELECT id, nama, status, telepon, kode, ruang, absen_masuk, absen_pulang, manual_status FROM juri WHERE id = $1 LIMIT 1',
+                query: 'SELECT id, nama, status, telepon, kode, ruang, absen_masuk, absen_pulang, manual_status FROM juri WHERE id = $1 LIMIT 1;',
                 params: [inputId]
             })
         });
