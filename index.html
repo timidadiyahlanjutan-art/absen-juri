@@ -285,7 +285,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="dash-table-juri-body" class="divide-y divide-slate-100">
-                                    <!-- Populated dynamically -->
                                 </tbody>
                             </table>
                         </div>
@@ -316,7 +315,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="table-admin-juri" class="divide-y divide-slate-200">
-                                    <!-- Populated dynamically -->
                                 </tbody>
                             </table>
                         </div>
@@ -344,7 +342,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="table-admin-peserta" class="divide-y divide-slate-200">
-                                    <!-- Populated dynamically -->
                                 </tbody>
                             </table>
                         </div>
@@ -357,7 +354,6 @@
                         <h3 class="text-base font-bold text-slate-800 mb-2"><i class="fa-solid fa-clipboard-list text-emerald-600 mr-2"></i> Penugasan Kode Abjad Juri & Ruang Ujian</h3>
                         <p class="text-xs text-slate-500 mb-4">Pilih juri lalu masukkan kode abjad (Contoh: A, B, AD, AL) untuk pemetaan ruangan otomatis.</p>
                         <div id="penugasan-container-list" class="space-y-3">
-                            <!-- Populated dynamically -->
                         </div>
                     </div>
                 </div>
@@ -377,7 +373,6 @@
                             <div class="border rounded-xl p-4 bg-slate-50">
                                 <h4 class="font-bold text-xs text-slate-700 mb-3 uppercase">Daftar Peserta Ruangan Ini</h4>
                                 <div id="juri-peserta-list" class="space-y-2 max-h-96 overflow-y-auto">
-                                    <!-- Populated dynamically -->
                                 </div>
                             </div>
 
@@ -542,7 +537,6 @@
                                         </tr>
                                     </thead>
                                     <tbody id="table-operator-juri-status" class="divide-y divide-slate-200">
-                                        <!-- Populated dynamically -->
                                     </tbody>
                                 </table>
                             </div>
@@ -575,7 +569,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="table-rekap-nilai-body" class="divide-y divide-slate-200">
-                                    <!-- Populated dynamically -->
                                 </tbody>
                             </table>
                         </div>
@@ -686,7 +679,6 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Juri Pengganti</label>
                     <select id="select-juri-pengganti" class="w-full border rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none">
-                        <!-- Populated dynamically -->
                     </select>
                 </div>
             </div>
@@ -698,10 +690,8 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT APP LOGIC & SIDEBAR NAVIGATION -->
+    <!-- JAVASCRIPT APP LOGIC & BACKEND SYNC -->
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_GANTI_DENGAN_URL_DEPLOY_ANDA/exec";
-
         let currentUser = null;
         let activeSelectedPesertaId = null;
         let selectedJuriIdForModal = null;
@@ -925,33 +915,56 @@
             }
         }
 
+        // =============================================
+        // SINKRONISASI DATABASE CLOUDFLARE PAGES / NEON
+        // =============================================
         async function syncToCloud() {
-            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("GANTI_DENGAN_URL")) return;
             const ind = document.getElementById('storage-indicator');
             if (ind) ind.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Syncing...';
 
             try {
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: "syncAll", dataJuri: dataJuri, dataPeserta: dataPeserta })
-                });
+                if (dataJuri && dataJuri.length > 0) {
+                    await fetch('/api/juri', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dataJuri)
+                    });
+                }
+                if (dataPeserta && dataPeserta.length > 0) {
+                    await fetch('/api/peserta', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dataPeserta)
+                    });
+                }
                 if (ind) ind.innerHTML = '<i class="fa-solid fa-cloud-check text-xs"></i> Cloud Tersinkron';
             } catch(e) {
+                console.warn("Gagal sinkron ke cloud:", e);
                 if (ind) ind.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-xs text-amber-400"></i> Offline Sync';
             }
         }
 
         async function fetchFromCloud() {
-            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("GANTI_DENGAN_URL")) return;
             try {
-                const res = await fetch(GOOGLE_SCRIPT_URL);
-                const json = await res.json();
-                
-                if (json.juri && json.juri.length > 1) {
-                    switchTab(activeTab);
+                const resJuri = await fetch('/api/juri');
+                if (resJuri.ok) {
+                    const juriRemote = await resJuri.json();
+                    if (Array.isArray(juriRemote) && juriRemote.length > 0) {
+                        dataJuri = juriRemote;
+                        localStorage.setItem(STORAGE_KEY_JURI, JSON.stringify(dataJuri));
+                    }
                 }
+
+                const resPeserta = await fetch('/api/peserta');
+                if (resPeserta.ok) {
+                    const pesertaRemote = await resPeserta.json();
+                    if (Array.isArray(pesertaRemote) && pesertaRemote.length > 0) {
+                        dataPeserta = pesertaRemote;
+                        localStorage.setItem(STORAGE_KEY_PESERTA, JSON.stringify(dataPeserta));
+                    }
+                }
+
+                switchTab(activeTab);
             } catch(e) {
                 console.warn("Gagal mengambil data cloud:", e);
             }
@@ -959,7 +972,7 @@
 
         function forceSyncOnline() {
             syncToCloud();
-            alert("Memulai sinkronisasi data online ke Cloud...");
+            alert("Memulai sinkronisasi data online ke database...");
         }
 
         setInterval(() => {
@@ -1539,19 +1552,6 @@
             document.getElementById('juri-profile-ruang').innerText = juri.ruang || 'Belum Ditentukan';
             document.getElementById('juri-profile-kode').innerText = juri.kode || '-';
 
-            const mBadge = document.getElementById('absen-masuk-badge');
-            const pBadge = document.getElementById('absen-pulang-badge');
-
-            if (mBadge) {
-                mBadge.innerText = `Datang: ${juri.absenMasuk || 'Belum'}`;
-                mBadge.className = `px-2 py-0.5 rounded text-xs font-medium ${juri.absenMasuk ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`;
-            }
-
-            if (pBadge) {
-                pBadge.innerText = `Pulang: ${juri.absenPulang || 'Belum'}`;
-                pBadge.className = `px-2 py-0.5 rounded text-xs font-medium ${juri.absenPulang ? 'bg-indigo-100 text-indigo-800' : 'bg-amber-100 text-amber-800'}`;
-            }
-
             const filteredPeserta = dataPeserta.filter(p => p.juriKode === juri.kode || p.ruangTes === juri.ruang);
             const container = document.getElementById('juri-peserta-list');
             if (!container) return;
@@ -1570,22 +1570,6 @@
                     </div>
                 </div>
             `).join('');
-        }
-
-        function recordAbsenJuri(type) {
-            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const juriInData = dataJuri.find(j => j.id === currentUser.id);
-            if (type === 'masuk') {
-                if (currentUser.absenMasuk) { alert("Anda sudah absen datang!"); return; }
-                currentUser.absenMasuk = timeNow;
-                if (juriInData) juriInData.absenMasuk = timeNow;
-            } else if (type === 'pulang') {
-                if (currentUser.absenPulang) { alert("Anda sudah absen pulang!"); return; }
-                currentUser.absenPulang = timeNow;
-                if (juriInData) juriInData.absenPulang = timeNow;
-            }
-            saveToStorage();
-            renderJuriDashboard();
         }
 
         function selectPesertaForScoring(idpps) {
@@ -1638,7 +1622,7 @@
             };
 
             saveToStorage();
-            alert("Nilai kesalahan berhasil disimpan!");
+            alert("Nilai kesalahan berhasil disimpan ke Database Cloud!");
             renderJuriDashboard();
         }
 
@@ -1648,6 +1632,11 @@
             const k2Sum = Object.values(scores.k2 || {}).reduce((a, b) => a + b, 0);
             return k1Sum + k2Sum;
         }
+
+        // Muat data awal dari Cloudflare Pages / Neon saat web dibuka
+        window.addEventListener('DOMContentLoaded', async () => {
+            await fetchFromCloud();
+        });
     </script>
 </body>
 </html>
