@@ -1,17 +1,20 @@
-import { Client } from '@neondatabase/serverless';
-
 export async function onRequest(context) {
-    const client = new Client(context.env.DATABASE_URL);
-    await client.connect();
+    const { request, env } = context;
+    const dbUrl = env.DATABASE_URL;
 
-    const { request } = context;
+    async function sql(queryText, params = []) {
+        const response = await fetch(`${dbUrl.replace(/^postgres(ql)?:\/\//, 'https://').split('?')[0]}/sql`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: queryText, params: params })
+        });
+        const result = await response.json();
+        return result.rows || [];
+    }
 
     try {
-        // Ambil Data Peserta & Nilai (GET)
         if (request.method === "GET") {
-            const { rows } = await client.query('SELECT * FROM peserta ORDER BY no ASC');
-            await client.end();
-
+            const rows = await sql('SELECT * FROM peserta ORDER BY no ASC');
             const formatted = rows.map(r => ({
                 no: r.no,
                 idpps: r.idpps,
@@ -33,13 +36,12 @@ export async function onRequest(context) {
             });
         }
 
-        // Simpan / Update Peserta & Nilai (POST)
         if (request.method === "POST") {
             const data = await request.json();
             const pesertaList = Array.isArray(data) ? data : [data];
 
             for (const p of pesertaList) {
-                await client.query(`
+                await sql(`
                     INSERT INTO peserta (idpps, no, nama, dom, kelas, guru, ruang_sore, tes, jml_ket_tes, juri_kode, ruang_tes, status, scores)
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
                     ON CONFLICT (idpps) DO UPDATE SET
@@ -61,13 +63,11 @@ export async function onRequest(context) {
                 ]);
             }
 
-            await client.end();
             return new Response(JSON.stringify({ status: "success" }), {
                 headers: { "Content-Type": "application/json" }
             });
         }
     } catch (err) {
-        await client.end();
         return new Response(JSON.stringify({ error: err.message }), { status: 500 });
     }
 }
