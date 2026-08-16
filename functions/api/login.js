@@ -11,13 +11,31 @@ export async function onRequest(context) {
         const inputId = String(id || '').trim();
 
         if (!inputId) {
-            return new Response(JSON.stringify({ success: false, message: "ID wajib diisi!" }), { status: 400 });
+            return new Response(JSON.stringify({ success: false, message: "ID wajib diisi!" }), {
+                headers: { "Content-Type": "application/json" },
+                status: 400
+            });
         }
 
-        // Query HTTP ke Neon Database
-        const response = await fetch(`${dbUrl.replace(/^postgres(ql)?:\/\//, 'https://').split('?')[0]}/sql`, {
+        if (!dbUrl) {
+            return new Response(JSON.stringify({ success: false, message: "DATABASE_URL belum dikonfigurasi di Cloudflare!" }), {
+                headers: { "Content-Type": "application/json" },
+                status: 500
+            });
+        }
+
+        // Parsing alamat dan sandi dari DATABASE_URL Neon
+        const parsedUrl = new URL(dbUrl.replace(/^postgres(ql)?:\/\//, 'http://'));
+        const host = parsedUrl.hostname;
+        const password = decodeURIComponent(parsedUrl.password);
+
+        // Query ke Neon SQL API
+        const response = await fetch(`https://${host}/sql`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${password}`
+            },
             body: JSON.stringify({
                 query: 'SELECT id, nama, status, telepon, kode, ruang, absen_masuk, absen_pulang, manual_status FROM juri WHERE id = $1 LIMIT 1',
                 params: [inputId]
@@ -25,7 +43,19 @@ export async function onRequest(context) {
         });
 
         const result = await response.json();
-        const user = result.rows && result.rows[0];
+
+        if (!response.ok || !result.rows) {
+            return new Response(JSON.stringify({ 
+                success: false, 
+                message: result.message || "Gagal membaca database!",
+                detail: result 
+            }), {
+                headers: { "Content-Type": "application/json" },
+                status: 500
+            });
+        }
+
+        const user = result.rows[0];
 
         if (!user) {
             return new Response(JSON.stringify({ success: false, message: "ID / Sandi Akses tidak terdaftar!" }), {
@@ -34,7 +64,6 @@ export async function onRequest(context) {
             });
         }
 
-        // Tentukan hak akses role berdasarkan status di database
         let role = 'juri';
         const st = String(user.status || '').toUpperCase();
         if (st === 'ADMIN') role = 'admin';
@@ -59,7 +88,7 @@ export async function onRequest(context) {
         });
 
     } catch (err) {
-        return new Response(JSON.stringify({ success: false, error: err.message }), { 
+        return new Response(JSON.stringify({ success: false, message: err.message }), { 
             headers: { "Content-Type": "application/json" },
             status: 500 
         });
