@@ -265,7 +265,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 4: 📋 PENUGASAN JURI (DENGAN TOMBOL RESET SEMUA PENUGASAN) -->
+                <!-- TAB 4: 📋 PENUGASAN JURI -->
                 <div id="tab-penugasan" class="tab-pane space-y-6 hidden">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b">
@@ -556,6 +556,7 @@
         let selectedJuriIdForModal = null;
         let activeTab = 'dashboard';
 
+        const STORAGE_KEY_AUTH    = 'ujian_sessionUser';
         const STORAGE_KEY_JURI    = 'ujian_dataJuri';
         const STORAGE_KEY_PESERTA = 'ujian_dataPeserta';
 
@@ -631,7 +632,6 @@
             document.getElementById('dash-total-ruang').innerText = uniqueRuang.size;
         }
 
-        // --- PENUGASAN JURI LENGKAP DENGAN GRID & PERNAH BERTUGAS ---
         function renderPenugasanList() {
             const container = document.getElementById('penugasan-container-list');
             if (!container) return;
@@ -652,7 +652,6 @@
             }
             
             container.innerHTML = juriList.map(j => {
-                // Hitung santri yang sudah pernah dinilai oleh juri ini
                 const totalPesertaJuri = dataPeserta.filter(p => p.juriKode && j.kode && String(p.juriKode).toUpperCase() === String(j.kode).toUpperCase());
                 const totalTugasCount = totalPesertaJuri.filter(p => {
                     const k1 = Object.values(p.scores?.k1 || {}).reduce((a,b)=>a+b, 0);
@@ -689,7 +688,6 @@
             `}).join('');
         }
 
-        // --- FUNGSI RESET SEMUA PENUGASAN JURI (KOSONGKAN KODE & RUANG) ---
         function resetAllPenugasan() {
             if (!confirm("Apakah Anda yakin ingin MENGOSONGKAN seluruh penugasan juri (Kode & Ruang)?\n\nCatatan: Data master juri dan santri tidak akan terhapus.")) {
                 return;
@@ -712,7 +710,6 @@
             alert("Seluruh penugasan juri berhasil di-reset menjadi kosong!");
         }
 
-        // --- FUNGSI KOSONGKAN PENUGASAN 1 ORANG JURI ---
         function hapusTugasSingle() {
             if (!selectedJuriIdForModal) return;
             const juri = dataJuri.find(j => j.id === selectedJuriIdForModal);
@@ -831,7 +828,6 @@
             switchTab(activeTab);
         }
 
-        // --- IMPOR JURI DENGAN FORMAT: id juri, nama, GRID, STATUS ---
         function importJuri(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1153,32 +1149,48 @@
                 if (!data.success) { alert(data.message || "ID tidak ditemukan!"); return; }
 
                 currentUser = data.user;
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('hidden');
-                document.getElementById('app-screen').classList.add('flex');
-                document.getElementById('sidebar-role-badge').innerText = currentUser.role.toUpperCase();
-                document.getElementById('sidebar-user-name').innerText = currentUser.nama || 'User';
-                document.getElementById('sidebar-user-id').innerText = "ID: " + currentUser.id;
-
-                applyRoleSidebarPermissions();
-                await fetchFromCloud();
-
-                if (currentUser.role === 'juri') switchTab('penilaian');
-                else switchTab('dashboard');
+                localStorage.setItem(STORAGE_KEY_AUTH, JSON.stringify(currentUser));
+                showMainApp();
             } catch (err) {
                 alert("Gagal terhubung ke database!");
             }
         }
 
+        function showMainApp() {
+            if (!currentUser) return;
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            document.getElementById('app-screen').classList.add('flex');
+            document.getElementById('sidebar-role-badge').innerText = (currentUser.role || 'USER').toUpperCase();
+            document.getElementById('sidebar-user-name').innerText = currentUser.nama || 'User';
+            document.getElementById('sidebar-user-id').innerText = "ID: " + currentUser.id;
+
+            applyRoleSidebarPermissions();
+
+            if (currentUser.role === 'juri') switchTab('penilaian');
+            else switchTab('dashboard');
+        }
+
         function handleLogout() {
             currentUser = null;
+            localStorage.removeItem(STORAGE_KEY_AUTH);
             document.getElementById('app-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('flex');
             document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('login-password').value = '';
         }
 
         loadFromStorage();
-        window.addEventListener('DOMContentLoaded', async () => { await fetchFromCloud(); });
+        window.addEventListener('DOMContentLoaded', async () => { 
+            const savedSession = localStorage.getItem(STORAGE_KEY_AUTH);
+            if (savedSession) {
+                try {
+                    currentUser = JSON.parse(savedSession);
+                    showMainApp();
+                } catch(e) {}
+            }
+            await fetchFromCloud(); 
+        });
     </script>
 </body>
 </html>
