@@ -812,8 +812,8 @@
             document.getElementById('stat-blm-val').innerText = cntBelum;
 
             const cntScored = dataPeserta.filter(p => {
-                const k1Sum = Object.values(p.scores.k1 || {}).reduce((a, b) => a + b, 0);
-                const k2Sum = Object.values(p.scores.k2 || {}).reduce((a, b) => a + b, 0);
+                const k1Sum = Object.values(p.scores?.k1 || {}).reduce((a, b) => a + b, 0);
+                const k2Sum = Object.values(p.scores?.k2 || {}).reduce((a, b) => a + b, 0);
                 return (k1Sum + k2Sum) > 0;
             }).length;
 
@@ -872,8 +872,8 @@
         function renderRekapTable() {
             const tbody = document.getElementById('table-rekap-nilai-body');
             tbody.innerHTML = dataPeserta.map((p, idx) => {
-                const k1Sum = Object.values(p.scores.k1 || {}).reduce((a, b) => a + b, 0);
-                const k2Sum = Object.values(p.scores.k2 || {}).reduce((a, b) => a + b, 0);
+                const k1Sum = Object.values(p.scores?.k1 || {}).reduce((a, b) => a + b, 0);
+                const k2Sum = Object.values(p.scores?.k2 || {}).reduce((a, b) => a + b, 0);
                 const totalErr = k1Sum + k2Sum;
                 return `
                 <tr class="hover:bg-slate-50">
@@ -1213,8 +1213,8 @@
                         nama: row['NAMA'] || 'Juri Baru',
                         telepon: String(row['No. TELEPON'] || row['TELEPON'] || '-'),
                         status: row['STATUS'] || 'JURI',
-                        kode: row['KODE JURI'] || row['KODE'] || '',
-                        ruang: row['RUANG UJIAN'] || row['RUANG'] || '',
+                        kode: String(row['KODE JURI'] || row['KODE'] || '').trim().toUpperCase(),
+                        ruang: String(row['RUANG UJIAN'] || row['RUANG'] || '').trim(),
                         absenMasuk: null,
                         absenPulang: null
                     }));
@@ -1257,6 +1257,7 @@
             XLSX.writeFile(workbook, "MENTAHAN_JURI.xlsx");
         }
 
+        // --- IMPOR PESERTA DENGAN PEMETAAN AKURAT (MENCEGAH MEMBELUDAK) ---
         function importPeserta(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1269,24 +1270,30 @@
                 const json = XLSX.utils.sheet_to_json(worksheet);
 
                 if (json.length > 0) {
-                    dataPeserta = json.map((row, idx) => ({
-                        no: row['NO'] || (idx + 1),
-                        idpps: String(row['IDPPS'] || row['ID'] || `P${idx+1}`),
-                        nama: row['NAMA'] || 'Peserta Baru',
-                        dom: row['DOM'] || '-',
-                        kelas: row['KELAS'] || '-',
-                        guru: row['GURU'] || '-',
-                        ruangSore: row['RUANG SORE'] || '-',
-                        tes: row['TES'] || '-',
-                        jmlKetTes: row['jml ket tes'] || 1,
-                        juriKode: row['JURI'] || row['KODE JURI'] || '',
-                        ruangTes: row['RUANG TES'] || row['RUANG'] || '',
-                        status: 'HADIR',
-                        scores: { k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0}, k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0} }
-                    }));
+                    dataPeserta = json.map((row, idx) => {
+                        const kodeJuri = String(row['JURI'] || row['KODE JURI'] || row['Kode Juri'] || '').trim().toUpperCase();
+                        const ruangUjian = String(row['RUANG TES'] || row['RUANG'] || row['Ruang Tes'] || '').trim().toUpperCase();
+
+                        return {
+                            no: row['NO'] || (idx + 1),
+                            idpps: String(row['IDPPS'] || row['ID'] || `P${idx+1}`).trim(),
+                            nama: String(row['NAMA'] || 'Peserta Baru').trim(),
+                            dom: String(row['DOM'] || '-').trim(),
+                            kelas: String(row['KELAS'] || '-').trim(),
+                            guru: String(row['GURU'] || '-').trim(),
+                            ruangSore: String(row['RUANG SORE'] || '-').trim(),
+                            tes: String(row['TES'] || '-').trim(),
+                            jmlKetTes: row['jml ket tes'] || 1,
+                            juriKode: kodeJuri,
+                            ruangTes: ruangUjian || (mapKodeToRuang[kodeJuri] || ''),
+                            status: 'HADIR',
+                            scores: { k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0}, k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0} }
+                        };
+                    });
+
                     saveToStorage();
                     switchTab('peserta');
-                    alert("Berhasil mengimpor " + json.length + " data peserta!");
+                    alert("Berhasil mengimpor " + json.length + " data peserta dengan pemetaan yang akurat!");
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -1327,16 +1334,16 @@
                 "JURI": p.juriKode,
                 "RUANG TES": p.ruangTes,
                 "STATUS": p.status,
-                "K1_LAFADZ": p.scores.k1.lafadz,
-                "K1_MAKNA": p.scores.k1.makna,
-                "K1_TERJEMAH": p.scores.k1.terjemah,
-                "K1_TASRIF": p.scores.k1.tasrif,
-                "K1_TAKTEK": p.scores.k1.taktek,
-                "K2_LAFADZ": p.scores.k2.lafadz,
-                "K2_MAKNA": p.scores.k2.makna,
-                "K2_TERJEMAH": p.scores.k2.terjemah,
-                "K2_TASRIF": p.scores.k2.tasrif,
-                "K2_NADHOM": p.scores.k2.nadhom,
+                "K1_LAFADZ": p.scores?.k1?.lafadz || 0,
+                "K1_MAKNA": p.scores?.k1?.makna || 0,
+                "K1_TERJEMAH": p.scores?.k1?.terjemah || 0,
+                "K1_TASRIF": p.scores?.k1?.tasrif || 0,
+                "K1_TAKTEK": p.scores?.k1?.taktek || 0,
+                "K2_LAFADZ": p.scores?.k2?.lafadz || 0,
+                "K2_MAKNA": p.scores?.k2?.makna || 0,
+                "K2_TERJEMAH": p.scores?.k2?.terjemah || 0,
+                "K2_TASRIF": p.scores?.k2?.tasrif || 0,
+                "K2_NADHOM": p.scores?.k2?.nadhom || 0,
                 "TOTAL_KESALAHAN": calculateTotalErrors(p.scores)
             }));
 
@@ -1552,7 +1559,7 @@
             }
         }
 
-        // --- JURI DASHBOARD & SCORING LOGIC ---
+        // --- JURI DASHBOARD & SCORING LOGIC (FILTER TEPAT BERDASARKAN KODE/RUANG) ---
         function renderJuriDashboard() {
             const juri = currentUser;
             if (!juri) return;
@@ -1561,12 +1568,22 @@
             document.getElementById('juri-profile-ruang').innerText = juri.ruang || 'Belum Ditentukan';
             document.getElementById('juri-profile-kode').innerText = juri.kode || '-';
 
-            const filteredPeserta = dataPeserta.filter(p => p.juriKode === juri.kode || p.ruangTes === juri.ruang);
+            // Filter akurat: Cocokkan kode juri secara tepat agar peserta tidak membeludak
+            const filteredPeserta = dataPeserta.filter(p => {
+                if (juri.kode && juri.kode !== '-') {
+                    return String(p.juriKode || '').trim().toUpperCase() === String(juri.kode).trim().toUpperCase();
+                }
+                if (juri.ruang && juri.ruang !== '-') {
+                    return String(p.ruangTes || '').trim().toUpperCase() === String(juri.ruang).trim().toUpperCase();
+                }
+                return false;
+            });
+
             const container = document.getElementById('juri-peserta-list');
             if (!container) return;
 
             if (filteredPeserta.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic">Tidak ada peserta di ruang ini.</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-400 italic p-3 text-center">Tidak ada peserta yang ditugaskan untuk kode/ruang ini.</p>`;
                 return;
             }
 
@@ -1574,7 +1591,7 @@
                 <div onclick="selectPesertaForScoring('${p.idpps}')" class="p-3 bg-white rounded-lg border hover:border-emerald-500 cursor-pointer transition ${activeSelectedPesertaId === p.idpps ? 'ring-2 ring-emerald-500 border-transparent bg-emerald-50/30' : ''}">
                     <p class="font-bold text-xs text-slate-800">${p.nama}</p>
                     <div class="flex justify-between items-center mt-1">
-                        <span class="text-[10px] text-slate-500">ID: ${p.idpps}</span>
+                        <span class="text-[10px] text-slate-500">ID: ${p.idpps} | Kls: ${p.kelas}</span>
                         <span class="text-xs font-bold text-rose-600">${calculateTotalErrors(p.scores)} Err</span>
                     </div>
                 </div>
@@ -1594,17 +1611,17 @@
             document.getElementById('score-active-kelas').innerText = p.kelas;
             document.getElementById('score-active-status').innerText = p.status;
 
-            document.getElementById('k1-lafadz').value = p.scores.k1.lafadz;
-            document.getElementById('k1-makna').value = p.scores.k1.makna;
-            document.getElementById('k1-terjemah').value = p.scores.k1.terjemah;
-            document.getElementById('k1-tasrif').value = p.scores.k1.tasrif;
-            document.getElementById('k1-taktek').value = p.scores.k1.taktek;
+            document.getElementById('k1-lafadz').value = p.scores?.k1?.lafadz || 0;
+            document.getElementById('k1-makna').value = p.scores?.k1?.makna || 0;
+            document.getElementById('k1-terjemah').value = p.scores?.k1?.terjemah || 0;
+            document.getElementById('k1-tasrif').value = p.scores?.k1?.tasrif || 0;
+            document.getElementById('k1-taktek').value = p.scores?.k1?.taktek || 0;
 
-            document.getElementById('k2-lafadz').value = p.scores.k2.lafadz;
-            document.getElementById('k2-makna').value = p.scores.k2.makna;
-            document.getElementById('k2-terjemah').value = p.scores.k2.terjemah;
-            document.getElementById('k2-tasrif').value = p.scores.k2.tasrif;
-            document.getElementById('k2-nadhom').value = p.scores.k2.nadhom;
+            document.getElementById('k2-lafadz').value = p.scores?.k2?.lafadz || 0;
+            document.getElementById('k2-makna').value = p.scores?.k2?.makna || 0;
+            document.getElementById('k2-terjemah').value = p.scores?.k2?.terjemah || 0;
+            document.getElementById('k2-tasrif').value = p.scores?.k2?.tasrif || 0;
+            document.getElementById('k2-nadhom').value = p.scores?.k2?.nadhom || 0;
 
             renderJuriDashboard();
         }
