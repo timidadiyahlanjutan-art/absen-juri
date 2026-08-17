@@ -23,7 +23,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
-    <!-- LOGIN CONTAINER (AMAN DENGAN BACKEND AUTH) -->
+    <!-- LOGIN CONTAINER -->
     <div id="login-screen" class="flex items-center justify-center min-h-screen p-4 bg-slate-900">
         <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full">
             <div class="text-center mb-6">
@@ -47,13 +47,12 @@
         </div>
     </div>
 
-    <!-- MAIN APP CONTAINER (WITH SIDEBAR) -->
+    <!-- MAIN APP CONTAINER -->
     <div id="app-screen" class="hidden min-h-screen flex flex-col md:flex-row">
 
         <!-- SIDEBAR NAVIGATION -->
         <aside id="sidebar-nav" class="w-full md:w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col justify-between shadow-xl sticky top-0 md:h-screen z-40">
             <div>
-                <!-- Brand Header -->
                 <div class="p-5 border-b border-slate-800 flex items-center justify-between">
                     <div class="flex items-center space-x-3">
                         <div class="w-9 h-9 bg-emerald-500 rounded-xl flex items-center justify-center text-white font-black text-lg">
@@ -66,7 +65,6 @@
                     </div>
                 </div>
 
-                <!-- Navigation Links -->
                 <nav class="p-3 space-y-1 text-xs font-medium">
                     <p class="px-3 pt-3 pb-1 text-[10px] uppercase font-bold text-slate-500 tracking-wider">Menu Utama</p>
 
@@ -117,7 +115,6 @@
                 </nav>
             </div>
 
-            <!-- User Footer & Logout -->
             <div class="p-3 border-t border-slate-800 bg-slate-950/50 space-y-2">
                 <div class="px-3 py-2 bg-slate-800/80 rounded-lg flex items-center justify-between">
                     <div class="truncate">
@@ -135,7 +132,6 @@
 
         <!-- MAIN CONTENT AREA -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <!-- TOP TOOLBAR -->
             <header class="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center sticky top-0 z-30 shadow-sm">
                 <div>
                     <h2 class="text-base font-bold text-slate-800" id="page-title">🏠 Dashboard</h2>
@@ -148,7 +144,6 @@
                 </div>
             </header>
 
-            <!-- TAB CONTENT VIEWS -->
             <main class="p-6 flex-1 overflow-y-auto space-y-6">
 
                 <!-- TAB 1: 🏠 DASHBOARD -->
@@ -210,95 +205,16 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                            <div class="flex justify-between items-center border-b pb-3">
-                                <h4 class="font-bold text-sm text-slate-800 flex items-center">
-                                    <i class="fa-solid fa-chart-pie text-emerald-600 mr-2"></i> Kehadiran Dewan Juri
-                                </h4>
-                                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full" id="dash-juri-pct">0% Hadir</span>
-                            </div>
-                            <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden flex">
-                                <div id="bar-hadir" class="bg-emerald-500 h-full" style="width: 0%" title="Hadir"></div>
-                                <div id="bar-izin" class="bg-amber-400 h-full" style="width: 0%" title="Izin"></div>
-                                <div id="bar-alpa" class="bg-rose-500 h-full" style="width: 0%" title="Alpa"></div>
-                            </div>
-                            <div class="grid grid-cols-4 gap-2 text-center text-xs pt-1">
-                                <div class="bg-emerald-50 p-2 rounded-lg">
-                                    <p class="text-[10px] text-emerald-600 font-bold uppercase">Hadir</p>
-                                    <p class="font-black text-emerald-800 text-sm" id="stat-hdr-val">0</p>
-                                </div>
-                                <div class="bg-amber-50 p-2 rounded-lg">
-                                    <p class="text-[10px] text-amber-600 font-bold uppercase">Izin</p>
-                                    <p class="font-black text-amber-800 text-sm" id="stat-izn-val">0</p>
-                                </div>
-                                <div class="bg-rose-50 p-2 rounded-lg">
-                                    <p class="text-[10px] text-rose-600 font-bold uppercase">Alpa</p>
-                                    <p class="font-black text-rose-800 text-sm" id="stat-alp-val">0</p>
-                                </div>
-                                <div class="bg-slate-100 p-2 rounded-lg">
-                                    <p class="text-[10px] text-slate-500 font-bold uppercase">Belum</p>
-                                    <p class="font-black text-slate-700 text-sm" id="stat-blm-val">0</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                            <div class="flex justify-between items-center border-b pb-3">
-                                <h4 class="font-bold text-sm text-slate-800 flex items-center">
-                                    <i class="fa-solid fa-clipboard-check text-indigo-600 mr-2"></i> Status Penilaian Peserta
-                                </h4>
-                                <span class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full" id="dash-peserta-pct">0% Dinilai</span>
-                            </div>
-                            <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
-                                <div id="bar-peserta-scored" class="bg-indigo-600 h-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-3 text-center text-xs pt-1">
-                                <div class="bg-indigo-50 p-2.5 rounded-xl">
-                                    <p class="text-[10px] text-indigo-600 font-bold uppercase">Sudah Dinilai</p>
-                                    <p class="font-black text-indigo-800 text-base" id="stat-scored-val">0 Peserta</p>
-                                </div>
-                                <div class="bg-slate-100 p-2.5 rounded-xl">
-                                    <p class="text-[10px] text-slate-500 font-bold uppercase">Belum Dinilai</p>
-                                    <p class="font-black text-slate-700 text-base" id="stat-unscored-val">0 Peserta</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <div class="flex justify-between items-center mb-4">
-                            <h4 class="font-bold text-sm text-slate-800"><i class="fa-solid fa-clock-rotate-left text-amber-600 mr-2"></i> Kehadiran Juri Terkini</h4>
-                            <button onclick="switchTab('presensi')" class="text-xs font-bold text-emerald-600 hover:text-emerald-700">Lihat Semua Presensi &rarr;</button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs text-slate-600">
-                                <thead class="bg-slate-50 text-slate-700 uppercase">
-                                    <tr>
-                                        <th class="p-2.5">ID</th>
-                                        <th class="p-2.5">Nama Juri</th>
-                                        <th class="p-2.5">Ruang</th>
-                                        <th class="p-2.5">Jam Masuk</th>
-                                        <th class="p-2.5">Jam Pulang</th>
-                                        <th class="p-2.5">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dash-table-juri-body" class="divide-y divide-slate-100">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- TAB 2: 👨‍⚖️ DATA JURI -->
+                <!-- TAB 2: 👨‍⚖️ DATA JURI (GRID & STATUS) -->
                 <div id="tab-juri" class="tab-pane space-y-6 hidden">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
                             <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-user-shield text-emerald-600 mr-2"></i> Master Data Juri Ujian</h3>
                             <div class="relative w-full md:w-64">
                                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
-                                <input type="text" id="search-juri" oninput="renderAdminJuriTable()" placeholder="Cari Nama Juri..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                                <input type="text" id="search-juri" oninput="renderAdminJuriTable()" placeholder="Cari Nama / ID Juri..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
                             </div>
                         </div>
                         <div class="overflow-x-auto">
@@ -307,10 +223,11 @@
                                     <tr>
                                         <th class="p-3">ID Juri</th>
                                         <th class="p-3">Nama Juri</th>
+                                        <th class="p-3 text-center">Grid</th>
                                         <th class="p-3">Kode / Ruang</th>
                                         <th class="p-3">Jam Masuk</th>
                                         <th class="p-3">Jam Pulang</th>
-                                        <th class="p-3 text-center">Durasi Tugas</th>
+                                        <th class="p-3 text-center">Durasi</th>
                                         <th class="p-3 text-center">Aksi</th>
                                     </tr>
                                 </thead>
@@ -348,17 +265,17 @@
                     </div>
                 </div>
 
-                <!-- TAB 4: 📋 PENUGASAN JURI (LENGKAP DENGAN KOLOM CARI) -->
+                <!-- TAB 4: 📋 PENUGASAN JURI (GRID & JUMLAH PERNAH BERTUGAS) -->
                 <div id="tab-penugasan" class="tab-pane space-y-6 hidden">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
                             <div>
                                 <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-clipboard-list text-emerald-600 mr-2"></i> Penugasan Kode Abjad Juri & Ruang Ujian</h3>
-                                <p class="text-xs text-slate-500 mt-0.5">Pilih juri lalu masukkan kode abjad (Contoh: A, B, AD, AL) untuk pemetaan ruangan otomatis.</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Pantau Grid Tingkat Juri dan total santri yang telah dijuri.</p>
                             </div>
                             <div class="relative w-full md:w-64">
                                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
-                                <input type="text" id="search-penugasan" oninput="renderPenugasanList()" placeholder="Cari Nama / ID Juri..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                                <input type="text" id="search-penugasan" oninput="renderPenugasanList()" placeholder="Cari Nama / ID / Grid..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
                             </div>
                         </div>
                         <div id="penugasan-container-list" class="space-y-3">
@@ -377,14 +294,12 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <!-- List Peserta -->
                             <div class="border rounded-xl p-4 bg-slate-50">
                                 <h4 class="font-bold text-xs text-slate-700 mb-3 uppercase">Daftar Peserta Ruangan Ini</h4>
                                 <div id="juri-peserta-list" class="space-y-2 max-h-96 overflow-y-auto">
                                 </div>
                             </div>
 
-                            <!-- Form Scoring -->
                             <div class="md:col-span-2 border rounded-xl p-5 bg-white" id="scoring-form-container">
                                 <div id="scoring-form-empty" class="text-center py-12 text-slate-400">
                                     <i class="fa-solid fa-clipboard-list text-4xl mb-2"></i>
@@ -465,39 +380,16 @@
                     </div>
                 </div>
 
-                <!-- TAB 6: 🕒 PRESENSI JURI (SCANNER QR & STATS OPERATOR) -->
+                <!-- TAB 6: 🕒 PRESENSI JURI -->
                 <div id="tab-presensi" class="tab-pane space-y-6 hidden">
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 flex flex-wrap justify-between items-center gap-4">
                         <div>
                             <h3 class="text-base font-bold text-slate-800">Presensi & Monitoring Absensi Juri</h3>
                             <p class="text-xs text-slate-500">Scan QR Code atau ketik ID Juri untuk absensi otomatis.</p>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-center">
-                                <p class="text-[9px] font-bold text-emerald-600 uppercase">Hadir</p>
-                                <p class="text-base font-black text-emerald-700" id="stat-juri-hadir">0</p>
-                            </div>
-                            <div class="bg-amber-50 border border-amber-200 px-2.5 py-1.5 rounded-lg text-center">
-                                <p class="text-[9px] font-bold text-amber-600 uppercase">Izin</p>
-                                <p class="text-base font-black text-amber-700" id="stat-juri-izin">0</p>
-                            </div>
-                            <div class="bg-rose-50 border border-rose-200 px-2.5 py-1.5 rounded-lg text-center">
-                                <p class="text-[9px] font-bold text-rose-600 uppercase">Alpa</p>
-                                <p class="text-base font-black text-rose-700" id="stat-juri-alpa">0</p>
-                            </div>
-                            <div class="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg text-center">
-                                <p class="text-[9px] font-bold text-slate-500 uppercase">Belum</p>
-                                <p class="text-base font-black text-slate-700" id="stat-juri-belum">0</p>
-                            </div>
-                            <div class="bg-indigo-50 border border-indigo-200 px-2.5 py-1.5 rounded-lg text-center">
-                                <p class="text-[9px] font-bold text-indigo-600 uppercase">Total</p>
-                                <p class="text-base font-black text-indigo-700" id="stat-juri-total">0</p>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- CAMERA SCANNER -->
                         <div class="bg-white p-6 rounded-2xl border border-slate-200 md:col-span-1 flex flex-col justify-between">
                             <div>
                                 <h4 class="text-xs font-bold text-slate-800 mb-2 flex items-center">
@@ -506,42 +398,29 @@
                                 <div id="qr-reader" class="w-full bg-slate-900 rounded-lg overflow-hidden border border-slate-300 min-h-[200px]"></div>
 
                                 <div class="mt-3 flex space-x-2">
-                                    <input type="text" id="manual-qr-input" onkeypress="if(event.key==='Enter') processQrCode(this.value)" placeholder="Ketik ID Juri lalu Tekan Enter..." class="w-full border rounded-lg p-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none font-mono font-bold">
+                                    <input type="text" id="manual-qr-input" onkeypress="if(event.key==='Enter') processQrCode(this.value)" placeholder="Ketik ID Juri..." class="w-full border rounded-lg p-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none font-mono font-bold">
                                     <button onclick="processQrCode(document.getElementById('manual-qr-input').value)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition">
                                         Absen
                                     </button>
                                 </div>
                             </div>
-
                             <div id="scan-result-box" class="mt-3 p-3 rounded-lg text-xs bg-slate-100 text-slate-600 hidden font-semibold">
                                 <i class="fa-solid fa-info-circle mr-1"></i> <span id="scan-result-msg">Menunggu scan...</span>
                             </div>
                         </div>
 
-                        <!-- TABEL ABSENSI -->
                         <div class="bg-white p-6 rounded-2xl border border-slate-200 md:col-span-2">
-                            <div class="flex justify-between items-center mb-3">
-                                <h4 class="text-xs font-bold text-slate-800">Status Absensi Juri Bertugas</h4>
-                                <div class="space-x-1">
-                                    <button onclick="filterJuriStatus('all')" class="px-2 py-1 text-[10px] font-bold rounded bg-slate-200 hover:bg-slate-300 text-slate-700">Semua</button>
-                                    <button onclick="filterJuriStatus('hadir')" class="px-2 py-1 text-[10px] font-bold rounded bg-emerald-100 hover:bg-emerald-200 text-emerald-800">Hadir</button>
-                                    <button onclick="filterJuriStatus('izin')" class="px-2 py-1 text-[10px] font-bold rounded bg-amber-100 hover:bg-amber-200 text-amber-800">Izin</button>
-                                    <button onclick="filterJuriStatus('alpa')" class="px-2 py-1 text-[10px] font-bold rounded bg-rose-100 hover:bg-rose-200 text-rose-800">Alpa</button>
-                                    <button onclick="filterJuriStatus('belum')" class="px-2 py-1 text-[10px] font-bold rounded bg-slate-100 hover:bg-slate-200 text-slate-600">Belum</button>
-                                </div>
-                            </div>
-
                             <div class="overflow-x-auto max-h-[320px] overflow-y-auto">
                                 <table class="w-full text-left text-xs">
                                     <thead class="bg-slate-100 uppercase sticky top-0 z-10">
                                         <tr>
                                             <th class="p-2">ID</th>
                                             <th class="p-2">Nama Juri</th>
+                                            <th class="p-2 text-center">Grid</th>
                                             <th class="p-2">Kode / Ruang</th>
                                             <th class="p-2">Datang</th>
                                             <th class="p-2">Pulang</th>
                                             <th class="p-2">Status</th>
-                                            <th class="p-2 text-center">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody id="table-operator-juri-status" class="divide-y divide-slate-200">
@@ -586,7 +465,6 @@
                 <!-- TAB 8: 📁 IMPORT / EXPORT -->
                 <div id="tab-importexport" class="tab-pane space-y-6 hidden">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Impor/Ekspor Juri -->
                         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                             <h4 class="font-bold text-sm text-slate-800 border-b pb-2"><i class="fa-solid fa-user-gear text-amber-600 mr-2"></i> Kelola Data Juri (Excel)</h4>
                             <div class="flex space-x-2">
@@ -600,7 +478,6 @@
                             </div>
                         </div>
 
-                        <!-- Impor/Ekspor Peserta -->
                         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                             <h4 class="font-bold text-sm text-slate-800 border-b pb-2"><i class="fa-solid fa-users text-emerald-600 mr-2"></i> Kelola Data Peserta (Excel)</h4>
                             <div class="flex space-x-2">
@@ -659,67 +536,31 @@
         </div>
     </div>
 
-    <!-- MODAL QR CODE KARTU JURI -->
-    <div id="modal-qr-card" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full text-center">
-            <h3 class="text-lg font-bold text-slate-800 mb-1">Kartu Presensi QR Juri</h3>
-            <p class="text-xs text-slate-500 mb-4" id="qr-juri-nama">NAMA JURI</p>
-
-            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 inline-block mb-4 shadow-inner">
-                <div id="qrcode-container" class="flex justify-center"></div>
-            </div>
-
-            <p class="text-xs font-mono font-bold text-slate-600 mb-4" id="qr-juri-id">ID: 000000</p>
-
-            <div class="flex justify-center space-x-2">
-                <button onclick="closeQrModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold">Tutup</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL GANTI JURI -->
-    <div id="modal-ganti-juri" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full">
-            <h3 class="text-lg font-bold text-slate-800 mb-2">Ganti Juri Ruangan</h3>
-            <p class="text-sm text-slate-500 mb-4">Ruang: <span id="modal-ganti-ruang" class="font-bold text-slate-800"></span></p>
-
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Pilih Juri Pengganti</label>
-                    <select id="select-juri-pengganti" class="w-full border rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none">
-                    </select>
-                </div>
-            </div>
-
-            <div class="flex justify-end space-x-2 mt-6">
-                <button onclick="closeGantiJuriModal()" class="px-4 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 font-semibold">Batal</button>
-                <button onclick="submitGantiJuri()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold">Proses Ganti Juri</button>
-            </div>
-        </div>
-    </div>
-
     <!-- JAVASCRIPT APP LOGIC & BACKEND SYNC -->
     <script>
         let currentUser = null;
         let activeSelectedPesertaId = null;
         let selectedJuriIdForModal = null;
-        let selectedRuangForGantiModal = null;
         let activeTab = 'dashboard';
 
         const STORAGE_KEY_JURI    = 'ujian_dataJuri';
         const STORAGE_KEY_PESERTA = 'ujian_dataPeserta';
 
-        // Data array kosong (Murni diambil dari backend database Neon)
         let dataJuri = [];
         let dataPeserta = [];
+
+        function getGridBadge(grid) {
+            const g = String(grid || 'B').toUpperCase().trim();
+            if (g === 'A') return '<span class="px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-200 rounded font-black text-[10px]" title="Grid A: Ketat / Kelas Tinggi">GRID A</span>';
+            if (g === 'B') return '<span class="px-2 py-0.5 bg-amber-100 text-amber-800 border border-amber-200 rounded font-black text-[10px]" title="Grid B: Sedang">GRID B</span>';
+            return '<span class="px-2 py-0.5 bg-sky-100 text-sky-800 border border-sky-200 rounded font-black text-[10px]" title="Grid C: Kelas Bawah">GRID C</span>';
+        }
 
         function applyRoleSidebarPermissions() {
             if (!currentUser) return;
 
             const isJuri = currentUser.role === 'juri';
             const isOperator = currentUser.role === 'operator';
-            const isAdmin = currentUser.role === 'admin';
-
             const allNavs = ['dashboard', 'juri', 'peserta', 'penugasan', 'penilaian', 'presensi', 'rekap', 'importexport', 'pengaturan'];
 
             allNavs.forEach(navId => {
@@ -727,27 +568,19 @@
                 if (!btn) return;
 
                 if (isJuri) {
-                    if (navId === 'penilaian') {
-                        btn.classList.remove('hidden');
-                    } else {
-                        btn.classList.add('hidden');
-                    }
+                    if (navId === 'penilaian') btn.classList.remove('hidden');
+                    else btn.classList.add('hidden');
                 } else if (isOperator) {
-                    if (['dashboard', 'presensi', 'juri', 'peserta'].includes(navId)) {
-                        btn.classList.remove('hidden');
-                    } else {
-                        btn.classList.add('hidden');
-                    }
+                    if (['dashboard', 'presensi', 'juri', 'peserta'].includes(navId)) btn.classList.remove('hidden');
+                    else btn.classList.add('hidden');
                 } else {
                     btn.classList.remove('hidden');
                 }
             });
         }
 
-        // --- SIDEBAR SWITCH TAB FUNCTION ---
         function switchTab(tabName) {
             activeTab = tabName;
-
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
 
             const navIds = ['dashboard', 'juri', 'peserta', 'penugasan', 'penilaian', 'presensi', 'rekap', 'importexport', 'pengaturan'];
@@ -761,23 +594,6 @@
             if (targetTab) targetTab.classList.remove('hidden');
             if (targetBtn) targetBtn.classList.add('sidebar-active');
 
-            const pageTitles = {
-                'dashboard': ['🏠 Dashboard Utama', 'Ringkasan statistik data juri, peserta, dan aktivitas ujian'],
-                'juri': ['👨‍⚖️ Master Data Juri', 'Daftar lengkap juri ujian beserta status dan durasi kerja'],
-                'peserta': ['👥 Master Data Peserta', 'Daftar data peserta ujian serta juri penanggung jawab'],
-                'penugasan': ['📋 Penugasan Juri & Ruangan', 'Atur kode abjad juri untuk pemetaan ruang ujian otomatis'],
-                'penilaian': ['📝 Form Penilaian Kesalahan', 'Input angka kesalahan peserta ujian lisan oleh Dewan Juri'],
-                'presensi': ['🕒 Presensi & Scanner QR Juri', 'Absensi QR Code kamera dan monitoring kehadiran juri'],
-                'rekap': ['📊 Rekapitulasi Nilai Ujian', 'Laporan akhir rekap nilai kesalahan peserta ujian'],
-                'importexport': ['📁 Impor & Ekspor Data', 'Kelola file master data Juri dan Peserta berbasis Excel'],
-                'pengaturan': ['⚙️ Pengaturan Sistem', 'Opsi sinkronisasi database online dan reset data']
-            };
-
-            if (pageTitles[tabName]) {
-                document.getElementById('page-title').innerText = pageTitles[tabName][0];
-                document.getElementById('page-subtitle').innerText = pageTitles[tabName][1];
-            }
-
             if (tabName === 'dashboard') updateDashboardStats();
             if (tabName === 'juri') renderAdminJuriTable();
             if (tabName === 'peserta') renderAdminPesertaTable();
@@ -789,78 +605,20 @@
 
         function updateDashboardStats() {
             if (currentUser) {
-                document.getElementById('dash-user-title').innerText = currentUser.nama || currentUser.name || 'User';
+                document.getElementById('dash-user-title').innerText = currentUser.nama || 'User';
             }
-
             document.getElementById('dash-total-peserta').innerText = dataPeserta.length;
             const juriBertugas = dataJuri.filter(j => j.status === 'JURI' && (j.ruang || j.kode));
             document.getElementById('dash-total-juri').innerText = juriBertugas.length;
 
-            const totalJuriBertugas = juriBertugas.length;
             const cntHadir = juriBertugas.filter(j => j.absenMasuk && !j.manualStatus).length;
-            const cntIzin  = juriBertugas.filter(j => j.manualStatus === 'IZIN').length;
-            const cntAlpa  = juriBertugas.filter(j => j.manualStatus === 'ALPA').length;
-            const cntBelum = totalJuriBertugas - (cntHadir + cntIzin + cntAlpa);
-
             document.getElementById('dash-juri-hadir').innerText = cntHadir;
 
             const uniqueRuang = new Set(dataPeserta.map(p => p.ruangTes).filter(r => r && r !== '-'));
             document.getElementById('dash-total-ruang').innerText = uniqueRuang.size;
-
-            const pctHadir = totalJuriBertugas > 0 ? Math.round((cntHadir / totalJuriBertugas) * 100) : 0;
-            document.getElementById('dash-juri-pct').innerText = `${pctHadir}% Hadir`;
-
-            document.getElementById('bar-hadir').style.width = totalJuriBertugas > 0 ? `${(cntHadir/totalJuriBertugas)*100}%` : '0%';
-            document.getElementById('bar-izin').style.width  = totalJuriBertugas > 0 ? `${(cntIzin/totalJuriBertugas)*100}%`  : '0%';
-            document.getElementById('bar-alpa').style.width  = totalJuriBertugas > 0 ? `${(cntAlpa/totalJuriBertugas)*100}%`  : '0%';
-
-            document.getElementById('stat-hdr-val').innerText = cntHadir;
-            document.getElementById('stat-izn-val').innerText = cntIzin;
-            document.getElementById('stat-alp-val').innerText = cntAlpa;
-            document.getElementById('stat-blm-val').innerText = cntBelum;
-
-            const cntScored = dataPeserta.filter(p => {
-                const k1Sum = Object.values(p.scores?.k1 || {}).reduce((a, b) => a + b, 0);
-                const k2Sum = Object.values(p.scores?.k2 || {}).reduce((a, b) => a + b, 0);
-                return (k1Sum + k2Sum) > 0;
-            }).length;
-
-            const totalPeserta = dataPeserta.length;
-            const pctScored = totalPeserta > 0 ? Math.round((cntScored / totalPeserta) * 100) : 0;
-
-            document.getElementById('dash-peserta-pct').innerText = `${pctScored}% Dinilai`;
-            document.getElementById('bar-peserta-scored').style.width = totalPeserta > 0 ? `${pctScored}%` : '0%';
-
-            document.getElementById('stat-scored-val').innerText = `${cntScored} Peserta`;
-            document.getElementById('stat-unscored-val').innerText = `${totalPeserta - cntScored} Peserta`;
-
-            const tbodyDash = document.getElementById('dash-table-juri-body');
-            if (tbodyDash) {
-                const recentJuri = juriBertugas.slice(0, 5);
-                if (recentJuri.length === 0) {
-                    tbodyDash.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-400 italic">Belum ada penugasan juri.</td></tr>`;
-                } else {
-                    tbodyDash.innerHTML = recentJuri.map(j => {
-                        let stBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">BELUM HADIR</span>';
-                        if (j.manualStatus === 'IZIN') stBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">IZIN</span>';
-                        else if (j.manualStatus === 'ALPA') stBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800">ALPA</span>';
-                        else if (j.absenMasuk) stBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">HADIR</span>';
-
-                        return `
-                        <tr>
-                            <td class="p-2.5 font-mono font-bold text-slate-700">${j.id}</td>
-                            <td class="p-2.5 font-bold text-slate-800">${j.nama}</td>
-                            <td class="p-2.5 text-emerald-700 font-semibold"><span class="px-1.5 py-0.5 bg-slate-100 text-slate-800 rounded font-bold">${j.kode || '-'}</span> ${j.ruang || '-'}</td>
-                            <td class="p-2.5 font-bold text-emerald-600">${j.absenMasuk || '--:--'}</td>
-                            <td class="p-2.5 font-bold text-indigo-600">${j.absenPulang || '--:--'}</td>
-                            <td class="p-2.5">${stBadge}</td>
-                        </tr>
-                    `}).join('');
-                }
-            }
         }
 
-        // --- PENUGASAN JURI DENGAN FITUR PENCARIAN REALTIME ---
+        // --- PENUGASAN JURI LENGKAP DENGAN GRID & PERNAH BERTUGAS ---
         function renderPenugasanList() {
             const container = document.getElementById('penugasan-container-list');
             if (!container) return;
@@ -869,8 +627,10 @@
             
             const juriList = dataJuri.filter(j => {
                 const isJuri = j.status === 'JURI';
-                const matchSearch = String(j.nama || '').toLowerCase().includes(query) || String(j.id || '').toLowerCase().includes(query);
-                return isJuri && matchSearch;
+                const match = String(j.nama || '').toLowerCase().includes(query) || 
+                              String(j.id || '').toLowerCase().includes(query) ||
+                              String(j.grid || '').toLowerCase().includes(query);
+                return isJuri && match;
             });
 
             if (juriList.length === 0) {
@@ -878,238 +638,39 @@
                 return;
             }
             
-            container.innerHTML = juriList.map(j => `
-                <div class="p-3 bg-slate-50 rounded-xl border flex justify-between items-center text-xs hover:border-emerald-300 transition">
-                    <div>
-                        <p class="font-bold text-slate-800 text-sm">${j.nama}</p>
-                        <p class="text-slate-500">ID: ${j.id} | Ruang: <span class="font-bold text-emerald-700">${j.ruang || 'Belum Ada'}</span> ${j.kode ? `(<span class="font-bold text-indigo-600">Kode: ${j.kode}</span>)` : ''}</p>
-                    </div>
-                    <button onclick="openAssignModal('${j.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition shadow-sm">
-                        ${j.ruang ? 'Ubah Kode' : 'Tugaskan'}
-                    </button>
-                </div>
-            `).join('');
-        }
+            container.innerHTML = juriList.map(j => {
+                const totalPesertaJuri = dataPeserta.filter(p => p.juriKode && j.kode && String(p.juriKode).toUpperCase() === String(j.kode).toUpperCase());
+                const totalTugasCount = totalPesertaJuri.filter(p => {
+                    const k1 = Object.values(p.scores?.k1 || {}).reduce((a,b)=>a+b, 0);
+                    const k2 = Object.values(p.scores?.k2 || {}).reduce((a,b)=>a+b, 0);
+                    return (k1 + k2) > 0;
+                }).length;
 
-        function renderRekapTable() {
-            const tbody = document.getElementById('table-rekap-nilai-body');
-            tbody.innerHTML = dataPeserta.map((p, idx) => {
-                const k1Sum = Object.values(p.scores?.k1 || {}).reduce((a, b) => a + b, 0);
-                const k2Sum = Object.values(p.scores?.k2 || {}).reduce((a, b) => a + b, 0);
-                const totalErr = k1Sum + k2Sum;
                 return `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-2.5">${p.no || (idx + 1)}</td>
-                    <td class="p-2.5 font-mono">${p.idpps}</td>
-                    <td class="p-2.5 font-bold text-slate-800">${p.nama}</td>
-                    <td class="p-2.5 text-slate-500">${p.kelas} (${p.dom})</td>
-                    <td class="p-2.5 font-bold text-indigo-600">${p.juriKode || '-'}</td>
-                    <td class="p-2.5 text-slate-700">${p.ruangTes || '-'}</td>
-                    <td class="p-2.5 text-center font-bold text-slate-700">${k1Sum}</td>
-                    <td class="p-2.5 text-center font-bold text-slate-700">${k2Sum}</td>
-                    <td class="p-2.5 text-center font-black text-rose-600">${totalErr} Err</td>
-                </tr>
+                <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-wrap justify-between items-center gap-3 hover:border-emerald-400 transition">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-mono font-bold text-slate-500 text-xs">${j.id}</span>
+                            <p class="font-bold text-slate-800 text-sm">${j.nama}</p>
+                            ${getGridBadge(j.grid)}
+                        </div>
+                        <div class="flex items-center space-x-2 text-xs text-slate-500 mt-1.5">
+                            <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 font-bold border border-indigo-100 rounded-md text-[11px]">
+                                Pernah Bertugas (${totalTugasCount}x)
+                            </span>
+                            <span>•</span>
+                            <span>Ruang: <b class="text-emerald-700">${j.ruang || 'Belum Ditentukan'}</b></span>
+                            ${j.kode ? `<span class="px-1.5 py-0.5 bg-slate-100 font-bold text-slate-700 rounded text-[10px]">Kode: ${j.kode}</span>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <button onclick="openAssignModal('${j.id}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition shadow-sm">
+                            ${j.ruang ? 'Ubah Kode' : 'Tugaskan'}
+                        </button>
+                    </div>
+                </div>
             `}).join('');
-        }
-
-        function saveToStorage() {
-            try {
-                localStorage.setItem(STORAGE_KEY_JURI,    JSON.stringify(dataJuri));
-                localStorage.setItem(STORAGE_KEY_PESERTA, JSON.stringify(dataPeserta));
-                syncToCloud();
-            } catch(e) {
-                console.warn('Gagal menyimpan ke localStorage:', e);
-            }
-        }
-
-        function loadFromStorage() {
-            try {
-                const savedJuri    = localStorage.getItem(STORAGE_KEY_JURI);
-                const savedPeserta = localStorage.getItem(STORAGE_KEY_PESERTA);
-                if (savedJuri)    dataJuri    = JSON.parse(savedJuri);
-                if (savedPeserta) dataPeserta = JSON.parse(savedPeserta);
-            } catch(e) {
-                console.warn('Gagal memuat lokal:', e);
-            }
-        }
-
-        function clearStorage() {
-            if (confirm('Yakin ingin mereset SEMUA data ke kondisi awal? Data yang telah diinput akan hilang.')) {
-                localStorage.removeItem(STORAGE_KEY_JURI);
-                localStorage.removeItem(STORAGE_KEY_PESERTA);
-                location.reload();
-            }
-        }
-
-        // =============================================
-        // SINKRONISASI DATABASE CLOUDFLARE PAGES / NEON
-        // =============================================
-        async function syncToCloud() {
-            const ind = document.getElementById('storage-indicator');
-            if (ind) ind.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Syncing...';
-
-            try {
-                if (dataJuri && dataJuri.length > 0) {
-                    await fetch('/api/juri', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(dataJuri)
-                    });
-                }
-                if (dataPeserta && dataPeserta.length > 0) {
-                    await fetch('/api/peserta', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(dataPeserta)
-                    });
-                }
-                if (ind) ind.innerHTML = '<i class="fa-solid fa-cloud-check text-xs"></i> Cloud Tersinkron';
-            } catch(e) {
-                console.warn("Gagal sinkron ke cloud:", e);
-                if (ind) ind.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-xs text-amber-400"></i> Offline Sync';
-            }
-        }
-
-        async function fetchFromCloud() {
-            try {
-                const resJuri = await fetch('/api/juri');
-                if (resJuri.ok) {
-                    const juriRemote = await resJuri.json();
-                    if (Array.isArray(juriRemote) && juriRemote.length > 0) {
-                        dataJuri = juriRemote;
-                        localStorage.setItem(STORAGE_KEY_JURI, JSON.stringify(dataJuri));
-                    }
-                }
-
-                const resPeserta = await fetch('/api/peserta');
-                if (resPeserta.ok) {
-                    const pesertaRemote = await resPeserta.json();
-                    if (Array.isArray(pesertaRemote) && pesertaRemote.length > 0) {
-                        dataPeserta = pesertaRemote;
-                        localStorage.setItem(STORAGE_KEY_PESERTA, JSON.stringify(dataPeserta));
-                    }
-                }
-
-                switchTab(activeTab);
-            } catch(e) {
-                console.warn("Gagal mengambil data cloud:", e);
-            }
-        }
-
-        function forceSyncOnline() {
-            syncToCloud();
-            alert("Memulai sinkronisasi data online ke database...");
-        }
-
-        setInterval(() => {
-            if (currentUser) fetchFromCloud();
-        }, 10000);
-
-        const mapKodeToRuang = {
-            'A': 'AL-GHAZALI 1.02', 'B': 'AL-GHAZALI 1.02', 'C': 'AL-GHAZALI 1.02', 'D': 'AL-GHAZALI 1.02', 'E': 'AL-GHAZALI 1.02', 'F': 'AL-GHAZALI 1.02',
-            'G': 'AL-GHAZALI 1.05', 'H': 'AL-GHAZALI 1.05', 'I': 'AL-GHAZALI 1.05', 'J': 'AL-GHAZALI 1.05', 'K': 'AL-GHAZALI 1.05', 'L': 'AL-GHAZALI 1.05',
-            'M': 'AL-GHAZALI 1.06', 'N': 'AL-GHAZALI 1.06', 'O': 'AL-GHAZALI 1.06', 'P': 'AL-GHAZALI 1.06', 'Q': 'AL-GHAZALI 1.06', 'R': 'AL-GHAZALI 1.06',
-            'S': 'AL-GHAZALI 1.07', 'T': 'AL-GHAZALI 1.07', 'U': 'AL-GHAZALI 1.07', 'V': 'AL-GHAZALI 1.07', 'W': 'AL-GHAZALI 1.07', 'X': 'AL-GHAZALI 1.07',
-            'Y': 'AL-GHAZALI 1.08', 'Z': 'AL-GHAZALI 1.08', 'AA': 'AL-GHAZALI 1.08', 'AB': 'AL-GHAZALI 1.08', 'AC': 'AL-GHAZALI 1.08', 'AD': 'AL-GHAZALI 1.08',
-            'AE': 'AL-GHAZALI 1.09', 'AF': 'AL-GHAZALI 1.09', 'AG': 'AL-GHAZALI 1.09', 'AH': 'AL-GHAZALI 1.09', 'AI': 'AL-GHAZALI 1.09', 'AJ': 'AL-GHAZALI 1.09',
-            'AK': 'AL-GHAZALI 3.01', 'AL': 'AL-GHAZALI 3.01'
-        };
-
-        loadFromStorage();
-
-        // =============================================
-        // BACKEND AUTHENTICATION LOGIN
-        // =============================================
-        async function handleLogin(e) {
-            e.preventDefault();
-            const inputId = document.getElementById('login-password').value.trim();
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-
-            if (!inputId) return;
-
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Memeriksa Akses...';
-
-            try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: inputId })
-                });
-
-                const data = await res.json();
-
-                if (!data.success) {
-                    alert(data.message || "ID / Sandi Akses tidak terdaftar!");
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk';
-                    return;
-                }
-
-                currentUser = data.user;
-
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('hidden');
-                document.getElementById('app-screen').classList.add('flex');
-                
-                document.getElementById('sidebar-role-badge').innerText = currentUser.role.toUpperCase();
-                document.getElementById('sidebar-user-name').innerText = currentUser.nama || 'User';
-                document.getElementById('sidebar-user-id').innerText = "ID: " + currentUser.id;
-
-                applyRoleSidebarPermissions();
-
-                await fetchFromCloud();
-
-                if (currentUser.role === 'admin' || currentUser.role === 'operator') {
-                    switchTab('dashboard');
-                } else if (currentUser.role === 'juri') {
-                    switchTab('penilaian');
-                }
-
-            } catch (err) {
-                alert("Gagal terhubung ke server database!");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk';
-            }
-        }
-
-        function handleLogout() {
-            currentUser = null;
-            document.getElementById('login-password').value = '';
-            document.getElementById('app-screen').classList.add('hidden');
-            document.getElementById('app-screen').classList.remove('flex');
-            document.getElementById('login-screen').classList.remove('hidden');
-        }
-
-        function autoDetectRuang() {
-            const kodeInput = document.getElementById('assign-kode').value.trim().toUpperCase();
-            const ruangField = document.getElementById('assign-ruang');
-
-            if (mapKodeToRuang[kodeInput]) {
-                ruangField.value = mapKodeToRuang[kodeInput];
-            } else if (kodeInput === '') {
-                ruangField.value = '';
-            }
-        }
-
-        function calculateDuration(masuk, pulang) {
-            if (!masuk || !pulang) return masuk ? '<span class="text-amber-600 font-medium">Sedang Bertugas</span>' : '<span class="text-slate-400">-</span>';
-            try {
-                const parseTime = (tStr) => {
-                    const parts = tStr.split(':');
-                    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
-                };
-                let mMin = parseTime(masuk);
-                let pMin = parseTime(pulang);
-                if (pMin < mMin) pMin += 24 * 60;
-                const diff = pMin - mMin;
-                const hrs = Math.floor(diff / 60);
-                const mins = diff % 60;
-                return `<span class="px-2 py-1 bg-indigo-50 text-indigo-700 font-bold rounded text-xs">${hrs} Jam ${mins} Mnt</span>`;
-            } catch(e) {
-                return '<span class="text-slate-400">-</span>';
-            }
         }
 
         function renderAdminJuriTable() {
@@ -1117,28 +678,22 @@
             const tbody = document.getElementById('table-admin-juri');
             if (!tbody) return;
 
-            const filtered = dataJuri.filter(j => j.status === 'JURI' && (j.nama || '').toLowerCase().includes(query));
+            const filtered = dataJuri.filter(j => j.status === 'JURI' && (String(j.nama || '').toLowerCase().includes(query) || String(j.id || '').includes(query)));
 
-            tbody.innerHTML = filtered.map(j => {
-                const durasiText = calculateDuration(j.absenMasuk, j.absenPulang);
-                return `
+            tbody.innerHTML = filtered.map(j => `
                 <tr class="hover:bg-slate-50">
                     <td class="p-3 font-mono text-xs font-bold text-slate-700">${j.id}</td>
                     <td class="p-3 font-semibold text-slate-800">${j.nama}</td>
+                    <td class="p-3 text-center">${getGridBadge(j.grid)}</td>
                     <td class="p-3 text-emerald-700 font-semibold text-xs"><span class="px-1.5 py-0.5 bg-slate-100 text-slate-800 rounded font-bold">${j.kode || '-'}</span> ${j.ruang || '-'}</td>
-                    <td class="p-3 text-xs font-bold text-emerald-600">${j.absenMasuk ? j.absenMasuk : '<span class="text-slate-400 font-normal">--:--</span>'}</td>
-                    <td class="p-3 text-xs font-bold text-indigo-600">${j.absenPulang ? j.absenPulang : '<span class="text-slate-400 font-normal">--:--</span>'}</td>
-                    <td class="p-3 text-center text-xs">${durasiText}</td>
-                    <td class="p-3 text-center space-x-1">
-                        ${j.ruang ? `
-                            <button onclick="openAssignModal('${j.id}')" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-xs font-semibold">Edit</button>
-                            <button onclick="cancelAssignment('${j.id}')" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs font-semibold">Batalkan</button>
-                        ` : `
-                            <button onclick="openAssignModal('${j.id}')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold">Tugaskan Juri</button>
-                        `}
+                    <td class="p-3 text-xs font-bold text-emerald-600">${j.absenMasuk || '--:--'}</td>
+                    <td class="p-3 text-xs font-bold text-indigo-600">${j.absenPulang || '--:--'}</td>
+                    <td class="p-3 text-center text-xs">${j.absenMasuk ? 'Aktif' : '-'}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="openAssignModal('${j.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold">Tugaskan</button>
                     </td>
                 </tr>
-            `}).join('');
+            `).join('');
         }
 
         function renderAdminPesertaTable() {
@@ -1158,11 +713,29 @@
                     <td class="p-3"><span class="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-bold rounded">${p.juriKode || '-'}</span></td>
                     <td class="p-3 text-xs font-semibold text-slate-700">${p.ruangTes || '-'}</td>
                     <td class="p-3">
-                        <span class="px-2 py-1 text-xs rounded-full font-bold ${p.status === 'HADIR' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                            ${p.status}
-                        </span>
+                        <span class="px-2 py-1 text-xs rounded-full font-bold bg-emerald-100 text-emerald-800">HADIR</span>
                     </td>
                     <td class="p-3 text-center font-bold text-rose-600">${totalErr} Err</td>
+                </tr>
+            `}).join('');
+        }
+
+        function renderRekapTable() {
+            const tbody = document.getElementById('table-rekap-nilai-body');
+            tbody.innerHTML = dataPeserta.map((p, idx) => {
+                const k1Sum = Object.values(p.scores?.k1 || {}).reduce((a, b) => a + b, 0);
+                const k2Sum = Object.values(p.scores?.k2 || {}).reduce((a, b) => a + b, 0);
+                return `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-2.5">${p.no || (idx + 1)}</td>
+                    <td class="p-2.5 font-mono">${p.idpps}</td>
+                    <td class="p-2.5 font-bold text-slate-800">${p.nama}</td>
+                    <td class="p-2.5 text-slate-500">${p.kelas} (${p.dom})</td>
+                    <td class="p-2.5 font-bold text-indigo-600">${p.juriKode || '-'}</td>
+                    <td class="p-2.5 text-slate-700">${p.ruangTes || '-'}</td>
+                    <td class="p-2.5 text-center font-bold text-slate-700">${k1Sum}</td>
+                    <td class="p-2.5 text-center font-bold text-slate-700">${k2Sum}</td>
+                    <td class="p-2.5 text-center font-black text-rose-600">${k1Sum + k2Sum} Err</td>
                 </tr>
             `}).join('');
         }
@@ -1170,7 +743,7 @@
         function openAssignModal(juriId) {
             selectedJuriIdForModal = juriId;
             const juri = dataJuri.find(j => j.id === juriId);
-            document.getElementById('modal-juri-nama').innerText = juri ? juri.nama : '';
+            document.getElementById('modal-juri-nama').innerText = juri ? `${juri.nama} (GRID ${juri.grid || 'B'})` : '';
             document.getElementById('assign-kode').value = juri ? (juri.kode || '') : '';
             document.getElementById('assign-ruang').value = juri ? (juri.ruang || '') : '';
             document.getElementById('modal-assign').classList.remove('hidden');
@@ -1196,9 +769,7 @@
             }
 
             dataPeserta.forEach(p => {
-                if (p.juriKode === kode) {
-                    p.ruangTes = ruang;
-                }
+                if (p.juriKode === kode) p.ruangTes = ruang;
             });
 
             saveToStorage();
@@ -1206,18 +777,7 @@
             switchTab(activeTab);
         }
 
-        function cancelAssignment(juriId) {
-            if (confirm("Yakin ingin membatalkan penugasan juri ini?")) {
-                const juri = dataJuri.find(j => j.id === juriId);
-                if (juri) {
-                    juri.kode = "";
-                    juri.ruang = "";
-                }
-                saveToStorage();
-                switchTab(activeTab);
-            }
-        }
-
+        // --- IMPOR JURI DENGAN FORMAT: id juri, nama, GRID, STATUS ---
         function importJuri(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1230,48 +790,43 @@
                 const json = XLSX.utils.sheet_to_json(worksheet);
 
                 if (json.length > 0) {
-                    dataJuri = json.map((row, idx) => ({
-                        id: String(row['ID'] || `J${idx+1}`),
-                        nama: row['NAMA'] || 'Juri Baru',
-                        telepon: String(row['No. TELEPON'] || row['TELEPON'] || '-'),
-                        status: row['STATUS'] || 'JURI',
-                        kode: String(row['KODE JURI'] || row['KODE'] || '').trim().toUpperCase(),
-                        ruang: String(row['RUANG UJIAN'] || row['RUANG'] || '').trim(),
-                        absenMasuk: null,
-                        absenPulang: null
-                    }));
+                    const existingMap = {};
+                    dataJuri.forEach(j => { if (j.id) existingMap[j.id] = j; });
+
+                    dataJuri = json.map((row, idx) => {
+                        const rawId = String(row['id juri'] || row['ID JURI'] || row['ID'] || `J${idx+1}`).trim();
+                        const existing = existingMap[rawId];
+
+                        return {
+                            id: rawId,
+                            nama: String(row['nama'] || row['NAMA'] || 'Juri Baru').trim(),
+                            grid: String(row['GRID'] || row['grid'] || 'B').trim().toUpperCase(),
+                            status: String(row['STATUS'] || row['status'] || 'JURI').trim().toUpperCase(),
+                            kode: existing && existing.kode ? existing.kode : '',
+                            ruang: existing && existing.ruang ? existing.ruang : '',
+                            absenMasuk: existing ? existing.absenMasuk : null,
+                            absenPulang: existing ? existing.absenPulang : null,
+                            manualStatus: existing ? existing.manualStatus : null
+                        };
+                    });
+
                     saveToStorage();
-                    switchTab('juri');
-                    alert("Berhasil mengimpor " + json.length + " data juri!");
+                    switchTab('penugasan');
+                    alert("Berhasil mengimpor " + json.length + " data juri dengan Grid Tingkat Juri!");
                 }
             };
             reader.readAsArrayBuffer(file);
         }
 
         function exportJuriOnly() {
-            const exportData = dataJuri.map((j, idx) => {
-                let durasi = "-";
-                if (j.absenMasuk && j.absenPulang) {
-                    const parseTime = (tStr) => { const p = tStr.split(':'); return parseInt(p[0])*60 + parseInt(p[1]); };
-                    let diff = parseTime(j.absenPulang) - parseTime(j.absenMasuk);
-                    if (diff < 0) diff += 24*60;
-                    durasi = `${Math.floor(diff/60)} Jam ${diff%60} Mnt`;
-                } else if (j.absenMasuk) {
-                    durasi = "Sedang Bertugas";
-                }
-                return {
-                    "No.": idx + 1,
-                    "ID": j.id,
-                    "NAMA": j.nama,
-                    "No. TELEPON": j.telepon,
-                    "STATUS": j.status,
-                    "KODE JURI": j.kode,
-                    "RUANG UJIAN": j.ruang,
-                    "JAM MASUK": j.absenMasuk || "-",
-                    "JAM PULANG": j.absenPulang || "-",
-                    "DURASI TUGAS": durasi
-                };
-            });
+            const exportData = dataJuri.map((j, idx) => ({
+                "id juri": j.id,
+                "nama": j.nama,
+                "GRID": j.grid || "B",
+                "STATUS": j.status,
+                "KODE JURI": j.kode || "-",
+                "RUANG UJIAN": j.ruang || "-"
+            }));
 
             const worksheet = XLSX.utils.json_to_sheet(exportData);
             const workbook = XLSX.utils.book_new();
@@ -1279,7 +834,6 @@
             XLSX.writeFile(workbook, "MENTAHAN_JURI.xlsx");
         }
 
-        // --- IMPOR PESERTA DENGAN PEMETAAN AKURAT (MENCEGAH MEMBELUDAK) ---
         function importPeserta(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1292,13 +846,18 @@
                 const json = XLSX.utils.sheet_to_json(worksheet);
 
                 if (json.length > 0) {
+                    const existingMap = {};
+                    dataPeserta.forEach(p => { if (p.idpps) existingMap[p.idpps] = p; });
+
                     dataPeserta = json.map((row, idx) => {
+                        const rawId = String(row['IDPPS'] || row['ID'] || `P${idx+1}`).trim();
                         const kodeJuri = String(row['JURI'] || row['KODE JURI'] || row['Kode Juri'] || '').trim().toUpperCase();
                         const ruangUjian = String(row['RUANG TES'] || row['RUANG'] || row['Ruang Tes'] || '').trim().toUpperCase();
+                        const existing = existingMap[rawId];
 
                         return {
                             no: row['NO'] || (idx + 1),
-                            idpps: String(row['IDPPS'] || row['ID'] || `P${idx+1}`).trim(),
+                            idpps: rawId,
                             nama: String(row['NAMA'] || 'Peserta Baru').trim(),
                             dom: String(row['DOM'] || '-').trim(),
                             kelas: String(row['KELAS'] || '-').trim(),
@@ -1308,14 +867,14 @@
                             jmlKetTes: row['jml ket tes'] || 1,
                             juriKode: kodeJuri,
                             ruangTes: ruangUjian || (mapKodeToRuang[kodeJuri] || ''),
-                            status: 'HADIR',
-                            scores: { k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0}, k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0} }
+                            status: existing && existing.status ? existing.status : 'HADIR',
+                            scores: existing && existing.scores ? existing.scores : { k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0}, k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0} }
                         };
                     });
 
                     saveToStorage();
                     switchTab('peserta');
-                    alert("Berhasil mengimpor " + json.length + " data peserta dengan pemetaan yang akurat!");
+                    alert("Berhasil mengimpor " + json.length + " data peserta!");
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -1335,7 +894,6 @@
                 "JURI": p.juriKode,
                 "RUANG TES": p.ruangTes
             }));
-
             const worksheet = XLSX.utils.json_to_sheet(exportData);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "DATA PESERTA");
@@ -1356,232 +914,14 @@
                 "JURI": p.juriKode,
                 "RUANG TES": p.ruangTes,
                 "STATUS": p.status,
-                "K1_LAFADZ": p.scores?.k1?.lafadz || 0,
-                "K1_MAKNA": p.scores?.k1?.makna || 0,
-                "K1_TERJEMAH": p.scores?.k1?.terjemah || 0,
-                "K1_TASRIF": p.scores?.k1?.tasrif || 0,
-                "K1_TAKTEK": p.scores?.k1?.taktek || 0,
-                "K2_LAFADZ": p.scores?.k2?.lafadz || 0,
-                "K2_MAKNA": p.scores?.k2?.makna || 0,
-                "K2_TERJEMAH": p.scores?.k2?.terjemah || 0,
-                "K2_TASRIF": p.scores?.k2?.tasrif || 0,
-                "K2_NADHOM": p.scores?.k2?.nadhom || 0,
                 "TOTAL_KESALAHAN": calculateTotalErrors(p.scores)
             }));
-
             const worksheet = XLSX.utils.json_to_sheet(exportData);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "KOLOM NILAI");
             XLSX.writeFile(workbook, "REKAP_NILAI_PESERTA.xlsx");
         }
 
-        // =============================================
-        // SCANNER QR CODE & OPERATOR LOGIC
-        // =============================================
-        let html5QrcodeScanner = null;
-        let currentJuriFilter = 'all';
-        let lastScannedId = null;
-        let scanCooldown = false;
-
-        function initQrScanner() {
-            if (html5QrcodeScanner) return;
-            try {
-                html5QrcodeScanner = new Html5QrcodeScanner(
-                    "qr-reader", 
-                    { fps: 10, qrbox: { width: 180, height: 180 } },
-                    /* verbose= */ false
-                );
-                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-            } catch(e) {
-                console.warn("Gagal inisialisasi QR Scanner:", e);
-            }
-        }
-
-        function onScanSuccess(decodedText, decodedResult) {
-            if (scanCooldown && lastScannedId === decodedText.trim()) return;
-            processQrCode(decodedText);
-        }
-
-        function onScanFailure(error) {}
-
-        function processQrCode(scannedText) {
-            const cleanId = String(scannedText).trim();
-            if (!cleanId) return;
-
-            scanCooldown = true;
-            lastScannedId = cleanId;
-            setTimeout(() => { scanCooldown = false; }, 2500);
-
-            const box = document.getElementById('scan-result-box');
-            const msg = document.getElementById('scan-result-msg');
-            box.classList.remove('hidden');
-
-            const juri = dataJuri.find(j => j.id === cleanId && j.status === 'JURI');
-            if (!juri) {
-                box.className = "mt-3 p-3 rounded-lg text-xs bg-rose-100 text-rose-800 font-semibold";
-                msg.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> ID Juri (<b>${cleanId}</b>) tidak ditemukan!`;
-                return;
-            }
-
-            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            juri.manualStatus = null;
-            if (!juri.absenMasuk) {
-                juri.absenMasuk = timeNow;
-                box.className = "mt-3 p-3 rounded-lg text-xs bg-emerald-100 text-emerald-800 font-semibold";
-                msg.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Absen MASUK Berhasil: <b>${juri.nama}</b> (${timeNow})`;
-            } else if (!juri.absenPulang) {
-                juri.absenPulang = timeNow;
-                box.className = "mt-3 p-3 rounded-lg text-xs bg-indigo-100 text-indigo-800 font-semibold";
-                msg.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Absen PULANG Berhasil: <b>${juri.nama}</b> (${timeNow})`;
-            } else {
-                box.className = "mt-3 p-3 rounded-lg text-xs bg-amber-100 text-amber-800 font-semibold";
-                msg.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> <b>${juri.nama}</b> sudah absen Datang & Pulang!`;
-            }
-
-            saveToStorage();
-            renderOperatorViews();
-            document.getElementById('manual-qr-input').value = '';
-        }
-
-        function showJuriQrCode(juriId) {
-            const juri = dataJuri.find(j => j.id === juriId);
-            if (!juri) return;
-
-            document.getElementById('qr-juri-nama').innerText = juri.nama + (juri.ruang ? ` (${juri.ruang})` : '');
-            document.getElementById('qr-juri-id').innerText = "ID: " + juri.id;
-
-            const container = document.getElementById('qrcode-container');
-            container.innerHTML = "";
-            new QRCode(container, {
-                text: juri.id,
-                width: 150,
-                height: 150
-            });
-
-            document.getElementById('modal-qr-card').classList.remove('hidden');
-        }
-
-        function closeQrModal() {
-            document.getElementById('modal-qr-card').classList.add('hidden');
-        }
-
-        function filterJuriStatus(filterType) {
-            currentJuriFilter = filterType;
-            renderOperatorViews();
-        }
-
-        function setJuriManualStatus(juriId, statusType) {
-            const juri = dataJuri.find(j => j.id === juriId);
-            if (!juri) return;
-
-            if (statusType === 'IZIN') {
-                juri.manualStatus = 'IZIN';
-                juri.absenMasuk = null;
-                juri.absenPulang = null;
-            } else if (statusType === 'ALPA') {
-                juri.manualStatus = 'ALPA';
-                juri.absenMasuk = null;
-                juri.absenPulang = null;
-            } else if (statusType === 'RESET') {
-                juri.manualStatus = null;
-                juri.absenMasuk = null;
-                juri.absenPulang = null;
-            }
-
-            saveToStorage();
-            renderOperatorViews();
-        }
-
-        function renderOperatorViews() {
-            initQrScanner();
-
-            const juriBertugas = dataJuri.filter(j => j.status === 'JURI' && (j.ruang || j.kode));
-            const totalBertugas = juriBertugas.length;
-            const sudahHadir = juriBertugas.filter(j => j.absenMasuk && !j.manualStatus).length;
-            const statusIzin = juriBertugas.filter(j => j.manualStatus === 'IZIN').length;
-            const statusAlpa = juriBertugas.filter(j => j.manualStatus === 'ALPA').length;
-            const belumHadir = totalBertugas - (sudahHadir + statusIzin + statusAlpa);
-
-            if (document.getElementById('stat-juri-total')) {
-                document.getElementById('stat-juri-total').innerText = totalBertugas;
-                document.getElementById('stat-juri-hadir').innerText = sudahHadir;
-                document.getElementById('stat-juri-izin').innerText = statusIzin;
-                document.getElementById('stat-juri-alpa').innerText = statusAlpa;
-                document.getElementById('stat-juri-belum').innerText = belumHadir;
-            }
-
-            let filteredJuri = juriBertugas;
-            if (currentJuriFilter === 'hadir') filteredJuri = juriBertugas.filter(j => j.absenMasuk && !j.manualStatus);
-            if (currentJuriFilter === 'izin') filteredJuri = juriBertugas.filter(j => j.manualStatus === 'IZIN');
-            if (currentJuriFilter === 'alpa') filteredJuri = juriBertugas.filter(j => j.manualStatus === 'ALPA');
-            if (currentJuriFilter === 'belum') filteredJuri = juriBertugas.filter(j => !j.absenMasuk && !j.manualStatus);
-
-            const tbodyJuri = document.getElementById('table-operator-juri-status');
-            if (!tbodyJuri) return;
-
-            if (filteredJuri.length === 0) {
-                tbodyJuri.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Tidak ada data juri untuk kategori ini.</td></tr>`;
-            } else {
-                tbodyJuri.innerHTML = filteredJuri.map(j => {
-                    let statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">BELUM</span>';
-                    if (j.manualStatus === 'IZIN') {
-                        statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">IZIN</span>';
-                    } else if (j.manualStatus === 'ALPA') {
-                        statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800">ALPA</span>';
-                    } else if (j.absenMasuk) {
-                        statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">HADIR</span>';
-                    }
-
-                    return `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-2 font-mono font-bold text-slate-700">${j.id}</td>
-                        <td class="p-2 font-bold text-slate-800">${j.nama}</td>
-                        <td class="p-2 text-emerald-700 font-semibold"><span class="px-1.5 py-0.5 bg-slate-100 text-slate-800 rounded font-bold">${j.kode || '-'}</span> ${j.ruang || '-'}</td>
-                        <td class="p-2">${j.absenMasuk ? `<span class="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded">${j.absenMasuk}</span>` : '<span class="text-slate-400">--:--</span>'}</td>
-                        <td class="p-2">${j.absenPulang ? `<span class="text-indigo-700 font-bold bg-indigo-50 px-2 py-0.5 rounded">${j.absenPulang}</span>` : '<span class="text-slate-400">--:--</span>'}</td>
-                        <td class="p-2">${statusBadge}</td>
-                        <td class="p-2 text-center">
-                            <div class="flex items-center justify-center space-x-1">
-                                <button onclick="setJuriManualStatus('${j.id}', 'IZIN')" class="px-1.5 py-1 ${j.manualStatus === 'IZIN' ? 'bg-amber-600 text-white' : 'bg-amber-100 hover:bg-amber-200 text-amber-800'} rounded text-[10px] font-bold" title="Tandai Izin">IZIN</button>
-                                <button onclick="setJuriManualStatus('${j.id}', 'ALPA')" class="px-1.5 py-1 ${j.manualStatus === 'ALPA' ? 'bg-rose-600 text-white' : 'bg-rose-100 hover:bg-rose-200 text-rose-800'} rounded text-[10px] font-bold" title="Tandai Alpa">ALPA</button>
-                                ${(j.manualStatus || j.absenMasuk) ? `<button onclick="setJuriManualStatus('${j.id}', 'RESET')" class="px-1.5 py-1 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded text-[10px] font-bold" title="Reset Status"><i class="fa-solid fa-rotate-left"></i></button>` : ''}
-                                <button onclick="showJuriQrCode('${j.id}')" class="px-1.5 py-1 bg-slate-700 hover:bg-slate-800 text-white rounded text-[10px] font-bold" title="Lihat QR Code"><i class="fa-solid fa-qrcode"></i></button>
-                                <button onclick="openGantiJuriModal('${j.ruang}')" class="px-1.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-[10px] font-bold">Ganti</button>
-                            </div>
-                        </td>
-                    </tr>
-                `}).join('');
-            }
-        }
-
-        function openGantiJuriModal(ruang) {
-            selectedRuangForGantiModal = ruang;
-            document.getElementById('modal-ganti-ruang').innerText = ruang || 'Semua';
-            const select = document.getElementById('select-juri-pengganti');
-            select.innerHTML = dataJuri.filter(j => j.status === 'JURI').map(j => `
-                <option value="${j.id}">${j.nama} (${j.ruang ? 'Ruang: ' + j.ruang : 'Bebas'})</option>
-            `).join('');
-            document.getElementById('modal-ganti-juri').classList.remove('hidden');
-        }
-
-        function closeGantiJuriModal() {
-            document.getElementById('modal-ganti-juri').classList.add('hidden');
-        }
-
-        function submitGantiJuri() {
-            const newJuriId = document.getElementById('select-juri-pengganti').value;
-            const newJuri = dataJuri.find(j => j.id === newJuriId);
-
-            if (newJuri) {
-                newJuri.ruang = selectedRuangForGantiModal;
-                saveToStorage();
-                alert(`Juri ${newJuri.nama} berhasil ditempatkan di ruang ${selectedRuangForGantiModal}`);
-                closeGantiJuriModal();
-                switchTab(activeTab);
-            }
-        }
-
-        // --- JURI DASHBOARD & SCORING LOGIC (FILTER TEPAT BERDASARKAN KODE/RUANG) ---
         function renderJuriDashboard() {
             const juri = currentUser;
             if (!juri) return;
@@ -1590,14 +930,9 @@
             document.getElementById('juri-profile-ruang').innerText = juri.ruang || 'Belum Ditentukan';
             document.getElementById('juri-profile-kode').innerText = juri.kode || '-';
 
-            // Filter akurat: Cocokkan kode juri secara tepat agar peserta tidak membeludak
             const filteredPeserta = dataPeserta.filter(p => {
-                if (juri.kode && juri.kode !== '-') {
-                    return String(p.juriKode || '').trim().toUpperCase() === String(juri.kode).trim().toUpperCase();
-                }
-                if (juri.ruang && juri.ruang !== '-') {
-                    return String(p.ruangTes || '').trim().toUpperCase() === String(juri.ruang).trim().toUpperCase();
-                }
+                if (juri.kode && juri.kode !== '-') return String(p.juriKode || '').trim().toUpperCase() === String(juri.kode).trim().toUpperCase();
+                if (juri.ruang && juri.ruang !== '-') return String(p.ruangTes || '').trim().toUpperCase() === String(juri.ruang).trim().toUpperCase();
                 return false;
             });
 
@@ -1605,12 +940,12 @@
             if (!container) return;
 
             if (filteredPeserta.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic p-3 text-center">Tidak ada peserta yang ditugaskan untuk kode/ruang ini.</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-400 italic p-3 text-center">Tidak ada peserta untuk kode/ruang ini.</p>`;
                 return;
             }
 
             container.innerHTML = filteredPeserta.map(p => `
-                <div onclick="selectPesertaForScoring('${p.idpps}')" class="p-3 bg-white rounded-lg border hover:border-emerald-500 cursor-pointer transition ${activeSelectedPesertaId === p.idpps ? 'ring-2 ring-emerald-500 border-transparent bg-emerald-50/30' : ''}">
+                <div onclick="selectPesertaForScoring('${p.idpps}')" class="p-3 bg-white rounded-lg border hover:border-emerald-500 cursor-pointer transition ${activeSelectedPesertaId === p.idpps ? 'ring-2 ring-emerald-500 bg-emerald-50/30' : ''}">
                     <p class="font-bold text-xs text-slate-800">${p.nama}</p>
                     <div class="flex justify-between items-center mt-1">
                         <span class="text-[10px] text-slate-500">ID: ${p.idpps} | Kls: ${p.kelas}</span>
@@ -1631,7 +966,6 @@
             document.getElementById('score-active-nama').innerText = p.nama;
             document.getElementById('score-active-id').innerText = p.idpps;
             document.getElementById('score-active-kelas').innerText = p.kelas;
-            document.getElementById('score-active-status').innerText = p.status;
 
             document.getElementById('k1-lafadz').value = p.scores?.k1?.lafadz || 0;
             document.getElementById('k1-makna').value = p.scores?.k1?.makna || 0;
@@ -1657,18 +991,18 @@
 
             p.scores = {
                 k1: {
-                    lafadz: parseInt(document.getElementById('k1-lafadz').value) || 0,
-                    makna: parseInt(document.getElementById('k1-makna').value) || 0,
-                    terjemah: parseInt(document.getElementById('k1-terjemah').value) || 0,
-                    tasrif: parseInt(document.getElementById('k1-tasrif').value) || 0,
-                    taktek: parseInt(document.getElementById('k1-taktek').value) || 0
+                    lafadz: Math.max(0, parseInt(document.getElementById('k1-lafadz').value) || 0),
+                    makna: Math.max(0, parseInt(document.getElementById('k1-makna').value) || 0),
+                    terjemah: Math.max(0, parseInt(document.getElementById('k1-terjemah').value) || 0),
+                    tasrif: Math.max(0, parseInt(document.getElementById('k1-tasrif').value) || 0),
+                    taktek: Math.max(0, parseInt(document.getElementById('k1-taktek').value) || 0)
                 },
                 k2: {
-                    lafadz: parseInt(document.getElementById('k2-lafadz').value) || 0,
-                    makna: parseInt(document.getElementById('k2-makna').value) || 0,
-                    terjemah: parseInt(document.getElementById('k2-terjemah').value) || 0,
-                    tasrif: parseInt(document.getElementById('k2-tasrif').value) || 0,
-                    nadhom: parseInt(document.getElementById('k2-nadhom').value) || 0
+                    lafadz: Math.max(0, parseInt(document.getElementById('k2-lafadz').value) || 0),
+                    makna: Math.max(0, parseInt(document.getElementById('k2-makna').value) || 0),
+                    terjemah: Math.max(0, parseInt(document.getElementById('k2-terjemah').value) || 0),
+                    tasrif: Math.max(0, parseInt(document.getElementById('k2-tasrif').value) || 0),
+                    nadhom: Math.max(0, parseInt(document.getElementById('k2-nadhom').value) || 0)
                 }
             };
 
@@ -1684,10 +1018,113 @@
             return k1Sum + k2Sum;
         }
 
-        // Muat data awal dari Cloudflare Pages / Neon saat web dibuka
-        window.addEventListener('DOMContentLoaded', async () => {
-            await fetchFromCloud();
-        });
+        function saveToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY_JURI, JSON.stringify(dataJuri));
+                localStorage.setItem(STORAGE_KEY_PESERTA, JSON.stringify(dataPeserta));
+                syncToCloud();
+            } catch(e) {}
+        }
+
+        function loadFromStorage() {
+            try {
+                const savedJuri = localStorage.getItem(STORAGE_KEY_JURI);
+                const savedPeserta = localStorage.getItem(STORAGE_KEY_PESERTA);
+                if (savedJuri) dataJuri = JSON.parse(savedJuri);
+                if (savedPeserta) dataPeserta = JSON.parse(savedPeserta);
+            } catch(e) {}
+        }
+
+        function clearStorage() {
+            if (confirm('Yakin ingin mereset seluruh data lokal?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        async function syncToCloud() {
+            const ind = document.getElementById('storage-indicator');
+            if (ind) ind.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Syncing...';
+            try {
+                if (dataJuri && dataJuri.length > 0) {
+                    await fetch('/api/juri', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataJuri) });
+                }
+                if (dataPeserta && dataPeserta.length > 0) {
+                    await fetch('/api/peserta', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataPeserta) });
+                }
+                if (ind) ind.innerHTML = '<i class="fa-solid fa-cloud-check text-xs"></i> Cloud Tersinkron';
+            } catch(e) {
+                if (ind) ind.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-xs text-amber-400"></i> Offline Sync';
+            }
+        }
+
+        async function fetchFromCloud() {
+            try {
+                const resJuri = await fetch('/api/juri');
+                if (resJuri.ok) {
+                    const juriRemote = await resJuri.json();
+                    if (Array.isArray(juriRemote) && juriRemote.length > 0) dataJuri = juriRemote;
+                }
+                const resPeserta = await fetch('/api/peserta');
+                if (resPeserta.ok) {
+                    const pesertaRemote = await resPeserta.json();
+                    if (Array.isArray(pesertaRemote) && pesertaRemote.length > 0) dataPeserta = pesertaRemote;
+                }
+                switchTab(activeTab);
+            } catch(e) {}
+        }
+
+        function autoDetectRuang() {
+            const kodeInput = document.getElementById('assign-kode').value.trim().toUpperCase();
+            const mapKode = {
+                'A':'AL-GHAZALI 1.02','B':'AL-GHAZALI 1.02','C':'AL-GHAZALI 1.02','D':'AL-GHAZALI 1.02','E':'AL-GHAZALI 1.02','F':'AL-GHAZALI 1.02',
+                'G':'AL-GHAZALI 1.05','H':'AL-GHAZALI 1.05','I':'AL-GHAZALI 1.05','J':'AL-GHAZALI 1.05','K':'AL-GHAZALI 1.05','L':'AL-GHAZALI 1.05',
+                'M':'AL-GHAZALI 1.06','N':'AL-GHAZALI 1.06','O':'AL-GHAZALI 1.06','P':'AL-GHAZALI 1.06','Q':'AL-GHAZALI 1.06','R':'AL-GHAZALI 1.06',
+                'S':'AL-GHAZALI 1.07','T':'AL-GHAZALI 1.07','U':'AL-GHAZALI 1.07','V':'AL-GHAZALI 1.07','W':'AL-GHAZALI 1.07','X':'AL-GHAZALI 1.07',
+                'Y':'AL-GHAZALI 1.08','Z':'AL-GHAZALI 1.08','AA':'AL-GHAZALI 1.08','AB':'AL-GHAZALI 1.08','AC':'AL-GHAZALI 1.08','AD':'AL-GHAZALI 1.08',
+                'AE':'AL-GHAZALI 1.09','AF':'AL-GHAZALI 1.09','AG':'AL-GHAZALI 1.09','AH':'AL-GHAZALI 1.09','AI':'AL-GHAZALI 1.09','AJ':'AL-GHAZALI 1.09',
+                'AK':'AL-GHAZALI 3.01','AL':'AL-GHAZALI 3.01'
+            };
+            document.getElementById('assign-ruang').value = mapKode[kodeInput] || '';
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const inputId = document.getElementById('login-password').value.trim();
+            if (!inputId) return;
+
+            try {
+                const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: inputId }) });
+                const data = await res.json();
+                if (!data.success) { alert(data.message || "ID tidak ditemukan!"); return; }
+
+                currentUser = data.user;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('flex');
+                document.getElementById('sidebar-role-badge').innerText = currentUser.role.toUpperCase();
+                document.getElementById('sidebar-user-name').innerText = currentUser.nama || 'User';
+                document.getElementById('sidebar-user-id').innerText = "ID: " + currentUser.id;
+
+                applyRoleSidebarPermissions();
+                await fetchFromCloud();
+
+                if (currentUser.role === 'juri') switchTab('penilaian');
+                else switchTab('dashboard');
+            } catch (err) {
+                alert("Gagal terhubung ke database!");
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('app-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('flex');
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+
+        loadFromStorage();
+        window.addEventListener('DOMContentLoaded', async () => { await fetchFromCloud(); });
     </script>
 </body>
 </html>
