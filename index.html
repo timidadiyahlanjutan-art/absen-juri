@@ -238,11 +238,21 @@
                     </div>
                 </div>
 
-                <!-- TAB 3: 👥 DATA PESERTA -->
+                <!-- TAB 3: 👥 DATA PESERTA (DENGAN PENCARIAN & AKSI EDIT/HAPUS) -->
                 <div id="tab-peserta" class="tab-pane space-y-6 hidden">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <h3 class="text-base font-bold text-slate-800 mb-4"><i class="fa-solid fa-users text-indigo-600 mr-2"></i> Master Data Peserta Ujian</h3>
-                        <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                        <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b">
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-users text-indigo-600 mr-2"></i> Master Data Peserta Ujian</h3>
+                                <p class="text-xs text-slate-500 mt-0.5">Kelola data santri peserta ujian, ganti kode juri/ruang, atau koreksi identitas secara langsung.</p>
+                            </div>
+                            <div class="relative w-full md:w-72">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                                <input type="text" id="search-peserta" oninput="renderAdminPesertaTable()" placeholder="Cari Nama / ID / Kelas / Ruang..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto max-h-[520px] overflow-y-auto">
                             <table class="w-full text-left text-xs text-slate-600">
                                 <thead class="bg-slate-100 text-slate-700 uppercase sticky top-0 z-10">
                                     <tr>
@@ -256,6 +266,7 @@
                                         <th class="p-3">Ruang Tes</th>
                                         <th class="p-3">Status</th>
                                         <th class="p-3 text-center">Total Err</th>
+                                        <th class="p-3 text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-admin-peserta" class="divide-y divide-slate-200">
@@ -436,16 +447,26 @@
                     </div>
                 </div>
 
-                <!-- TAB 7: 📊 REKAP NILAI -->
+                <!-- TAB 7: 📊 REKAP NILAI (DENGAN PENCARIAN REAL-TIME) -->
                 <div id="tab-rekap" class="tab-pane space-y-6 hidden">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-chart-simple text-indigo-600 mr-2"></i> Rekapitulasi Nilai Akhir Peserta</h3>
-                            <button onclick="exportNilai()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition">
-                                <i class="fa-solid fa-download mr-1.5"></i> Export Rekap Excel
-                            </button>
+                        <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b">
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-chart-simple text-indigo-600 mr-2"></i> Rekapitulasi Nilai Akhir Peserta</h3>
+                                <p class="text-xs text-slate-500 mt-0.5">Pantau nilai kesalahan Kitab 1 & Kitab 2 seluruh santri secara terpusat.</p>
+                            </div>
+                            <div class="flex items-center space-x-2 w-full md:w-auto">
+                                <div class="relative flex-1 md:w-64">
+                                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                                    <input type="text" id="search-rekap" oninput="renderRekapTable()" placeholder="Cari Nama / IDPPS / Kelas / Ruang..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+                                </div>
+                                <button onclick="exportNilai()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shadow">
+                                    <i class="fa-solid fa-download"></i> Export Excel
+                                </button>
+                            </div>
                         </div>
-                        <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+
+                        <div class="overflow-x-auto max-h-[520px] overflow-y-auto">
                             <table class="w-full text-left text-xs text-slate-600">
                                 <thead class="bg-slate-100 text-slate-700 uppercase sticky top-0 z-10">
                                     <tr>
@@ -546,6 +567,79 @@
                     <button onclick="submitAssignment()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow">Simpan</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT DATA PESERTA (SANTRI) -->
+    <div id="modal-edit-peserta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-lg w-full">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b">
+                <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-user-pen text-indigo-600 mr-2"></i> Edit Data Peserta (Santri)</h3>
+                <button onclick="closeEditPesertaModal()" class="text-slate-400 hover:text-slate-600 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form onsubmit="submitEditPeserta(event)" class="space-y-4 text-xs">
+                <input type="hidden" id="edit-peserta-original-id">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">IDPPS</label>
+                        <input type="text" id="edit-peserta-idpps" required class="w-full border rounded-lg p-2.5 bg-slate-100 font-mono font-bold text-slate-700 outline-none" readonly>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Nama Santri</label>
+                        <input type="text" id="edit-peserta-nama" required class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-slate-800">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Kelas</label>
+                        <input type="text" id="edit-peserta-kelas" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Domisili (DOM)</label>
+                        <input type="text" id="edit-peserta-dom" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Guru</label>
+                        <input type="text" id="edit-peserta-guru" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Ruang Sore</label>
+                        <input type="text" id="edit-peserta-ruangsore" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Kode Juri (Abjad)</label>
+                        <input type="text" id="edit-peserta-juri" oninput="autoDetectRuangForPeserta()" class="w-full border rounded-lg p-2.5 uppercase font-bold text-indigo-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Ruang Tes</label>
+                        <input type="text" id="edit-peserta-ruangtes" class="w-full border rounded-lg p-2.5 font-bold text-emerald-700 bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-1">Status Kehadiran</label>
+                    <select id="edit-peserta-status" class="w-full border rounded-lg p-2.5 bg-white font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="HADIR">HADIR</option>
+                        <option value="IZIN">IZIN</option>
+                        <option value="SAKIT">SAKIT</option>
+                        <option value="GHAIB">GHAIB / ALPHA</option>
+                    </select>
+                </div>
+
+                <div class="flex justify-end space-x-2 pt-3 border-t">
+                    <button type="button" onclick="closeEditPesertaModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 font-semibold">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold shadow">Simpan Perubahan</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -747,39 +841,88 @@
             `).join('');
         }
 
+        // --- TAB DATA PESERTA (DENGAN PENCARIAN & AKSI EDIT / HAPUS) ---
         function renderAdminPesertaTable() {
             const tbody = document.getElementById('table-admin-peserta');
             if (!tbody) return;
 
-            tbody.innerHTML = dataPeserta.map((p, idx) => {
+            const query = document.getElementById('search-peserta') ? document.getElementById('search-peserta').value.trim().toLowerCase() : '';
+
+            const filtered = dataPeserta.filter(p => {
+                return String(p.nama || '').toLowerCase().includes(query) ||
+                       String(p.idpps || '').toLowerCase().includes(query) ||
+                       String(p.kelas || '').toLowerCase().includes(query) ||
+                       String(p.dom || '').toLowerCase().includes(query) ||
+                       String(p.juriKode || '').toLowerCase().includes(query) ||
+                       String(p.ruangTes || '').toLowerCase().includes(query);
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" class="p-6 text-center text-xs text-slate-400 italic bg-slate-50">Tidak ada data santri yang cocok.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((p, idx) => {
                 const totalErr = calculateTotalErrors(p.scores);
+                const isHadir = p.status === 'HADIR' || !p.status;
+                const statusBadge = isHadir 
+                    ? `<span class="px-2 py-1 text-xs rounded-full font-bold bg-emerald-100 text-emerald-800">HADIR</span>`
+                    : `<span class="px-2 py-1 text-xs rounded-full font-bold bg-amber-100 text-amber-800">${p.status}</span>`;
+
                 return `
                 <tr class="hover:bg-slate-50">
                     <td class="p-3">${p.no || (idx + 1)}</td>
-                    <td class="p-3 font-mono text-xs">${p.idpps}</td>
+                    <td class="p-3 font-mono text-xs font-bold text-slate-700">${p.idpps}</td>
                     <td class="p-3 font-bold text-slate-800">${p.nama}</td>
                     <td class="p-3 text-xs">${p.kelas} (${p.dom})</td>
                     <td class="p-3 text-xs text-slate-500">${p.guru || '-'}</td>
                     <td class="p-3 text-xs text-slate-500">${p.ruangSore || '-'}</td>
                     <td class="p-3"><span class="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-xs font-bold rounded">${p.juriKode || '-'}</span></td>
                     <td class="p-3 text-xs font-semibold text-slate-700">${p.ruangTes || '-'}</td>
-                    <td class="p-3">
-                        <span class="px-2 py-1 text-xs rounded-full font-bold bg-emerald-100 text-emerald-800">HADIR</span>
-                    </td>
+                    <td class="p-3">${statusBadge}</td>
                     <td class="p-3 text-center font-bold text-rose-600">${totalErr} Err</td>
+                    <td class="p-3 text-center">
+                        <div class="flex items-center justify-center space-x-1.5">
+                            <button onclick="openEditPesertaModal('${p.idpps}')" class="p-1.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white rounded transition" title="Edit Santri">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="hapusPesertaSingle('${p.idpps}')" class="p-1.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded transition" title="Hapus Santri">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </td>
                 </tr>
             `}).join('');
         }
 
+        // --- TAB REKAP NILAI (DENGAN PENCARIAN REAL-TIME) ---
         function renderRekapTable() {
             const tbody = document.getElementById('table-rekap-nilai-body');
-            tbody.innerHTML = dataPeserta.map((p, idx) => {
+            if (!tbody) return;
+
+            const query = document.getElementById('search-rekap') ? document.getElementById('search-rekap').value.trim().toLowerCase() : '';
+
+            const filtered = dataPeserta.filter(p => {
+                return String(p.nama || '').toLowerCase().includes(query) ||
+                       String(p.idpps || '').toLowerCase().includes(query) ||
+                       String(p.kelas || '').toLowerCase().includes(query) ||
+                       String(p.dom || '').toLowerCase().includes(query) ||
+                       String(p.juriKode || '').toLowerCase().includes(query) ||
+                       String(p.ruangTes || '').toLowerCase().includes(query);
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-xs text-slate-400 italic bg-slate-50">Data rekap tidak ditemukan.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((p, idx) => {
                 const k1Sum = Object.values(p.scores?.k1 || {}).reduce((a, b) => a + b, 0);
                 const k2Sum = Object.values(p.scores?.k2 || {}).reduce((a, b) => a + b, 0);
                 return `
                 <tr class="hover:bg-slate-50">
                     <td class="p-2.5">${p.no || (idx + 1)}</td>
-                    <td class="p-2.5 font-mono">${p.idpps}</td>
+                    <td class="p-2.5 font-mono font-bold text-slate-700">${p.idpps}</td>
                     <td class="p-2.5 font-bold text-slate-800">${p.nama}</td>
                     <td class="p-2.5 text-slate-500">${p.kelas} (${p.dom})</td>
                     <td class="p-2.5 font-bold text-indigo-600">${p.juriKode || '-'}</td>
@@ -789,6 +932,83 @@
                     <td class="p-2.5 text-center font-black text-rose-600">${k1Sum + k2Sum} Err</td>
                 </tr>
             `}).join('');
+        }
+
+        // --- FUNGSI EDIT SANTRI (PESERTA) ---
+        function openEditPesertaModal(idpps) {
+            const p = dataPeserta.find(item => item.idpps === idpps);
+            if (!p) return;
+
+            document.getElementById('edit-peserta-original-id').value = p.idpps;
+            document.getElementById('edit-peserta-idpps').value = p.idpps;
+            document.getElementById('edit-peserta-nama').value = p.nama || '';
+            document.getElementById('edit-peserta-kelas').value = p.kelas || '';
+            document.getElementById('edit-peserta-dom').value = p.dom || '';
+            document.getElementById('edit-peserta-guru').value = p.guru || '';
+            document.getElementById('edit-peserta-ruangsore').value = p.ruangSore || '';
+            document.getElementById('edit-peserta-juri').value = p.juriKode || '';
+            document.getElementById('edit-peserta-ruangtes').value = p.ruangTes || '';
+            document.getElementById('edit-peserta-status').value = p.status || 'HADIR';
+
+            document.getElementById('modal-edit-peserta').classList.remove('hidden');
+        }
+
+        function closeEditPesertaModal() {
+            document.getElementById('modal-edit-peserta').classList.add('hidden');
+        }
+
+        function autoDetectRuangForPeserta() {
+            const kodeInput = document.getElementById('edit-peserta-juri').value.trim().toUpperCase();
+            const mapKode = {
+                'A':'AL-GHAZALI 1.02','B':'AL-GHAZALI 1.02','C':'AL-GHAZALI 1.02','D':'AL-GHAZALI 1.02','E':'AL-GHAZALI 1.02','F':'AL-GHAZALI 1.02',
+                'G':'AL-GHAZALI 1.05','H':'AL-GHAZALI 1.05','I':'AL-GHAZALI 1.05','J':'AL-GHAZALI 1.05','K':'AL-GHAZALI 1.05','L':'AL-GHAZALI 1.05',
+                'M':'AL-GHAZALI 1.06','N':'AL-GHAZALI 1.06','O':'AL-GHAZALI 1.06','P':'AL-GHAZALI 1.06','Q':'AL-GHAZALI 1.06','R':'AL-GHAZALI 1.06',
+                'S':'AL-GHAZALI 1.07','T':'AL-GHAZALI 1.07','U':'AL-GHAZALI 1.07','V':'AL-GHAZALI 1.07','W':'AL-GHAZALI 1.07','X':'AL-GHAZALI 1.07',
+                'Y':'AL-GHAZALI 1.08','Z':'AL-GHAZALI 1.08','AA':'AL-GHAZALI 1.08','AB':'AL-GHAZALI 1.08','AC':'AL-GHAZALI 1.08','AD':'AL-GHAZALI 1.08',
+                'AE':'AL-GHAZALI 1.09','AF':'AL-GHAZALI 1.09','AG':'AL-GHAZALI 1.09','AH':'AL-GHAZALI 1.09','AI':'AL-GHAZALI 1.09','AJ':'AL-GHAZALI 1.09',
+                'AK':'AL-GHAZALI 3.01','AL':'AL-GHAZALI 3.01'
+            };
+            if (mapKode[kodeInput]) {
+                document.getElementById('edit-peserta-ruangtes').value = mapKode[kodeInput];
+            }
+        }
+
+        function submitEditPeserta(e) {
+            e.preventDefault();
+            const origId = document.getElementById('edit-peserta-original-id').value;
+            const p = dataPeserta.find(item => item.idpps === origId);
+            if (!p) return;
+
+            p.nama = document.getElementById('edit-peserta-nama').value.trim();
+            p.kelas = document.getElementById('edit-peserta-kelas').value.trim();
+            p.dom = document.getElementById('edit-peserta-dom').value.trim();
+            p.guru = document.getElementById('edit-peserta-guru').value.trim();
+            p.ruangSore = document.getElementById('edit-peserta-ruangsore').value.trim();
+            p.juriKode = document.getElementById('edit-peserta-juri').value.trim().toUpperCase();
+            p.ruangTes = document.getElementById('edit-peserta-ruangtes').value.trim();
+            p.status = document.getElementById('edit-peserta-status').value;
+
+            saveToStorage();
+            closeEditPesertaModal();
+            renderAdminPesertaTable();
+            renderRekapTable();
+            updateDashboardStats();
+            alert("Data santri " + p.nama + " berhasil diperbarui!");
+        }
+
+        function hapusPesertaSingle(idpps) {
+            const p = dataPeserta.find(item => item.idpps === idpps);
+            if (!p) return;
+
+            if (!confirm(`Yakin ingin menghapus santri "${p.nama}" (${p.idpps}) dari sistem?`)) {
+                return;
+            }
+
+            dataPeserta = dataPeserta.filter(item => item.idpps !== idpps);
+            saveToStorage();
+            renderAdminPesertaTable();
+            renderRekapTable();
+            updateDashboardStats();
         }
 
         function openAssignModal(juriId) {
