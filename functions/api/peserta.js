@@ -10,7 +10,7 @@ export async function onRequest(context) {
     const parsedUrl = new URL(cleanDbUrl.replace(/^postgres(ql)?:\/\//, 'http://'));
     const host = parsedUrl.hostname;
 
-    // GET: Ambil SELURUH data peserta tanpa batasan default 50
+    // GET: Ambil master data peserta
     if (request.method === "GET") {
         try {
             const res = await fetch(`https://${host}/sql`, {
@@ -20,8 +20,7 @@ export async function onRequest(context) {
                     'Neon-Connection-String': cleanDbUrl
                 },
                 body: JSON.stringify({
-                    // Tambahkan LIMIT 10000 agar Neon menarik seluruh data tanpa dipotong
-                    query: 'SELECT no, idpps, nama, dom, kelas, guru, ruang_sore, tes, jml_ket_tes, juri_kode, ruang_tes, status, scores FROM peserta ORDER BY no ASC LIMIT 10000;'
+                    query: 'SELECT no, idpps, nama, dom, kelas, guru, ruang_sore, tes, jml_ket_tes, juri_kode, ruang_tes, status, scores FROM peserta ORDER BY no ASC, idpps ASC LIMIT 10000;'
                 })
             });
             const result = await res.json();
@@ -29,19 +28,18 @@ export async function onRequest(context) {
                 no: r.no,
                 idpps: String(r.idpps || '').trim(),
                 nama: r.nama,
-                dom: r.dom,
-                kelas: r.kelas,
-                guru: r.guru,
-                ruangSore: r.ruang_sore,
-                tes: r.tes,
-                jmlKetTes: r.jml_ket_tes,
+                dom: r.dom || '-',
+                kelas: r.kelas || '-',
+                guru: r.guru || '-',
+                ruangSore: r.ruang_sore || '-',
+                tes: r.tes || '-',
+                jmlKetTes: r.jml_ket_tes || 1,
                 juriKode: r.juri_kode || '',
                 ruangTes: r.ruang_tes || '',
                 status: r.status || 'HADIR',
-                scores: typeof r.scores === 'string' ? JSON.parse(r.scores) : (r.scores || { k1: {}, k2: {} })
+                scores: typeof r.scores === 'string' ? JSON.parse(r.scores) : (r.scores || {})
             }));
-
-            return new Response(JSON.stringify(rows), {
+            return new Response(JSON.stringify({ success: true, data: rows }), {
                 headers: { "Content-Type": "application/json" }
             });
         } catch (e) {
@@ -49,7 +47,7 @@ export async function onRequest(context) {
         }
     }
 
-    // POST: Simpan seluruh data peserta dengan sistem Batch Insert (Cepat & Tidak Terpotong)
+    // POST: Batch Sync / Import Master Data Peserta
     if (request.method === "POST") {
         try {
             const pesertaList = await request.json();
@@ -57,11 +55,9 @@ export async function onRequest(context) {
                 return new Response(JSON.stringify({ success: true }), { status: 200 });
             }
 
-            // Pecah data per 50 item per batch query agar pengiriman data besar sangat stabil
             const chunkSize = 50;
             for (let i = 0; i < pesertaList.length; i += chunkSize) {
                 const chunk = pesertaList.slice(i, i + chunkSize);
-                
                 const valueClauses = [];
                 const params = [];
                 let paramIndex = 1;
@@ -69,19 +65,19 @@ export async function onRequest(context) {
                 chunk.forEach(p => {
                     valueClauses.push(`($${paramIndex}, $${paramIndex+1}, $${paramIndex+2}, $${paramIndex+3}, $${paramIndex+4}, $${paramIndex+5}, $${paramIndex+6}, $${paramIndex+7}, $${paramIndex+8}, $${paramIndex+9}, $${paramIndex+10}, $${paramIndex+11}, $${paramIndex+12}::jsonb)`);
                     params.push(
-                        p.no || 0,
+                        p.no || null,
                         String(p.idpps || '').trim(),
                         p.nama || '',
-                        p.dom || '',
-                        p.kelas || '',
-                        p.guru || '',
-                        p.ruangSore || '',
-                        p.tes || '',
+                        p.dom || '-',
+                        p.kelas || '-',
+                        p.guru || '-',
+                        p.ruangSore || '-',
+                        p.tes || '-',
                         p.jmlKetTes || 1,
                         p.juriKode || '',
                         p.ruangTes || '',
                         p.status || 'HADIR',
-                        JSON.stringify(p.scores || { k1: {}, k2: {} })
+                        JSON.stringify(p.scores || {})
                     );
                     paramIndex += 13;
                 });
@@ -110,16 +106,39 @@ export async function onRequest(context) {
                         'Content-Type': 'application/json',
                         'Neon-Connection-String': cleanDbUrl
                     },
-                    body: JSON.stringify({
-                        query: queryText,
-                        params: params
-                    })
+                    body: JSON.stringify({ query: queryText, params: params })
                 });
             }
 
-            return new Response(JSON.stringify({ success: true }), {
-                headers: { "Content-Type": "application/json" }
+            return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } });
+        } catch (e) {
+            return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+        }
+    }
+
+    // PUT: Update Skor Kesalahan Satuan Peserta (Input Nilai Juri)
+    if (request.method === "PUT") {
+        try {
+            const body = await request.json();
+            const { idpps, scores } = body;
+
+            if (!idpps) {
+                return new Response(JSON.stringify({ error: "IDPPS wajib disertakan" }), { status: 400 });
+            }
+
+            await fetch(`https://${host}/sql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Neon-Connection-String': cleanDbUrl
+                },
+                body: JSON.stringify({
+                    query: 'UPDATE peserta SET scores = $2::jsonb WHERE idpps = $1;',
+                    params: [String(idpps).trim(), JSON.stringify(scores || {})]
+                })
             });
+
+            return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } });
         } catch (e) {
             return new Response(JSON.stringify({ error: e.message }), { status: 500 });
         }
