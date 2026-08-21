@@ -276,7 +276,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 4: 📋 PENUGASAN JURI -->
+                <!-- TAB 4: 📋 PENUGASAN JURI (DENGAN TOMBOL RESET SEMUA PENUGASAN) -->
                 <div id="tab-penugasan" class="tab-pane space-y-6 hidden">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b">
@@ -1104,9 +1104,16 @@
             XLSX.writeFile(workbook, "MENTAHAN_JURI.xlsx");
         }
 
+        // --- IMPOR PESERTA DENGAN PILIHAN RESET NILAI / PERTAHANKAN NILAI ---
         function importPeserta(e) {
             const file = e.target.files[0];
             if (!file) return;
+
+            const resetScores = confirm(
+                "Apakah ini SESI UJIAN BARU?\n\n" +
+                "• Klik [OK] untuk SESI BARU (Semua nilai kesalahan santri akan di-reset jadi 0).\n" +
+                "• Klik [BATAL] jika hanya ingin memperbarui data santri tanpa menghapus nilai kesalahan yang sudah diinput juri."
+            );
 
             const reader = new FileReader();
             reader.onload = function(evt) {
@@ -1125,6 +1132,14 @@
                         const ruangUjian = String(row['RUANG TES'] || row['RUANG'] || row['Ruang Tes'] || '').trim().toUpperCase();
                         const existing = existingMap[rawId];
 
+                        let targetScores = { k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0}, k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0} };
+                        let targetStatus = 'HADIR';
+
+                        if (!resetScores && existing) {
+                            if (existing.scores) targetScores = existing.scores;
+                            if (existing.status) targetStatus = existing.status;
+                        }
+
                         return {
                             no: row['NO'] || (idx + 1),
                             idpps: rawId,
@@ -1137,15 +1152,17 @@
                             jmlKetTes: row['jml ket tes'] || 1,
                             juriKode: kodeJuri,
                             ruangTes: ruangUjian || (mapKodeToRuang[kodeJuri] || ''),
-                            status: existing && existing.status ? existing.status : 'HADIR',
-                            scores: existing && existing.scores ? existing.scores : { k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0}, k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0} }
+                            status: targetStatus,
+                            scores: targetScores
                         };
                     });
 
                     saveToStorage();
                     switchTab('peserta');
-                    alert("Berhasil mengimpor " + json.length + " data peserta!");
+                    renderRekapTable();
+                    alert("Berhasil mengimpor " + json.length + " data peserta!" + (resetScores ? " (Nilai kesalahan telah dibersihkan menjadi 0)" : " (Nilai sebelumnya dipertahankan)"));
                 }
+                e.target.value = '';
             };
             reader.readAsArrayBuffer(file);
         }
