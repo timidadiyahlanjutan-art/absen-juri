@@ -10,7 +10,7 @@ export async function onRequest(context) {
     const parsedUrl = new URL(cleanDbUrl.replace(/^postgres(ql)?:\/\//, 'http://'));
     const host = parsedUrl.hostname;
 
-    // GET: Ambil SELURUH data juri tanpa batas (LIMIT 10000)
+    // GET: Ambil master data juri
     if (request.method === "GET") {
         try {
             const res = await fetch(`https://${host}/sql`, {
@@ -20,7 +20,7 @@ export async function onRequest(context) {
                     'Neon-Connection-String': cleanDbUrl
                 },
                 body: JSON.stringify({
-                    query: 'SELECT id, nama, status, telepon, kode, ruang, absen_masuk, absen_pulang, manual_status FROM juri ORDER BY id ASC LIMIT 10000;'
+                    query: 'SELECT id, nama, status, grid, kode, ruang, absen_masuk, absen_pulang, manual_status FROM juri ORDER BY id ASC LIMIT 10000;'
                 })
             });
             const result = await res.json();
@@ -28,14 +28,14 @@ export async function onRequest(context) {
                 id: String(r.id || '').trim(),
                 nama: r.nama,
                 status: r.status || 'JURI',
-                telepon: r.telepon || '-',
+                grid: r.grid || 'B',
                 kode: r.kode || '',
                 ruang: r.ruang || '',
                 absenMasuk: r.absen_masuk,
                 absenPulang: r.absen_pulang,
                 manualStatus: r.manual_status
             }));
-            return new Response(JSON.stringify(rows), {
+            return new Response(JSON.stringify({ success: true, data: rows }), {
                 headers: { "Content-Type": "application/json" }
             });
         } catch (e) {
@@ -43,7 +43,7 @@ export async function onRequest(context) {
         }
     }
 
-    // POST: Simpan seluruh juri secara BATCH (Cepat, stabil & tidak terpotong)
+    // POST: Batch Sync / Import Master Data Juri
     if (request.method === "POST") {
         try {
             const juriList = await request.json();
@@ -54,7 +54,6 @@ export async function onRequest(context) {
             const chunkSize = 50;
             for (let i = 0; i < juriList.length; i += chunkSize) {
                 const chunk = juriList.slice(i, i + chunkSize);
-                
                 const valueClauses = [];
                 const params = [];
                 let paramIndex = 1;
@@ -65,7 +64,7 @@ export async function onRequest(context) {
                         String(j.id || '').trim(),
                         j.nama || '',
                         j.status || 'JURI',
-                        j.telepon || '-',
+                        String(j.grid || 'B').trim().toUpperCase(),
                         j.kode || '',
                         j.ruang || '',
                         j.absenMasuk || null,
@@ -76,12 +75,12 @@ export async function onRequest(context) {
                 });
 
                 const queryText = `
-                    INSERT INTO juri (id, nama, status, telepon, kode, ruang, absen_masuk, absen_pulang, manual_status)
+                    INSERT INTO juri (id, nama, status, grid, kode, ruang, absen_masuk, absen_pulang, manual_status)
                     VALUES ${valueClauses.join(', ')}
                     ON CONFLICT (id) DO UPDATE SET
                         nama = EXCLUDED.nama,
                         status = EXCLUDED.status,
-                        telepon = EXCLUDED.telepon,
+                        grid = EXCLUDED.grid,
                         kode = EXCLUDED.kode,
                         ruang = EXCLUDED.ruang,
                         absen_masuk = EXCLUDED.absen_masuk,
@@ -95,16 +94,45 @@ export async function onRequest(context) {
                         'Content-Type': 'application/json',
                         'Neon-Connection-String': cleanDbUrl
                     },
-                    body: JSON.stringify({
-                        query: queryText,
-                        params: params
-                    })
+                    body: JSON.stringify({ query: queryText, params: params })
                 });
             }
 
-            return new Response(JSON.stringify({ success: true, status: "success" }), {
-                headers: { "Content-Type": "application/json" }
+            return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } });
+        } catch (e) {
+            return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+        }
+    }
+
+    // PUT: Update Absensi Satuan (Presensi QR)
+    if (request.method === "PUT") {
+        try {
+            const body = await request.json();
+            const { id, absenMasuk, absenPulang, manualStatus } = body;
+
+            if (!id) {
+                return new Response(JSON.stringify({ error: "ID Juri wajib disertakan" }), { status: 400 });
+            }
+
+            await fetch(`https://${host}/sql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Neon-Connection-String': cleanDbUrl
+                },
+                body: JSON.stringify({
+                    query: `
+                        UPDATE juri 
+                        SET absen_masuk = COALESCE($2, absen_masuk),
+                            absen_pulang = COALESCE($3, absen_pulang),
+                            manual_status = $4
+                        WHERE id = $1;
+                    `,
+                    params: [String(id).trim(), absenMasuk || null, absenPulang || null, manualStatus || null]
+                })
             });
+
+            return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } });
         } catch (e) {
             return new Response(JSON.stringify({ error: e.message }), { status: 500 });
         }
