@@ -1,96 +1,118 @@
+// Helper HMAC-SHA256 JWT untuk Cloudflare Workers
+async function generateJWT(payload, secret) {
+    const header = { alg: "HS256", typ: "JWT" };
+    const enc = new TextEncoder();
+
+    const b64Url = (obj) =>
+        btoa(JSON.stringify(obj))
+            .replace(/=/g, "")
+            .replace(/\+/g, "-")
+            .replace(/\//g, "_");
+
+    const headerB64 = b64Url(header);
+    const payloadB64 = b64Url(payload);
+    const dataToSign = `${headerB64}.${payloadB64}`;
+
+    const key = await crypto.subtle.importKey(
+        "raw",
+        enc.encode(secret),
+        { name: "HMAC", hash: "SHA-256" },
+        false,
+        ["sign"]
+    );
+
+    const signature = await crypto.subtle.sign(
+        "HMAC",
+        key,
+        enc.encode(dataToSign)
+    );
+
+    const sigB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
+        .replace(/=/g, "")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_");
+
+    return `${dataToSign}.${sigB64}`;
+}
+
 export async function onRequest(context) {
     const { request, env } = context;
-    const dbUrl = env.DATABASE_URL;
 
     if (request.method !== "POST") {
         return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
     }
 
+    const dbUrl = env.DATABASE_URL;
+    const jwtSecret = env.JWT_SECRET || "default_jwt_secret_ujian_secure_key_2026";
+
+    if (!dbUrl) {
+        return new Response(JSON.stringify({ error: "DATABASE_URL not configured" }), { status: 500 });
+    }
+
     try {
-        const { id } = await request.json();
-        const inputId = String(id || '').trim();
+        const body = await request.json();
+        const inputId = String(body.id || "").trim();
 
         if (!inputId) {
-            return new Response(JSON.stringify({ success: false, message: "ID wajib diisi!" }), {
-                headers: { "Content-Type": "application/json" },
-                status: 400
-            });
+            return new Response(JSON.stringify({ success: false, message: "ID wajib diisi!" }), { status: 400 });
         }
 
-        if (!dbUrl) {
-            return new Response(JSON.stringify({ success: false, message: "DATABASE_URL belum dikonfigurasi di Cloudflare!" }), {
-                headers: { "Content-Type": "application/json" },
-                status: 500
-            });
-        }
-
-        // Ambil host Neon dari DATABASE_URL
         const cleanDbUrl = dbUrl.trim();
-        const parsedUrl = new URL(cleanDbUrl.replace(/^postgres(ql)?:\/\//, 'http://'));
+        const parsedUrl = new URL(cleanDbUrl.replace(/^postgres(ql)?:\/\//, "http://"));
         const host = parsedUrl.hostname;
 
-        // Query ke Neon HTTP API dengan header Neon-Connection-String
-        const response = await fetch(`https://${host}/sql`, {
-            method: 'POST',
+        const res = await fetch(`https://${host}/sql`, {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'Neon-Connection-String': cleanDbUrl
+                "Content-Type": "application/json",
+                "Neon-Connection-String": cleanDbUrl
             },
             body: JSON.stringify({
-                query: 'SELECT id, nama, status, telepon, kode, ruang, absen_masuk, absen_pulang, manual_status FROM juri WHERE id = $1 LIMIT 1;',
+                query: "SELECT id, nama, status, grid, kode, ruang FROM juri WHERE id = $1 LIMIT 1;",
                 params: [inputId]
             })
         });
 
-        const result = await response.json();
+        const result = await res.json();
+        const userRow = (result.rows || [])[0];
 
-        if (!response.ok || !result.rows) {
-            return new Response(JSON.stringify({ 
-                success: false, 
-                message: result.message || "Gagal membaca database!",
-                detail: result 
-            }), {
-                headers: { "Content-Type": "application/json" },
-                status: 500
-            });
+        if (!userRow) {
+            return new Response(JSON.stringify({ success: false, message: "ID tidak ditemukan dalam sistem!" }), { status: 401 });
         }
 
-        const user = result.rows[0];
+        const rawStatus = String(userRow.status || "JURI").toUpperCase();
+        let role = "juri";
+        if (rawStatus === "ADMIN") role = "admin";
+        else if (rawStatus === "OPERATOR") role = "operator";
 
-        if (!user) {
-            return new Response(JSON.stringify({ success: false, message: "ID / Sandi Akses tidak terdaftar!" }), {
-                headers: { "Content-Type": "application/json" },
-                status: 401
-            });
-        }
+        const userPayload = {
+            id: String(userRow.id).trim(),
+            nama: userRow.nama,
+            role: role,
+            grid: userRow.grid || "B",
+            kode: userRow.kode || "",
+            ruang: userRow.ruang || "",
+            exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 jam
+        };
 
-        let role = 'juri';
-        const st = String(user.status || '').toUpperCase();
-        if (st === 'ADMIN') role = 'admin';
-        else if (st === 'OPERATOR') role = 'operator';
+        const token = await generateJWT(userPayload, jwtSecret);
 
         return new Response(JSON.stringify({
             success: true,
+            token: token,
             user: {
-                id: user.id,
-                nama: user.nama,
-                role: role,
-                status: user.status,
-                telepon: user.telepon,
-                kode: user.kode || '',
-                ruang: user.ruang || '',
-                absenMasuk: user.absen_masuk,
-                absenPulang: user.absen_pulang,
-                manualStatus: user.manual_status
+                id: userPayload.id,
+                nama: userPayload.nama,
+                role: userPayload.role,
+                grid: userPayload.grid,
+                kode: userPayload.kode,
+                ruang: userPayload.ruang
             }
         }), {
             headers: { "Content-Type": "application/json" }
         });
 
-    } catch (err) {
-        return new Response(JSON.stringify({ success: false, message: err.message }), { 
-            headers: { "Content-Type": "application/json" },
-            status: 500 
-        });
+    } catch (e) {
+        return new Response(JSON.stringify({ success: false, message: e.message }), { status: 500 });
     }
 }
