@@ -19,7 +19,6 @@
             color: #ffffff;
             font-weight: 700;
         }
-        /* Transisi smooth untuk drawer mobile */
         #sidebar-nav {
             transition: transform 0.3s ease-in-out;
         }
@@ -44,7 +43,7 @@
                     <input type="text" id="login-password" autocomplete="off" required class="w-full border border-slate-300 rounded-lg p-3 bg-slate-50 text-center text-lg font-bold tracking-wider focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Masukkan ID">
                 </div>
 
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg shadow-md transition duration-200 flex items-center justify-center">
+                <button type="submit" id="login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg shadow-md transition duration-200 flex items-center justify-center">
                     <i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk
                 </button>
             </form>
@@ -70,7 +69,6 @@
                             <p class="text-[10px] text-emerald-400 font-semibold" id="sidebar-role-badge">ADMIN</p>
                         </div>
                     </div>
-                    <!-- Tombol Tutup Sidebar di Mobile -->
                     <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
@@ -143,10 +141,8 @@
 
         <!-- MAIN CONTENT AREA -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <!-- TOPBAR HEADER -->
             <header class="bg-white border-b border-slate-200 px-4 md:px-6 py-3 flex justify-between items-center sticky top-0 z-30 shadow-xs">
                 <div class="flex items-center space-x-3">
-                    <!-- HAMBURGER MENU BUTTON (MOBILE ONLY) -->
                     <button onclick="toggleMobileSidebar()" class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none">
                         <i class="fa-solid fa-bars text-lg"></i>
                     </button>
@@ -355,23 +351,23 @@
                                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
                                                 <div>
                                                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Lafadz</label>
-                                                    <input type="number" min="0" value="0" id="k1-lafadz" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                                    <input type="number" min="0" max="99" value="0" id="k1-lafadz" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
                                                 </div>
                                                 <div>
                                                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Makna</label>
-                                                    <input type="number" min="0" value="0" id="k1-makna" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                                    <input type="number" min="0" max="99" value="0" id="k1-makna" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
                                                 </div>
                                                 <div>
                                                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Terjemah</label>
-                                                    <input type="number" min="0" value="0" id="k1-terjemah" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                                    <input type="number" min="0" max="99" value="0" id="k1-terjemah" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
                                                 </div>
                                                 <div>
                                                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tasrif</label>
-                                                    <input type="number" min="0" value="0" id="k1-tasrif" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                                    <input type="number" min="0" max="99" value="0" id="k1-tasrif" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
                                                 </div>
                                                 <div>
                                                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Taktek</label>
-                                                    <input type="number" min="0" value="0" id="k1-taktek" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
+                                                    <input type="number" min="0" max="99" value="0" id="k1-taktek" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
                                                 </div>
                                             </div>
                                         </div>
@@ -382,23 +378,23 @@
                                             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
                                                 <div>
                                                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Lafadz</label>
-                                                    <input type="number" min="0" value="0" id="k2-lafadz" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                                    <input type="number" min="0" max="99" value="0" id="k2-lafadz" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
                                                 </div>
                                                 <div>
                                                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Makna</label>
-                                                    <input type="number" min="0" value="0" id="k2-makna" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                                    <input type="number" min="0" max="99" value="0" id="k2-makna" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
                                                 </div>
                                                 <div>
                                                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Terjemah</label>
-                                                    <input type="number" min="0" value="0" id="k2-terjemah" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                                    <input type="number" min="0" max="99" value="0" id="k2-terjemah" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
                                                 </div>
                                                 <div>
                                                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tasrif</label>
-                                                    <input type="number" min="0" value="0" id="k2-tasrif" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                                    <input type="number" min="0" max="99" value="0" id="k2-tasrif" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
                                                 </div>
                                                 <div>
                                                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nadhom</label>
-                                                    <input type="number" min="0" value="0" id="k2-nadhom" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                                    <input type="number" min="0" max="99" value="0" id="k2-nadhom" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
                                                 </div>
                                             </div>
                                         </div>
@@ -661,19 +657,30 @@
 
     <!-- JAVASCRIPT APP LOGIC & BACKEND SYNC -->
     <script>
-        let currentUser = null;
+        let currentUser  = null;
+        let currentToken = null;
+        let dataJuri     = [];
+        let dataPeserta  = [];
+        let activeTab    = 'dashboard';
         let activeSelectedPesertaId = null;
-        let selectedJuriIdForModal = null;
-        let activeTab = 'dashboard';
+        let selectedJuriIdForModal  = null;
+        let html5QrScanner = null;
 
         const STORAGE_KEY_AUTH    = 'ujian_sessionUser';
+        const STORAGE_KEY_TOKEN   = 'ujian_sessionToken';
         const STORAGE_KEY_JURI    = 'ujian_dataJuri';
         const STORAGE_KEY_PESERTA = 'ujian_dataPeserta';
 
-        let dataJuri = [];
-        let dataPeserta = [];
+        const mapKodeToRuang = {
+            'A':'AL-GHAZALI 1.02','B':'AL-GHAZALI 1.02','C':'AL-GHAZALI 1.02','D':'AL-GHAZALI 1.02','E':'AL-GHAZALI 1.02','F':'AL-GHAZALI 1.02',
+            'G':'AL-GHAZALI 1.05','H':'AL-GHAZALI 1.05','I':'AL-GHAZALI 1.05','J':'AL-GHAZALI 1.05','K':'AL-GHAZALI 1.05','L':'AL-GHAZALI 1.05',
+            'M':'AL-GHAZALI 1.06','N':'AL-GHAZALI 1.06','O':'AL-GHAZALI 1.06','P':'AL-GHAZALI 1.06','Q':'AL-GHAZALI 1.06','R':'AL-GHAZALI 1.06',
+            'S':'AL-GHAZALI 1.07','T':'AL-GHAZALI 1.07','U':'AL-GHAZALI 1.07','V':'AL-GHAZALI 1.07','W':'AL-GHAZALI 1.07','X':'AL-GHAZALI 1.07',
+            'Y':'AL-GHAZALI 1.08','Z':'AL-GHAZALI 1.08','AA':'AL-GHAZALI 1.08','AB':'AL-GHAZALI 1.08','AC':'AL-GHAZALI 1.08','AD':'AL-GHAZALI 1.08',
+            'AE':'AL-GHAZALI 1.09','AF':'AL-GHAZALI 1.09','AG':'AL-GHAZALI 1.09','AH':'AL-GHAZALI 1.09','AI':'AL-GHAZALI 1.09','AJ':'AL-GHAZALI 1.09',
+            'AK':'AL-GHAZALI 3.01','AL':'AL-GHAZALI 3.01'
+        };
 
-        // --- FUNGSI TOGGLE DRAWER SIDEBAR DI HP (MOBILE) ---
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar-nav');
             const backdrop = document.getElementById('mobile-sidebar-backdrop');
@@ -731,12 +738,16 @@
             if (targetTab) targetTab.classList.remove('hidden');
             if (targetBtn) targetBtn.classList.add('sidebar-active');
 
-            // Tutup drawer di mobile secara otomatis jika user memilih menu
             const sidebar = document.getElementById('sidebar-nav');
             const backdrop = document.getElementById('mobile-sidebar-backdrop');
             if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
                 sidebar.classList.add('-translate-x-full');
                 backdrop.classList.add('hidden');
+            }
+
+            if (tabName !== 'presensi' && html5QrScanner) {
+                try { html5QrScanner.stop(); } catch(e){}
+                html5QrScanner = null;
             }
 
             if (tabName === 'dashboard') updateDashboardStats();
@@ -784,11 +795,7 @@
             
             container.innerHTML = juriList.map(j => {
                 const totalPesertaJuri = dataPeserta.filter(p => p.juriKode && j.kode && String(p.juriKode).toUpperCase() === String(j.kode).toUpperCase());
-                const totalTugasCount = totalPesertaJuri.filter(p => {
-                    const k1 = Object.values(p.scores?.k1 || {}).reduce((a,b)=>a+b, 0);
-                    const k2 = Object.values(p.scores?.k2 || {}).reduce((a,b)=>a+b, 0);
-                    return (k1 + k2) > 0;
-                }).length;
+                const totalTugasCount = totalPesertaJuri.filter(p => calculateTotalErrors(p.scores) > 0).length;
 
                 const isAssigned = (j.kode && j.kode.trim() !== '') || (j.ruang && j.ruang.trim() !== '');
 
@@ -819,7 +826,7 @@
             `}).join('');
         }
 
-        function resetAllPenugasan() {
+        async function resetAllPenugasan() {
             if (!confirm("Apakah Anda yakin ingin MENGOSONGKAN seluruh penugasan juri (Kode & Ruang)?\n\nCatatan: Data master juri dan santri tidak akan terhapus.")) {
                 return;
             }
@@ -834,21 +841,21 @@
                 }
             });
 
-            saveToStorage();
+            await syncToCloud();
             renderPenugasanList();
             renderAdminJuriTable();
             updateDashboardStats();
             alert("Seluruh penugasan juri berhasil di-reset menjadi kosong!");
         }
 
-        function hapusTugasSingle() {
+        async function hapusTugasSingle() {
             if (!selectedJuriIdForModal) return;
             const juri = dataJuri.find(j => j.id === selectedJuriIdForModal);
             if (juri) {
                 juri.kode = '';
                 juri.ruang = '';
             }
-            saveToStorage();
+            await syncToCloud();
             closeAssignModal();
             renderPenugasanList();
             renderAdminJuriTable();
@@ -877,7 +884,6 @@
             `).join('');
         }
 
-        // --- TAB DATA PESERTA (DENGAN PENCARIAN & AKSI EDIT / HAPUS) ---
         function renderAdminPesertaTable() {
             const tbody = document.getElementById('table-admin-peserta');
             if (!tbody) return;
@@ -931,7 +937,6 @@
             `}).join('');
         }
 
-        // --- TAB REKAP NILAI (DENGAN PENCARIAN REAL-TIME) ---
         function renderRekapTable() {
             const tbody = document.getElementById('table-rekap-nilai-body');
             if (!tbody) return;
@@ -970,7 +975,6 @@
             `}).join('');
         }
 
-        // --- FUNGSI EDIT SANTRI (PESERTA) ---
         function openEditPesertaModal(idpps) {
             const p = dataPeserta.find(item => item.idpps === idpps);
             if (!p) return;
@@ -995,21 +999,12 @@
 
         function autoDetectRuangForPeserta() {
             const kodeInput = document.getElementById('edit-peserta-juri').value.trim().toUpperCase();
-            const mapKode = {
-                'A':'AL-GHAZALI 1.02','B':'AL-GHAZALI 1.02','C':'AL-GHAZALI 1.02','D':'AL-GHAZALI 1.02','E':'AL-GHAZALI 1.02','F':'AL-GHAZALI 1.02',
-                'G':'AL-GHAZALI 1.05','H':'AL-GHAZALI 1.05','I':'AL-GHAZALI 1.05','J':'AL-GHAZALI 1.05','K':'AL-GHAZALI 1.05','L':'AL-GHAZALI 1.05',
-                'M':'AL-GHAZALI 1.06','N':'AL-GHAZALI 1.06','O':'AL-GHAZALI 1.06','P':'AL-GHAZALI 1.06','Q':'AL-GHAZALI 1.06','R':'AL-GHAZALI 1.06',
-                'S':'AL-GHAZALI 1.07','T':'AL-GHAZALI 1.07','U':'AL-GHAZALI 1.07','V':'AL-GHAZALI 1.07','W':'AL-GHAZALI 1.07','X':'AL-GHAZALI 1.07',
-                'Y':'AL-GHAZALI 1.08','Z':'AL-GHAZALI 1.08','AA':'AL-GHAZALI 1.08','AB':'AL-GHAZALI 1.08','AC':'AL-GHAZALI 1.08','AD':'AL-GHAZALI 1.08',
-                'AE':'AL-GHAZALI 1.09','AF':'AL-GHAZALI 1.09','AG':'AL-GHAZALI 1.09','AH':'AL-GHAZALI 1.09','AI':'AL-GHAZALI 1.09','AJ':'AL-GHAZALI 1.09',
-                'AK':'AL-GHAZALI 3.01','AL':'AL-GHAZALI 3.01'
-            };
-            if (mapKode[kodeInput]) {
-                document.getElementById('edit-peserta-ruangtes').value = mapKode[kodeInput];
+            if (mapKodeToRuang[kodeInput]) {
+                document.getElementById('edit-peserta-ruangtes').value = mapKodeToRuang[kodeInput];
             }
         }
 
-        function submitEditPeserta(e) {
+        async function submitEditPeserta(e) {
             e.preventDefault();
             const origId = document.getElementById('edit-peserta-original-id').value;
             const p = dataPeserta.find(item => item.idpps === origId);
@@ -1024,7 +1019,7 @@
             p.ruangTes = document.getElementById('edit-peserta-ruangtes').value.trim();
             p.status = document.getElementById('edit-peserta-status').value;
 
-            saveToStorage();
+            await syncToCloud();
             closeEditPesertaModal();
             renderAdminPesertaTable();
             renderRekapTable();
@@ -1032,7 +1027,7 @@
             alert("Data santri " + p.nama + " berhasil diperbarui!");
         }
 
-        function hapusPesertaSingle(idpps) {
+        async function hapusPesertaSingle(idpps) {
             const p = dataPeserta.find(item => item.idpps === idpps);
             if (!p) return;
 
@@ -1041,7 +1036,7 @@
             }
 
             dataPeserta = dataPeserta.filter(item => item.idpps !== idpps);
-            saveToStorage();
+            await syncToCloud();
             renderAdminPesertaTable();
             renderRekapTable();
             updateDashboardStats();
@@ -1060,7 +1055,7 @@
             document.getElementById('modal-assign').classList.add('hidden');
         }
 
-        function submitAssignment() {
+        async function submitAssignment() {
             const kode = document.getElementById('assign-kode').value.trim().toUpperCase();
             const ruang = document.getElementById('assign-ruang').value.trim();
 
@@ -1079,17 +1074,17 @@
                 if (p.juriKode === kode) p.ruangTes = ruang;
             });
 
-            saveToStorage();
+            await syncToCloud();
             closeAssignModal();
             switchTab(activeTab);
         }
 
-        function importJuri(e) {
+        async function importJuri(e) {
             const file = e.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(evt) {
+            reader.onload = async function(evt) {
                 const data = new Uint8Array(evt.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const worksheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -1116,7 +1111,7 @@
                         };
                     });
 
-                    saveToStorage();
+                    await syncToCloud();
                     switchTab('penugasan');
                     alert("Berhasil mengimpor " + json.length + " data juri dengan Grid Tingkat Juri!");
                 }
@@ -1140,8 +1135,7 @@
             XLSX.writeFile(workbook, "MENTAHAN_JURI.xlsx");
         }
 
-        // --- IMPOR PESERTA DENGAN PILIHAN RESET NILAI / PERTAHANKAN NILAI ---
-        function importPeserta(e) {
+        async function importPeserta(e) {
             const file = e.target.files[0];
             if (!file) return;
 
@@ -1152,7 +1146,7 @@
             );
 
             const reader = new FileReader();
-            reader.onload = function(evt) {
+            reader.onload = async function(evt) {
                 const data = new Uint8Array(evt.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const worksheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -1193,7 +1187,7 @@
                         };
                     });
 
-                    saveToStorage();
+                    await syncToCloud();
                     switchTab('peserta');
                     renderRekapTable();
                     alert("Berhasil mengimpor " + json.length + " data peserta!" + (resetScores ? " (Nilai kesalahan telah dibersihkan menjadi 0)" : " (Nilai sebelumnya dipertahankan)"));
@@ -1290,22 +1284,25 @@
             document.getElementById('score-active-id').innerText = p.idpps;
             document.getElementById('score-active-kelas').innerText = p.kelas;
 
-            document.getElementById('k1-lafadz').value = p.scores?.k1?.lafadz || 0;
-            document.getElementById('k1-makna').value = p.scores?.k1?.makna || 0;
-            document.getElementById('k1-terjemah').value = p.scores?.k1?.terjemah || 0;
-            document.getElementById('k1-tasrif').value = p.scores?.k1?.tasrif || 0;
-            document.getElementById('k1-taktek').value = p.scores?.k1?.taktek || 0;
+            const clamp = v => Math.min(99, Math.max(0, parseInt(v) || 0));
+            document.getElementById('k1-lafadz').value = clamp(p.scores?.k1?.lafadz);
+            document.getElementById('k1-makna').value = clamp(p.scores?.k1?.makna);
+            document.getElementById('k1-terjemah').value = clamp(p.scores?.k1?.terjemah);
+            document.getElementById('k1-tasrif').value = clamp(p.scores?.k1?.tasrif);
+            document.getElementById('k1-taktek').value = clamp(p.scores?.k1?.taktek);
 
-            document.getElementById('k2-lafadz').value = p.scores?.k2?.lafadz || 0;
-            document.getElementById('k2-makna').value = p.scores?.k2?.makna || 0;
-            document.getElementById('k2-terjemah').value = p.scores?.k2?.terjemah || 0;
-            document.getElementById('k2-tasrif').value = p.scores?.k2?.tasrif || 0;
-            document.getElementById('k2-nadhom').value = p.scores?.k2?.nadhom || 0;
+            document.getElementById('k2-lafadz').value = clamp(p.scores?.k2?.lafadz);
+            document.getElementById('k2-makna').value = clamp(p.scores?.k2?.makna);
+            document.getElementById('k2-terjemah').value = clamp(p.scores?.k2?.terjemah);
+            document.getElementById('k2-tasrif').value = clamp(p.scores?.k2?.tasrif);
+            document.getElementById('k2-nadhom').value = clamp(p.scores?.k2?.nadhom);
 
             renderJuriDashboard();
         }
 
-        function saveScores(e) {
+        const clampVal = v => Math.min(99, Math.max(0, parseInt(v) || 0));
+
+        async function saveScores(e) {
             e.preventDefault();
             if (!activeSelectedPesertaId) return;
 
@@ -1314,22 +1311,22 @@
 
             p.scores = {
                 k1: {
-                    lafadz: Math.max(0, parseInt(document.getElementById('k1-lafadz').value) || 0),
-                    makna: Math.max(0, parseInt(document.getElementById('k1-makna').value) || 0),
-                    terjemah: Math.max(0, parseInt(document.getElementById('k1-terjemah').value) || 0),
-                    tasrif: Math.max(0, parseInt(document.getElementById('k1-tasrif').value) || 0),
-                    taktek: Math.max(0, parseInt(document.getElementById('k1-taktek').value) || 0)
+                    lafadz: clampVal(document.getElementById('k1-lafadz').value),
+                    makna: clampVal(document.getElementById('k1-makna').value),
+                    terjemah: clampVal(document.getElementById('k1-terjemah').value),
+                    tasrif: clampVal(document.getElementById('k1-tasrif').value),
+                    taktek: clampVal(document.getElementById('k1-taktek').value)
                 },
                 k2: {
-                    lafadz: Math.max(0, parseInt(document.getElementById('k2-lafadz').value) || 0),
-                    makna: Math.max(0, parseInt(document.getElementById('k2-makna').value) || 0),
-                    terjemah: Math.max(0, parseInt(document.getElementById('k2-terjemah').value) || 0),
-                    tasrif: Math.max(0, parseInt(document.getElementById('k2-tasrif').value) || 0),
-                    nadhom: Math.max(0, parseInt(document.getElementById('k2-nadhom').value) || 0)
+                    lafadz: clampVal(document.getElementById('k2-lafadz').value),
+                    makna: clampVal(document.getElementById('k2-makna').value),
+                    terjemah: clampVal(document.getElementById('k2-terjemah').value),
+                    tasrif: clampVal(document.getElementById('k2-tasrif').value),
+                    nadhom: clampVal(document.getElementById('k2-nadhom').value)
                 }
             };
 
-            saveToStorage();
+            await saveSingleScore(activeSelectedPesertaId, p.scores);
             alert("Nilai kesalahan berhasil disimpan ke Database Cloud!");
             renderJuriDashboard();
         }
@@ -1341,39 +1338,39 @@
             return k1Sum + k2Sum;
         }
 
-        function saveToStorage() {
-            try {
-                localStorage.setItem(STORAGE_KEY_JURI, JSON.stringify(dataJuri));
-                localStorage.setItem(STORAGE_KEY_PESERTA, JSON.stringify(dataPeserta));
-                syncToCloud();
-            } catch(e) {}
-        }
-
-        function loadFromStorage() {
-            try {
-                const savedJuri = localStorage.getItem(STORAGE_KEY_JURI);
-                const savedPeserta = localStorage.getItem(STORAGE_KEY_PESERTA);
-                if (savedJuri) dataJuri = JSON.parse(savedJuri);
-                if (savedPeserta) dataPeserta = JSON.parse(savedPeserta);
-            } catch(e) {}
-        }
-
         function clearStorage() {
             if (confirm('Yakin ingin mereset seluruh data lokal?')) {
                 localStorage.clear();
+                sessionStorage.clear();
                 location.reload();
             }
         }
 
+        // --- AUTH & API REQUEST DENGAN JWT TOKEN ---
+        async function apiRequest(path, method = 'GET', body = null) {
+            const opts = { method, headers: { 'Content-Type': 'application/json' } };
+            if (currentToken) opts.headers['Authorization'] = `Bearer ${currentToken}`;
+            if (body) opts.body = JSON.stringify(body);
+            const res = await fetch(path, opts);
+            const data = await res.json();
+            if (res.status === 401 && path !== '/api/login') {
+                alert('Sesi habis, silakan login ulang.');
+                handleLogout();
+                throw new Error('Unauthorized');
+            }
+            return { ok: res.ok, status: res.status, data };
+        }
+
         async function syncToCloud() {
+            if (!currentToken) return;
             const ind = document.getElementById('storage-indicator');
             if (ind) ind.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Syncing...';
             try {
                 if (dataJuri && dataJuri.length > 0) {
-                    await fetch('/api/juri', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataJuri) });
+                    await apiRequest('/api/juri', 'POST', dataJuri);
                 }
                 if (dataPeserta && dataPeserta.length > 0) {
-                    await fetch('/api/peserta', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataPeserta) });
+                    await apiRequest('/api/peserta', 'POST', dataPeserta);
                 }
                 if (ind) ind.innerHTML = '<i class="fa-solid fa-cloud-check text-xs"></i> Cloud Tersinkron';
             } catch(e) {
@@ -1381,34 +1378,38 @@
             }
         }
 
-        async function fetchFromCloud() {
+        async function saveSingleScore(idpps, scores) {
+            if (!currentToken) return;
+            localStorage.setItem(STORAGE_KEY_PESERTA, JSON.stringify(dataPeserta));
             try {
-                const resJuri = await fetch('/api/juri');
-                if (resJuri.ok) {
-                    const juriRemote = await resJuri.json();
-                    if (Array.isArray(juriRemote) && juriRemote.length > 0) dataJuri = juriRemote;
-                }
-                const resPeserta = await fetch('/api/peserta');
-                if (resPeserta.ok) {
-                    const pesertaRemote = await resPeserta.json();
-                    if (Array.isArray(pesertaRemote) && pesertaRemote.length > 0) dataPeserta = pesertaRemote;
-                }
+                await apiRequest('/api/peserta', 'PUT', { idpps, scores });
+            } catch(e) {}
+        }
+
+        async function saveJuriAbsen(id, absenMasuk, absenPulang, manualStatus) {
+            if (!currentToken) return;
+            localStorage.setItem(STORAGE_KEY_JURI, JSON.stringify(dataJuri));
+            try {
+                await apiRequest('/api/juri', 'PUT', { id, absenMasuk, absenPulang, manualStatus });
+            } catch(e) {}
+        }
+
+        async function fetchFromCloud() {
+            if (!currentToken) return;
+            try {
+                const rJuri = await apiRequest('/api/juri');
+                if (rJuri.ok && rJuri.data.data) dataJuri = rJuri.data.data;
+
+                const rPeserta = await apiRequest('/api/peserta');
+                if (rPeserta.ok && rPeserta.data.data) dataPeserta = rPeserta.data.data;
+
                 switchTab(activeTab);
             } catch(e) {}
         }
 
         function autoDetectRuang() {
             const kodeInput = document.getElementById('assign-kode').value.trim().toUpperCase();
-            const mapKode = {
-                'A':'AL-GHAZALI 1.02','B':'AL-GHAZALI 1.02','C':'AL-GHAZALI 1.02','D':'AL-GHAZALI 1.02','E':'AL-GHAZALI 1.02','F':'AL-GHAZALI 1.02',
-                'G':'AL-GHAZALI 1.05','H':'AL-GHAZALI 1.05','I':'AL-GHAZALI 1.05','J':'AL-GHAZALI 1.05','K':'AL-GHAZALI 1.05','L':'AL-GHAZALI 1.05',
-                'M':'AL-GHAZALI 1.06','N':'AL-GHAZALI 1.06','O':'AL-GHAZALI 1.06','P':'AL-GHAZALI 1.06','Q':'AL-GHAZALI 1.06','R':'AL-GHAZALI 1.06',
-                'S':'AL-GHAZALI 1.07','T':'AL-GHAZALI 1.07','U':'AL-GHAZALI 1.07','V':'AL-GHAZALI 1.07','W':'AL-GHAZALI 1.07','X':'AL-GHAZALI 1.07',
-                'Y':'AL-GHAZALI 1.08','Z':'AL-GHAZALI 1.08','AA':'AL-GHAZALI 1.08','AB':'AL-GHAZALI 1.08','AC':'AL-GHAZALI 1.08','AD':'AL-GHAZALI 1.08',
-                'AE':'AL-GHAZALI 1.09','AF':'AL-GHAZALI 1.09','AG':'AL-GHAZALI 1.09','AH':'AL-GHAZALI 1.09','AI':'AL-GHAZALI 1.09','AJ':'AL-GHAZALI 1.09',
-                'AK':'AL-GHAZALI 3.01','AL':'AL-GHAZALI 3.01'
-            };
-            document.getElementById('assign-ruang').value = mapKode[kodeInput] || '';
+            document.getElementById('assign-ruang').value = mapKodeToRuang[kodeInput] || '';
         }
 
         async function handleLogin(e) {
@@ -1416,16 +1417,29 @@
             const inputId = document.getElementById('login-password').value.trim();
             if (!inputId) return;
 
-            try {
-                const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: inputId }) });
-                const data = await res.json();
-                if (!data.success) { alert(data.message || "ID tidak ditemukan!"); return; }
+            const btn = document.getElementById('login-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Memverifikasi...';
 
-                currentUser = data.user;
-                localStorage.setItem(STORAGE_KEY_AUTH, JSON.stringify(currentUser));
+            try {
+                const { ok, data } = await apiRequest('/api/login', 'POST', { id: inputId });
+                if (!ok || !data.success) {
+                    alert(data.message || "ID tidak ditemukan!");
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk';
+                    return;
+                }
+
+                currentToken = data.token;
+                currentUser  = data.user;
+                sessionStorage.setItem(STORAGE_KEY_TOKEN, currentToken);
+                sessionStorage.setItem(STORAGE_KEY_AUTH, JSON.stringify(currentUser));
+                
                 showMainApp();
             } catch (err) {
                 alert("Gagal terhubung ke database!");
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk';
             }
         }
 
@@ -1439,6 +1453,7 @@
             document.getElementById('sidebar-user-id').innerText = "ID: " + currentUser.id;
 
             applyRoleSidebarPermissions();
+            fetchFromCloud();
 
             if (currentUser.role === 'juri') switchTab('penilaian');
             else switchTab('dashboard');
@@ -1446,23 +1461,95 @@
 
         function handleLogout() {
             currentUser = null;
-            localStorage.removeItem(STORAGE_KEY_AUTH);
+            currentToken = null;
+            dataJuri = [];
+            dataPeserta = [];
+            sessionStorage.removeItem(STORAGE_KEY_AUTH);
+            sessionStorage.removeItem(STORAGE_KEY_TOKEN);
+            if (html5QrScanner) { try { html5QrScanner.stop(); } catch(e){} html5QrScanner = null; }
             document.getElementById('app-screen').classList.add('hidden');
             document.getElementById('app-screen').classList.remove('flex');
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('login-password').value = '';
         }
 
-        loadFromStorage();
-        window.addEventListener('DOMContentLoaded', async () => { 
-            const savedSession = localStorage.getItem(STORAGE_KEY_AUTH);
-            if (savedSession) {
+        function renderOperatorViews() {
+            const tbody = document.getElementById('table-operator-juri-status');
+            if (!tbody) return;
+            const list = dataJuri.filter(j => j.status === 'JURI');
+            tbody.innerHTML = list.map(j => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-2 font-mono text-xs font-bold text-slate-700">${j.id}</td>
+                    <td class="p-2 font-semibold text-slate-800">${j.nama}</td>
+                    <td class="p-2 text-center">${getGridBadge(j.grid)}</td>
+                    <td class="p-2 text-xs"><span class="px-1.5 py-0.5 bg-slate-100 font-bold rounded">${j.kode || '-'}</span> ${j.ruang || '-'}</td>
+                    <td class="p-2 text-xs font-bold text-emerald-600">${j.absenMasuk || '--:--'}</td>
+                    <td class="p-2 text-xs font-bold text-indigo-600">${j.absenPulang || '--:--'}</td>
+                </tr>
+            `).join('');
+            startQrScanner();
+        }
+
+        function startQrScanner() {
+            if (html5QrScanner) return;
+            const el = document.getElementById('qr-reader');
+            if (!el || typeof Html5Qrcode === 'undefined') return;
+            html5QrScanner = new Html5Qrcode('qr-reader');
+            Html5Qrcode.getCameras().then(cameras => {
+                if (!cameras.length) return;
+                html5QrScanner.start(cameras[0].id, { fps:10, qrbox:200 },
+                    (text) => processQrCode(text),
+                    () => {}
+                ).catch(() => {});
+            }).catch(() => {});
+        }
+
+        async function processQrCode(idText) {
+            const inputId = String(idText || '').trim();
+            if (!inputId) return;
+
+            const j = dataJuri.find(jj => jj.id === inputId);
+            if (!j) {
+                alert(`ID ${inputId} tidak ditemukan dalam data juri.`);
+                return;
+            }
+
+            const now = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+
+            if (!j.absenMasuk) {
+                j.absenMasuk = now;
+                await saveJuriAbsen(j.id, j.absenMasuk, j.absenPulang, j.manualStatus);
+                alert(`Absen MASUK Berhasil: ${j.nama} (${now})`);
+            } else if (!j.absenPulang) {
+                j.absenPulang = now;
+                await saveJuriAbsen(j.id, j.absenMasuk, j.absenPulang, j.manualStatus);
+                alert(`Absen PULANG Berhasil: ${j.nama} (${now})`);
+            } else {
+                alert(`${j.nama} sudah absen masuk & pulang.`);
+            }
+
+            const inp = document.getElementById('manual-qr-input');
+            if (inp) inp.value = '';
+            renderOperatorViews();
+        }
+
+        async function forceSyncOnline() {
+            await syncToCloud();
+            alert('Sinkronisasi cloud selesai!');
+        }
+
+        setInterval(() => { if (currentToken) fetchFromCloud(); }, 30000);
+
+        window.addEventListener('DOMContentLoaded', () => { 
+            const savedSession = sessionStorage.getItem(STORAGE_KEY_AUTH);
+            const savedToken   = sessionStorage.getItem(STORAGE_KEY_TOKEN);
+            if (savedSession && savedToken) {
                 try {
-                    currentUser = JSON.parse(savedSession);
+                    currentUser  = JSON.parse(savedSession);
+                    currentToken = savedToken;
                     showMainApp();
                 } catch(e) {}
             }
-            await fetchFromCloud(); 
         });
     </script>
 </body>
