@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Ujian & Scoring Juri - Multi-Role Dashboard</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,6 +18,10 @@
             background-color: #059669;
             color: #ffffff;
             font-weight: 700;
+        }
+        /* Transisi smooth untuk drawer mobile */
+        #sidebar-nav {
+            transition: transform 0.3s ease-in-out;
         }
     </style>
 </head>
@@ -48,10 +52,13 @@
     </div>
 
     <!-- MAIN APP CONTAINER -->
-    <div id="app-screen" class="hidden min-h-screen flex flex-col md:flex-row">
+    <div id="app-screen" class="hidden min-h-screen flex flex-col md:flex-row relative">
 
-        <!-- SIDEBAR NAVIGATION -->
-        <aside id="sidebar-nav" class="w-full md:w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col justify-between shadow-xl sticky top-0 md:h-screen z-40">
+        <!-- MOBILE BACKDROP OVERLAY -->
+        <div id="mobile-sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden md:hidden"></div>
+
+        <!-- SIDEBAR NAVIGATION (RESPONSIVE DRAWER) -->
+        <aside id="sidebar-nav" class="fixed inset-y-0 left-0 -translate-x-full md:translate-x-0 md:static w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col justify-between shadow-2xl md:shadow-xl z-50 md:h-screen">
             <div>
                 <div class="p-5 border-b border-slate-800 flex items-center justify-between">
                     <div class="flex items-center space-x-3">
@@ -63,9 +70,13 @@
                             <p class="text-[10px] text-emerald-400 font-semibold" id="sidebar-role-badge">ADMIN</p>
                         </div>
                     </div>
+                    <!-- Tombol Tutup Sidebar di Mobile -->
+                    <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
                 </div>
 
-                <nav class="p-3 space-y-1 text-xs font-medium">
+                <nav class="p-3 space-y-1 text-xs font-medium overflow-y-auto max-h-[calc(100vh-190px)]">
                     <p class="px-3 pt-3 pb-1 text-[10px] uppercase font-bold text-slate-500 tracking-wider">Menu Utama</p>
 
                     <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg hover:bg-slate-800 transition text-slate-300">
@@ -132,76 +143,83 @@
 
         <!-- MAIN CONTENT AREA -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <header class="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center sticky top-0 z-30 shadow-sm">
-                <div>
-                    <h2 class="text-base font-bold text-slate-800" id="page-title">🏠 Dashboard</h2>
-                    <p class="text-[11px] text-slate-400" id="page-subtitle">Ringkasan statistik dan aktivitas sistem</p>
-                </div>
+            <!-- TOPBAR HEADER -->
+            <header class="bg-white border-b border-slate-200 px-4 md:px-6 py-3 flex justify-between items-center sticky top-0 z-30 shadow-xs">
                 <div class="flex items-center space-x-3">
-                    <span class="text-xs text-emerald-600 font-semibold bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full flex items-center gap-1.5" id="storage-indicator">
-                        <i class="fa-solid fa-cloud-check text-xs"></i> <span>Cloud Sync Active</span>
+                    <!-- HAMBURGER MENU BUTTON (MOBILE ONLY) -->
+                    <button onclick="toggleMobileSidebar()" class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-sm md:text-base font-bold text-slate-800" id="page-title">🏠 Dashboard</h2>
+                        <p class="text-[10px] md:text-[11px] text-slate-400 hidden sm:block" id="page-subtitle">Ringkasan statistik dan aktivitas sistem</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-[10px] md:text-xs text-emerald-600 font-semibold bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1.5" id="storage-indicator">
+                        <i class="fa-solid fa-cloud-check text-xs"></i> <span class="hidden sm:inline">Cloud Sync Active</span><span class="sm:hidden">Online</span>
                     </span>
                 </div>
             </header>
 
-            <main class="p-6 flex-1 overflow-y-auto space-y-6">
+            <main class="p-4 md:p-6 flex-1 overflow-y-auto space-y-6">
 
                 <!-- TAB 1: 🏠 DASHBOARD -->
                 <div id="tab-dashboard" class="tab-pane space-y-6">
-                    <div class="bg-gradient-to-r from-emerald-800 to-slate-900 rounded-2xl p-6 text-white shadow-md flex flex-wrap justify-between items-center gap-4">
+                    <div class="bg-gradient-to-r from-emerald-800 to-slate-900 rounded-2xl p-5 md:p-6 text-white shadow-md flex flex-wrap justify-between items-center gap-4">
                         <div>
                             <span class="bg-emerald-500/30 text-emerald-300 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-400/30 uppercase tracking-wide">Ringkasan Sistem Ujian</span>
-                            <h3 class="text-xl font-extrabold mt-2">Selamat Datang, <span id="dash-user-title">User</span></h3>
-                            <p class="text-xs text-slate-300 mt-1">Pantau seluruh jalannya ujian lisan, kehadiran dewan juri, dan progress penilaian peserta secara real-time.</p>
+                            <h3 class="text-lg md:text-xl font-extrabold mt-2">Selamat Datang, <span id="dash-user-title">User</span></h3>
+                            <p class="text-xs text-slate-300 mt-1">Pantau jalannya ujian lisan, presensi dewan juri, dan progress penilaian peserta secara real-time.</p>
                         </div>
-                        <div class="flex space-x-2">
-                            <button onclick="switchTab('presensi')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow transition flex items-center gap-2">
-                                <i class="fa-solid fa-qrcode"></i> Scan Presensi Juri
+                        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                            <button onclick="switchTab('presensi')" class="flex-1 sm:flex-none bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-3.5 py-2 rounded-xl text-xs shadow transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-qrcode"></i> Scan Presensi
                             </button>
-                            <button onclick="switchTab('rekap')" class="bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2 rounded-xl text-xs transition border border-white/20 flex items-center gap-2">
+                            <button onclick="switchTab('rekap')" class="flex-1 sm:flex-none bg-white/10 hover:bg-white/20 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition border border-white/20 flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-chart-line"></i> Rekap Nilai
                             </button>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                        <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3 md:space-x-4">
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-lg md:text-xl font-bold shrink-0">
                                 <i class="fa-solid fa-users"></i>
                             </div>
-                            <div>
-                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Peserta</p>
-                                <h3 class="text-2xl font-black text-slate-800 mt-0.5" id="dash-total-peserta">0</h3>
+                            <div class="min-w-0">
+                                <p class="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase truncate">Total Peserta</p>
+                                <h3 class="text-xl md:text-2xl font-black text-slate-800 mt-0.5" id="dash-total-peserta">0</h3>
                             </div>
                         </div>
 
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                        <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3 md:space-x-4">
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg md:text-xl font-bold shrink-0">
                                 <i class="fa-solid fa-user-shield"></i>
                             </div>
-                            <div>
-                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Juri Bertugas</p>
-                                <h3 class="text-2xl font-black text-emerald-600 mt-0.5" id="dash-total-juri">0</h3>
+                            <div class="min-w-0">
+                                <p class="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase truncate">Juri Bertugas</p>
+                                <h3 class="text-xl md:text-2xl font-black text-emerald-600 mt-0.5" id="dash-total-juri">0</h3>
                             </div>
                         </div>
 
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                        <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3 md:space-x-4">
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-lg md:text-xl font-bold shrink-0">
                                 <i class="fa-solid fa-user-check"></i>
                             </div>
-                            <div>
-                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Juri Hadir</p>
-                                <h3 class="text-2xl font-black text-amber-600 mt-0.5" id="dash-juri-hadir">0</h3>
+                            <div class="min-w-0">
+                                <p class="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase truncate">Juri Hadir</p>
+                                <h3 class="text-xl md:text-2xl font-black text-amber-600 mt-0.5" id="dash-juri-hadir">0</h3>
                             </div>
                         </div>
 
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                        <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center space-x-3 md:space-x-4">
+                            <div class="w-10 h-10 md:w-12 md:h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center text-lg md:text-xl font-bold shrink-0">
                                 <i class="fa-solid fa-door-open"></i>
                             </div>
-                            <div>
-                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Ruang Ujian</p>
-                                <h3 class="text-2xl font-black text-sky-600 mt-0.5" id="dash-total-ruang">0</h3>
+                            <div class="min-w-0">
+                                <p class="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase truncate">Ruang Ujian</p>
+                                <h3 class="text-xl md:text-2xl font-black text-sky-600 mt-0.5" id="dash-total-ruang">0</h3>
                             </div>
                         </div>
                     </div>
@@ -209,16 +227,16 @@
 
                 <!-- TAB 2: 👨‍⚖️ DATA JURI (GRID & STATUS) -->
                 <div id="tab-juri" class="tab-pane space-y-6 hidden">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-xs">
                         <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
-                            <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-user-shield text-emerald-600 mr-2"></i> Master Data Juri Ujian</h3>
+                            <h3 class="text-sm md:text-base font-bold text-slate-800"><i class="fa-solid fa-user-shield text-emerald-600 mr-2"></i> Master Data Juri Ujian</h3>
                             <div class="relative w-full md:w-64">
                                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
                                 <input type="text" id="search-juri" oninput="renderAdminJuriTable()" placeholder="Cari Nama / ID Juri..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
                             </div>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs text-slate-600">
+                        <div class="overflow-x-auto -mx-4 md:mx-0">
+                            <table class="w-full text-left text-xs text-slate-600 min-w-[650px]">
                                 <thead class="bg-slate-100 text-slate-700 uppercase">
                                     <tr>
                                         <th class="p-3">ID Juri</th>
@@ -227,7 +245,6 @@
                                         <th class="p-3">Kode / Ruang</th>
                                         <th class="p-3">Jam Masuk</th>
                                         <th class="p-3">Jam Pulang</th>
-                                        <th class="p-3 text-center">Durasi</th>
                                         <th class="p-3 text-center">Aksi</th>
                                     </tr>
                                 </thead>
@@ -240,10 +257,10 @@
 
                 <!-- TAB 3: 👥 DATA PESERTA (DENGAN PENCARIAN & AKSI EDIT/HAPUS) -->
                 <div id="tab-peserta" class="tab-pane space-y-6 hidden">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-xs">
                         <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b">
                             <div>
-                                <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-users text-indigo-600 mr-2"></i> Master Data Peserta Ujian</h3>
+                                <h3 class="text-sm md:text-base font-bold text-slate-800"><i class="fa-solid fa-users text-indigo-600 mr-2"></i> Master Data Peserta Ujian</h3>
                                 <p class="text-xs text-slate-500 mt-0.5">Kelola data santri peserta ujian, ganti kode juri/ruang, atau koreksi identitas secara langsung.</p>
                             </div>
                             <div class="relative w-full md:w-72">
@@ -252,8 +269,8 @@
                             </div>
                         </div>
 
-                        <div class="overflow-x-auto max-h-[520px] overflow-y-auto">
-                            <table class="w-full text-left text-xs text-slate-600">
+                        <div class="overflow-x-auto max-h-[520px] overflow-y-auto -mx-4 md:mx-0">
+                            <table class="w-full text-left text-xs text-slate-600 min-w-[750px]">
                                 <thead class="bg-slate-100 text-slate-700 uppercase sticky top-0 z-10">
                                     <tr>
                                         <th class="p-3">NO</th>
@@ -276,20 +293,20 @@
                     </div>
                 </div>
 
-                <!-- TAB 4: 📋 PENUGASAN JURI (DENGAN TOMBOL RESET SEMUA PENUGASAN) -->
+                <!-- TAB 4: 📋 PENUGASAN JURI -->
                 <div id="tab-penugasan" class="tab-pane space-y-6 hidden">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-xs">
                         <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b">
                             <div>
-                                <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-clipboard-list text-emerald-600 mr-2"></i> Penugasan Kode Abjad Juri & Ruang Ujian</h3>
+                                <h3 class="text-sm md:text-base font-bold text-slate-800"><i class="fa-solid fa-clipboard-list text-emerald-600 mr-2"></i> Penugasan Kode Abjad & Ruang Juri</h3>
                                 <p class="text-xs text-slate-500 mt-0.5">Tugaskan kode abjad dan ruang ujian per sesi tanpa mereset data master juri.</p>
                             </div>
-                            <div class="flex items-center space-x-2 w-full md:w-auto">
-                                <div class="relative flex-1 md:w-60">
+                            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                                <div class="relative flex-1 md:w-60 min-w-[180px]">
                                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
                                     <input type="text" id="search-penugasan" oninput="renderPenugasanList()" placeholder="Cari Nama / ID / Grid..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
                                 </div>
-                                <button onclick="resetAllPenugasan()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-2 rounded-lg text-xs transition shadow flex items-center gap-1.5 whitespace-nowrap" title="Kosongkan seluruh kode dan ruang juri untuk mulai sesi ujian baru">
+                                <button onclick="resetAllPenugasan()" class="w-full sm:w-auto bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-2 rounded-lg text-xs transition shadow flex items-center justify-center gap-1.5 whitespace-nowrap" title="Kosongkan seluruh kode dan ruang juri untuk mulai sesi ujian baru">
                                     <i class="fa-solid fa-rotate-left"></i> Reset Semua Penugasan
                                 </button>
                             </div>
@@ -301,10 +318,10 @@
 
                 <!-- TAB 5: 📝 PENILAIAN UJIAN (JURI VIEW) -->
                 <div id="tab-penilaian" class="tab-pane space-y-6 hidden">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-xs">
                         <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b">
                             <div>
-                                <h3 class="text-lg font-bold text-slate-800" id="juri-profile-name">Nama Juri</h3>
+                                <h3 class="text-base md:text-lg font-bold text-slate-800" id="juri-profile-name">Nama Juri</h3>
                                 <p class="text-xs text-slate-500">Ruang: <span id="juri-profile-ruang" class="font-bold text-emerald-700">-</span> | Kode Juri: <span id="juri-profile-kode" class="font-bold text-slate-700">-</span></p>
                             </div>
                         </div>
@@ -312,20 +329,20 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="border rounded-xl p-4 bg-slate-50">
                                 <h4 class="font-bold text-xs text-slate-700 mb-3 uppercase">Daftar Peserta Ruangan Ini</h4>
-                                <div id="juri-peserta-list" class="space-y-2 max-h-96 overflow-y-auto">
+                                <div id="juri-peserta-list" class="space-y-2 max-h-72 md:max-h-96 overflow-y-auto">
                                 </div>
                             </div>
 
-                            <div class="md:col-span-2 border rounded-xl p-5 bg-white" id="scoring-form-container">
+                            <div class="md:col-span-2 border rounded-xl p-4 md:p-5 bg-white" id="scoring-form-container">
                                 <div id="scoring-form-empty" class="text-center py-12 text-slate-400">
                                     <i class="fa-solid fa-clipboard-list text-4xl mb-2"></i>
-                                    <p>Pilih peserta dari daftar di samping untuk mulai mengisi nilai kesalahan.</p>
+                                    <p class="text-xs md:text-sm">Pilih peserta dari daftar di samping untuk mulai mengisi nilai kesalahan.</p>
                                 </div>
 
                                 <div id="scoring-form-active" class="hidden space-y-6">
                                     <div class="border-b pb-3 flex justify-between items-center">
                                         <div>
-                                            <h4 class="font-bold text-slate-800 text-base" id="score-active-nama">NAMA PESERTA</h4>
+                                            <h4 class="font-bold text-slate-800 text-sm md:text-base" id="score-active-nama">NAMA PESERTA</h4>
                                             <p class="text-xs text-slate-500">ID: <span id="score-active-id">00000</span> | Kelas: <span id="score-active-kelas">-</span></p>
                                         </div>
                                         <span id="score-active-status" class="px-2.5 py-1 text-xs rounded-full font-bold bg-emerald-100 text-emerald-800">HADIR</span>
@@ -335,7 +352,7 @@
                                         <!-- KITAB 1 -->
                                         <div>
                                             <h5 class="text-xs font-bold text-indigo-700 uppercase tracking-wide border-b border-indigo-100 pb-1 mb-3">KITAB 1 (Kesalahan)</h5>
-                                            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
                                                 <div>
                                                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Lafadz</label>
                                                     <input type="number" min="0" value="0" id="k1-lafadz" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-indigo-500 outline-none">
@@ -362,7 +379,7 @@
                                         <!-- KITAB 2 -->
                                         <div>
                                             <h5 class="text-xs font-bold text-emerald-700 uppercase tracking-wide border-b border-emerald-100 pb-1 mb-3">KITAB 2 (Kesalahan)</h5>
-                                            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
                                                 <div>
                                                     <label class="block text-[11px] font-semibold text-slate-600 mb-1">Lafadz</label>
                                                     <input type="number" min="0" value="0" id="k2-lafadz" class="w-full border rounded p-2 text-xs text-center font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
@@ -398,15 +415,15 @@
 
                 <!-- TAB 6: 🕒 PRESENSI JURI -->
                 <div id="tab-presensi" class="tab-pane space-y-6 hidden">
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 flex flex-wrap justify-between items-center gap-4">
+                    <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 flex flex-wrap justify-between items-center gap-4">
                         <div>
-                            <h3 class="text-base font-bold text-slate-800">Presensi & Monitoring Absensi Juri</h3>
+                            <h3 class="text-sm md:text-base font-bold text-slate-800">Presensi & Monitoring Absensi Juri</h3>
                             <p class="text-xs text-slate-500">Scan QR Code atau ketik ID Juri untuk absensi otomatis.</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 md:col-span-1 flex flex-col justify-between">
+                        <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 md:col-span-1 flex flex-col justify-between">
                             <div>
                                 <h4 class="text-xs font-bold text-slate-800 mb-2 flex items-center">
                                     <i class="fa-solid fa-qrcode text-emerald-600 mr-2"></i> Scan QR Absensi Juri
@@ -425,9 +442,9 @@
                             </div>
                         </div>
 
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 md:col-span-2">
-                            <div class="overflow-x-auto max-h-[320px] overflow-y-auto">
-                                <table class="w-full text-left text-xs">
+                        <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 md:col-span-2">
+                            <div class="overflow-x-auto max-h-[320px] overflow-y-auto -mx-4 md:mx-0">
+                                <table class="w-full text-left text-xs min-w-[500px]">
                                     <thead class="bg-slate-100 uppercase sticky top-0 z-10">
                                         <tr>
                                             <th class="p-2">ID</th>
@@ -436,7 +453,6 @@
                                             <th class="p-2">Kode / Ruang</th>
                                             <th class="p-2">Datang</th>
                                             <th class="p-2">Pulang</th>
-                                            <th class="p-2">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody id="table-operator-juri-status" class="divide-y divide-slate-200">
@@ -449,25 +465,25 @@
 
                 <!-- TAB 7: 📊 REKAP NILAI (DENGAN PENCARIAN REAL-TIME) -->
                 <div id="tab-rekap" class="tab-pane space-y-6 hidden">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-xs">
                         <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b">
                             <div>
-                                <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-chart-simple text-indigo-600 mr-2"></i> Rekapitulasi Nilai Akhir Peserta</h3>
+                                <h3 class="text-sm md:text-base font-bold text-slate-800"><i class="fa-solid fa-chart-simple text-indigo-600 mr-2"></i> Rekapitulasi Nilai Akhir Peserta</h3>
                                 <p class="text-xs text-slate-500 mt-0.5">Pantau nilai kesalahan Kitab 1 & Kitab 2 seluruh santri secara terpusat.</p>
                             </div>
-                            <div class="flex items-center space-x-2 w-full md:w-auto">
-                                <div class="relative flex-1 md:w-64">
+                            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                                <div class="relative flex-1 md:w-64 min-w-[180px]">
                                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
                                     <input type="text" id="search-rekap" oninput="renderRekapTable()" placeholder="Cari Nama / IDPPS / Kelas / Ruang..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
                                 </div>
-                                <button onclick="exportNilai()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap shadow">
+                                <button onclick="exportNilai()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 whitespace-nowrap shadow">
                                     <i class="fa-solid fa-download"></i> Export Excel
                                 </button>
                             </div>
                         </div>
 
-                        <div class="overflow-x-auto max-h-[520px] overflow-y-auto">
-                            <table class="w-full text-left text-xs text-slate-600">
+                        <div class="overflow-x-auto max-h-[520px] overflow-y-auto -mx-4 md:mx-0">
+                            <table class="w-full text-left text-xs text-slate-600 min-w-[700px]">
                                 <thead class="bg-slate-100 text-slate-700 uppercase sticky top-0 z-10">
                                     <tr>
                                         <th class="p-2.5">NO</th>
@@ -491,9 +507,9 @@
                 <!-- TAB 8: 📁 IMPORT / EXPORT -->
                 <div id="tab-importexport" class="tab-pane space-y-6 hidden">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
                             <h4 class="font-bold text-sm text-slate-800 border-b pb-2"><i class="fa-solid fa-user-gear text-amber-600 mr-2"></i> Kelola Data Juri (Excel)</h4>
-                            <div class="flex space-x-2">
+                            <div class="flex flex-col sm:flex-row gap-2">
                                 <label class="flex-1 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold cursor-pointer text-center transition">
                                     <i class="fa-solid fa-file-import mr-1.5"></i> Impor Juri (.xlsx)
                                     <input type="file" accept=".xlsx, .xls" onchange="importJuri(event)" class="hidden">
@@ -504,9 +520,9 @@
                             </div>
                         </div>
 
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
                             <h4 class="font-bold text-sm text-slate-800 border-b pb-2"><i class="fa-solid fa-users text-emerald-600 mr-2"></i> Kelola Data Peserta (Excel)</h4>
-                            <div class="flex space-x-2">
+                            <div class="flex flex-col sm:flex-row gap-2">
                                 <label class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold cursor-pointer text-center transition">
                                     <i class="fa-solid fa-file-import mr-1.5"></i> Impor Peserta (.xlsx)
                                     <input type="file" accept=".xlsx, .xls" onchange="importPeserta(event)" class="hidden">
@@ -521,7 +537,7 @@
 
                 <!-- TAB 9: ⚙️ PENGATURAN -->
                 <div id="tab-pengaturan" class="tab-pane space-y-6 hidden">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 max-w-xl">
+                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4 max-w-xl">
                         <h4 class="font-bold text-sm text-slate-800 border-b pb-2"><i class="fa-solid fa-sliders text-slate-600 mr-2"></i> Pengaturan Aplikasi & Sistem</h4>
                         <div class="space-y-3 text-xs">
                             <button onclick="resetAllPenugasan()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-lg transition flex items-center justify-center gap-2">
@@ -542,9 +558,9 @@
     </div>
 
     <!-- MODAL PENUGASAN JURI -->
-    <div id="modal-assign" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full">
-            <h3 class="text-lg font-bold text-slate-800 mb-1">Tugaskan Juri</h3>
+    <div id="modal-assign" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-5 md:p-6 max-w-md w-full">
+            <h3 class="text-base md:text-lg font-bold text-slate-800 mb-1">Tugaskan Juri</h3>
             <p class="text-xs text-slate-500 mb-4">Nama Juri: <span id="modal-juri-nama" class="font-bold text-slate-800"></span></p>
 
             <div class="space-y-4">
@@ -571,14 +587,14 @@
     </div>
 
     <!-- MODAL EDIT DATA PESERTA (SANTRI) -->
-    <div id="modal-edit-peserta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-lg w-full">
+    <div id="modal-edit-peserta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-5 md:p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 pb-2 border-b">
-                <h3 class="text-base font-bold text-slate-800"><i class="fa-solid fa-user-pen text-indigo-600 mr-2"></i> Edit Data Peserta (Santri)</h3>
+                <h3 class="text-sm md:text-base font-bold text-slate-800"><i class="fa-solid fa-user-pen text-indigo-600 mr-2"></i> Edit Data Peserta (Santri)</h3>
                 <button onclick="closeEditPesertaModal()" class="text-slate-400 hover:text-slate-600 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <form onsubmit="submitEditPeserta(event)" class="space-y-4 text-xs">
+            <form onsubmit="submitEditPeserta(event)" class="space-y-3.5 text-xs">
                 <input type="hidden" id="edit-peserta-original-id">
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -657,6 +673,19 @@
         let dataJuri = [];
         let dataPeserta = [];
 
+        // --- FUNGSI TOGGLE DRAWER SIDEBAR DI HP (MOBILE) ---
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar-nav');
+            const backdrop = document.getElementById('mobile-sidebar-backdrop');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
         function getGridBadge(grid) {
             const g = String(grid || 'B').toUpperCase().trim();
             if (g === 'A') return '<span class="px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-200 rounded font-black text-[10px]" title="Grid A: Ketat / Kelas Tinggi">GRID A</span>';
@@ -701,6 +730,14 @@
             const targetBtn = document.getElementById(`nav-${tabName}`);
             if (targetTab) targetTab.classList.remove('hidden');
             if (targetBtn) targetBtn.classList.add('sidebar-active');
+
+            // Tutup drawer di mobile secara otomatis jika user memilih menu
+            const sidebar = document.getElementById('sidebar-nav');
+            const backdrop = document.getElementById('mobile-sidebar-backdrop');
+            if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
 
             if (tabName === 'dashboard') updateDashboardStats();
             if (tabName === 'juri') renderAdminJuriTable();
@@ -756,14 +793,14 @@
                 const isAssigned = (j.kode && j.kode.trim() !== '') || (j.ruang && j.ruang.trim() !== '');
 
                 return `
-                <div class="p-4 bg-white rounded-xl border ${isAssigned ? 'border-emerald-300 bg-emerald-50/10' : 'border-slate-200'} shadow-sm flex flex-wrap justify-between items-center gap-3 hover:border-emerald-400 transition">
+                <div class="p-4 bg-white rounded-xl border ${isAssigned ? 'border-emerald-300 bg-emerald-50/10' : 'border-slate-200'} shadow-xs flex flex-wrap justify-between items-center gap-3 hover:border-emerald-400 transition">
                     <div>
                         <div class="flex items-center space-x-2">
                             <span class="font-mono font-bold text-slate-500 text-xs">${j.id}</span>
                             <p class="font-bold text-slate-800 text-sm">${j.nama}</p>
                             ${getGridBadge(j.grid)}
                         </div>
-                        <div class="flex items-center space-x-2 text-xs text-slate-500 mt-1.5">
+                        <div class="flex flex-wrap items-center gap-1.5 text-xs text-slate-500 mt-1.5">
                             <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 font-bold border border-indigo-100 rounded-md text-[11px]">
                                 Pernah Bertugas (${totalTugasCount}x)
                             </span>
@@ -774,7 +811,7 @@
                     </div>
 
                     <div class="flex items-center space-x-2">
-                        <button onclick="openAssignModal('${j.id}')" class="px-4 py-2 ${isAssigned ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-emerald-600 hover:bg-emerald-700'} text-white font-bold rounded-lg text-xs transition shadow-sm">
+                        <button onclick="openAssignModal('${j.id}')" class="px-4 py-2 ${isAssigned ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-emerald-600 hover:bg-emerald-700'} text-white font-bold rounded-lg text-xs transition shadow-xs">
                             ${isAssigned ? '<i class="fa-solid fa-pen-to-square mr-1"></i> Ubah Kode' : '<i class="fa-solid fa-user-plus mr-1"></i> Tugaskan'}
                         </button>
                     </div>
@@ -833,7 +870,6 @@
                     <td class="p-3 text-emerald-700 font-semibold text-xs"><span class="px-1.5 py-0.5 bg-slate-100 text-slate-800 rounded font-bold">${j.kode || '-'}</span> ${j.ruang || '-'}</td>
                     <td class="p-3 text-xs font-bold text-emerald-600">${j.absenMasuk || '--:--'}</td>
                     <td class="p-3 text-xs font-bold text-indigo-600">${j.absenPulang || '--:--'}</td>
-                    <td class="p-3 text-center text-xs">${j.absenMasuk ? 'Aktif' : '-'}</td>
                     <td class="p-3 text-center">
                         <button onclick="openAssignModal('${j.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold">Tugaskan</button>
                     </td>
