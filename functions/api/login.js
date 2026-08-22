@@ -1,4 +1,6 @@
-// Helper HMAC-SHA256 JWT untuk Cloudflare Workers
+// functions/api/login.js
+// Endpoint: POST /api/login
+
 async function generateJWT(payload, secret) {
     const header = { alg: "HS256", typ: "JWT" };
     const enc = new TextEncoder();
@@ -9,7 +11,7 @@ async function generateJWT(payload, secret) {
             .replace(/\+/g, "-")
             .replace(/\//g, "_");
 
-    const headerB64 = b64Url(header);
+    const headerB64  = b64Url(header);
     const payloadB64 = b64Url(payload);
     const dataToSign = `${headerB64}.${payloadB64}`;
 
@@ -21,11 +23,7 @@ async function generateJWT(payload, secret) {
         ["sign"]
     );
 
-    const signature = await crypto.subtle.sign(
-        "HMAC",
-        key,
-        enc.encode(dataToSign)
-    );
+    const signature = await crypto.subtle.sign("HMAC", key, enc.encode(dataToSign));
 
     const sigB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
         .replace(/=/g, "")
@@ -39,27 +37,30 @@ export async function onRequest(context) {
     const { request, env } = context;
 
     if (request.method !== "POST") {
-        return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
+        return jsonResponse({ error: "Method not allowed" }, 405);
     }
 
-    const dbUrl = env.DATABASE_URL;
-    const jwtSecret = env.JWT_SECRET || "default_jwt_secret_ujian_secure_key_2026";
+    const dbUrl     = env.DATABASE_URL;
+    const jwtSecret = env.JWT_SECRET;
 
+    // ✅ FIX: Tidak ada fallback hardcoded — wajib diset di Cloudflare env vars
+    if (!jwtSecret) {
+        return jsonResponse({ success: false, message: "JWT_SECRET belum dikonfigurasi di Cloudflare!" }, 500);
+    }
     if (!dbUrl) {
-        return new Response(JSON.stringify({ error: "DATABASE_URL not configured" }), { status: 500 });
+        return jsonResponse({ success: false, message: "DATABASE_URL belum dikonfigurasi di Cloudflare!" }, 500);
     }
 
     try {
-        const body = await request.json();
+        const body    = await request.json();
         const inputId = String(body.id || "").trim();
 
         if (!inputId) {
-            return new Response(JSON.stringify({ success: false, message: "ID wajib diisi!" }), { status: 400 });
+            return jsonResponse({ success: false, message: "ID wajib diisi!" }, 400);
         }
 
         const cleanDbUrl = dbUrl.trim();
-        const parsedUrl = new URL(cleanDbUrl.replace(/^postgres(ql)?:\/\//, "http://"));
-        const host = parsedUrl.hostname;
+        const host = new URL(cleanDbUrl.replace(/^postgres(ql)?:\/\//, "http://")).hostname;
 
         const res = await fetch(`https://${host}/sql`, {
             method: "POST",
@@ -73,46 +74,55 @@ export async function onRequest(context) {
             })
         });
 
-        const result = await res.json();
+        const result  = await res.json();
         const userRow = (result.rows || [])[0];
 
         if (!userRow) {
-            return new Response(JSON.stringify({ success: false, message: "ID tidak ditemukan dalam sistem!" }), { status: 401 });
+            return jsonResponse({ success: false, message: "ID tidak ditemukan dalam sistem!" }, 401);
         }
 
         const rawStatus = String(userRow.status || "JURI").toUpperCase();
         let role = "juri";
-        if (rawStatus === "ADMIN") role = "admin";
+        if (rawStatus === "ADMIN")    role = "admin";
         else if (rawStatus === "OPERATOR") role = "operator";
 
         const userPayload = {
-            id: String(userRow.id).trim(),
+            id:   String(userRow.id).trim(),
             nama: userRow.nama,
             role: role,
             grid: userRow.grid || "B",
             kode: userRow.kode || "",
             ruang: userRow.ruang || "",
+            iat: Math.floor(Date.now() / 1000),
             exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 jam
         };
 
         const token = await generateJWT(userPayload, jwtSecret);
 
-        return new Response(JSON.stringify({
+        return jsonResponse({
             success: true,
             token: token,
             user: {
-                id: userPayload.id,
-                nama: userPayload.nama,
-                role: userPayload.role,
-                grid: userPayload.grid,
-                kode: userPayload.kode,
+                id:    userPayload.id,
+                nama:  userPayload.nama,
+                role:  userPayload.role,
+                grid:  userPayload.grid,
+                kode:  userPayload.kode,
                 ruang: userPayload.ruang
             }
-        }), {
-            headers: { "Content-Type": "application/json" }
         });
 
     } catch (e) {
-        return new Response(JSON.stringify({ success: false, message: e.message }), { status: 500 });
+        return jsonResponse({ success: false, message: e.message }, 500);
     }
+}
+
+function jsonResponse(data, status = 200) {
+    return new Response(JSON.stringify(data), {
+        status,
+        headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+        }
+    });
 }
