@@ -19,12 +19,42 @@
             color: #ffffff;
             font-weight: 700;
         }
+        #toast-container { 
+            position: fixed; 
+            bottom: 1.25rem; 
+            right: 1.25rem; 
+            z-index: 9999; 
+            display: flex; 
+            flex-direction: column; 
+            gap: .5rem; 
+        }
+        .toast { 
+            display: flex; 
+            align-items: center; 
+            gap: .75rem; 
+            padding: .75rem 1rem; 
+            border-radius: .75rem; 
+            box-shadow: 0 4px 12px rgba(0,0,0,.15); 
+            font-size: .8rem; 
+            font-weight: 600; 
+            color: #fff; 
+            opacity: 0; 
+            transition: opacity .3s; 
+            max-width: 22rem; 
+        }
+        .toast.show { opacity: 1; }
+        .toast-success { background: #059669; }
+        .toast-error   { background: #e11d48; }
+        .toast-info    { background: #334155; }
+        .toast-warning { background: #d97706; }
         #sidebar-nav {
             transition: transform 0.3s ease-in-out;
         }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+
+    <div id="toast-container"></div>
 
     <!-- LOGIN CONTAINER -->
     <div id="login-screen" class="flex items-center justify-center min-h-screen p-4 bg-slate-900">
@@ -47,6 +77,7 @@
                     <i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk
                 </button>
             </form>
+            <p id="login-error" class="hidden mt-3 text-xs text-center text-rose-600 font-semibold bg-rose-50 p-2 rounded-lg"></p>
         </div>
     </div>
 
@@ -693,6 +724,17 @@
             }
         }
 
+        function showToast(message, type = 'info') {
+            const icons = { success:'fa-circle-check', error:'fa-circle-xmark', info:'fa-circle-info', warning:'fa-triangle-exclamation' };
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3500);
+        }
+
         function getGridBadge(grid) {
             const g = String(grid || 'B').toUpperCase().trim();
             if (g === 'A') return '<span class="px-2 py-0.5 bg-rose-100 text-rose-800 border border-rose-200 rounded font-black text-[10px]" title="Grid A: Ketat / Kelas Tinggi">GRID A</span>';
@@ -845,7 +887,7 @@
             renderPenugasanList();
             renderAdminJuriTable();
             updateDashboardStats();
-            alert("Seluruh penugasan juri berhasil di-reset menjadi kosong!");
+            showToast("Seluruh penugasan juri berhasil di-reset!", "success");
         }
 
         async function hapusTugasSingle() {
@@ -860,6 +902,7 @@
             renderPenugasanList();
             renderAdminJuriTable();
             updateDashboardStats();
+            showToast("Penugasan juri berhasil dikosongkan.", "info");
         }
 
         function renderAdminJuriTable() {
@@ -975,20 +1018,21 @@
             `}).join('');
         }
 
+        // --- FUNGSI EDIT SANTRI (DIPERBAIKI: NAMA DAN GURU TIDAK AKAN TERTUKAR) ---
         function openEditPesertaModal(idpps) {
             const p = dataPeserta.find(item => item.idpps === idpps);
             if (!p) return;
 
             document.getElementById('edit-peserta-original-id').value = p.idpps;
-            document.getElementById('edit-peserta-idpps').value = p.idpps;
-            document.getElementById('edit-peserta-nama').value = p.nama || '';
-            document.getElementById('edit-peserta-kelas').value = p.kelas || '';
-            document.getElementById('edit-peserta-dom').value = p.dom || '';
-            document.getElementById('edit-peserta-guru').value = p.guru || '';
-            document.getElementById('edit-peserta-ruangsore').value = p.ruangSore || '';
-            document.getElementById('edit-peserta-juri').value = p.juriKode || '';
-            document.getElementById('edit-peserta-ruangtes').value = p.ruangTes || '';
-            document.getElementById('edit-peserta-status').value = p.status || 'HADIR';
+            document.getElementById('edit-peserta-idpps').value       = p.idpps;
+            document.getElementById('edit-peserta-nama').value        = p.nama || '';
+            document.getElementById('edit-peserta-kelas').value       = p.kelas || '';
+            document.getElementById('edit-peserta-dom').value         = p.dom || '';
+            document.getElementById('edit-peserta-guru').value        = p.guru || '';
+            document.getElementById('edit-peserta-ruangsore').value   = p.ruangSore || '';
+            document.getElementById('edit-peserta-juri').value        = p.juriKode || '';
+            document.getElementById('edit-peserta-ruangtes').value    = p.ruangTes || '';
+            document.getElementById('edit-peserta-status').value      = p.status || 'HADIR';
 
             document.getElementById('modal-edit-peserta').classList.remove('hidden');
         }
@@ -1010,21 +1054,24 @@
             const p = dataPeserta.find(item => item.idpps === origId);
             if (!p) return;
 
-            p.nama = document.getElementById('edit-peserta-nama').value.trim();
-            p.kelas = document.getElementById('edit-peserta-kelas').value.trim();
-            p.dom = document.getElementById('edit-peserta-dom').value.trim();
-            p.guru = document.getElementById('edit-peserta-guru').value.trim();
+            const inputNamaSantri = document.getElementById('edit-peserta-nama').value.trim();
+            const inputNamaGuru   = document.getElementById('edit-peserta-guru').value.trim();
+
+            p.nama      = inputNamaSantri;
+            p.kelas     = document.getElementById('edit-peserta-kelas').value.trim();
+            p.dom       = document.getElementById('edit-peserta-dom').value.trim();
+            p.guru      = inputNamaGuru;
             p.ruangSore = document.getElementById('edit-peserta-ruangsore').value.trim();
-            p.juriKode = document.getElementById('edit-peserta-juri').value.trim().toUpperCase();
-            p.ruangTes = document.getElementById('edit-peserta-ruangtes').value.trim();
-            p.status = document.getElementById('edit-peserta-status').value;
+            p.juriKode  = document.getElementById('edit-peserta-juri').value.trim().toUpperCase();
+            p.ruangTes  = document.getElementById('edit-peserta-ruangtes').value.trim();
+            p.status    = document.getElementById('edit-peserta-status').value;
 
             await syncToCloud();
             closeEditPesertaModal();
             renderAdminPesertaTable();
             renderRekapTable();
             updateDashboardStats();
-            alert("Data santri " + p.nama + " berhasil diperbarui!");
+            showToast(`Data santri "${p.nama}" (Guru: ${p.guru || '-'}) berhasil diperbarui!`, "success");
         }
 
         async function hapusPesertaSingle(idpps) {
@@ -1040,6 +1087,7 @@
             renderAdminPesertaTable();
             renderRekapTable();
             updateDashboardStats();
+            showToast(`Santri "${p.nama}" berhasil dihapus.`, "info");
         }
 
         function openAssignModal(juriId) {
@@ -1060,7 +1108,7 @@
             const ruang = document.getElementById('assign-ruang').value.trim();
 
             if (!kode || !ruang) {
-                alert("Harap isi kode juri!");
+                showToast("Harap isi kode juri!", "warning");
                 return;
             }
 
@@ -1077,6 +1125,7 @@
             await syncToCloud();
             closeAssignModal();
             switchTab(activeTab);
+            showToast("Penugasan juri berhasil disimpan!", "success");
         }
 
         async function importJuri(e) {
@@ -1113,7 +1162,7 @@
 
                     await syncToCloud();
                     switchTab('penugasan');
-                    alert("Berhasil mengimpor " + json.length + " data juri dengan Grid Tingkat Juri!");
+                    showToast(`Berhasil mengimpor ${json.length} data juri!`, "success");
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -1190,7 +1239,7 @@
                     await syncToCloud();
                     switchTab('peserta');
                     renderRekapTable();
-                    alert("Berhasil mengimpor " + json.length + " data peserta!" + (resetScores ? " (Nilai kesalahan telah dibersihkan menjadi 0)" : " (Nilai sebelumnya dipertahankan)"));
+                    showToast(`Berhasil mengimpor ${json.length} data peserta! ${resetScores ? '(Nilai di-reset ke 0)' : '(Nilai lama aman)'}`, "success");
                 }
                 e.target.value = '';
             };
@@ -1327,7 +1376,7 @@
             };
 
             await saveSingleScore(activeSelectedPesertaId, p.scores);
-            alert("Nilai kesalahan berhasil disimpan ke Database Cloud!");
+            showToast("Nilai kesalahan berhasil disimpan ke Database Cloud!", "success");
             renderJuriDashboard();
         }
 
@@ -1339,11 +1388,15 @@
         }
 
         function clearStorage() {
-            if (confirm('Yakin ingin mereset seluruh data lokal?')) {
-                localStorage.clear();
-                sessionStorage.clear();
-                location.reload();
-            }
+            if (!confirm('Yakin ingin mereset seluruh data lokal?\n\nData di server tidak akan terhapus.')) return;
+            localStorage.removeItem(STORAGE_KEY_JURI);
+            localStorage.removeItem(STORAGE_KEY_PESERTA);
+            sessionStorage.removeItem(STORAGE_KEY_AUTH);
+            sessionStorage.removeItem(STORAGE_KEY_TOKEN);
+            dataJuri = [];
+            dataPeserta = [];
+            showToast("Data lokal telah dibersihkan.", "info");
+            switchTab(activeTab);
         }
 
         // --- AUTH & API REQUEST DENGAN JWT TOKEN ---
@@ -1354,7 +1407,7 @@
             const res = await fetch(path, opts);
             const data = await res.json();
             if (res.status === 401 && path !== '/api/login') {
-                alert('Sesi habis, silakan login ulang.');
+                showToast('Sesi habis, silakan login ulang.', 'error');
                 handleLogout();
                 throw new Error('Unauthorized');
             }
@@ -1365,6 +1418,8 @@
             if (!currentToken) return;
             const ind = document.getElementById('storage-indicator');
             if (ind) ind.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Syncing...';
+            localStorage.setItem(STORAGE_KEY_JURI, JSON.stringify(dataJuri));
+            localStorage.setItem(STORAGE_KEY_PESERTA, JSON.stringify(dataPeserta));
             try {
                 if (dataJuri && dataJuri.length > 0) {
                     await apiRequest('/api/juri', 'POST', dataJuri);
@@ -1397,14 +1452,29 @@
         async function fetchFromCloud() {
             if (!currentToken) return;
             try {
-                const rJuri = await apiRequest('/api/juri');
+                const [rJuri, rPeserta] = await Promise.all([
+                    apiRequest('/api/juri'),
+                    apiRequest('/api/peserta')
+                ]);
                 if (rJuri.ok && rJuri.data.data) dataJuri = rJuri.data.data;
-
-                const rPeserta = await apiRequest('/api/peserta');
                 if (rPeserta.ok && rPeserta.data.data) dataPeserta = rPeserta.data.data;
 
+                if (!dataJuri.length) {
+                    const s = localStorage.getItem(STORAGE_KEY_JURI);
+                    if (s) dataJuri = JSON.parse(s);
+                }
+                if (!dataPeserta.length) {
+                    const s = localStorage.getItem(STORAGE_KEY_PESERTA);
+                    if (s) dataPeserta = JSON.parse(s);
+                }
                 switchTab(activeTab);
-            } catch(e) {}
+            } catch(e) {
+                const sj = localStorage.getItem(STORAGE_KEY_JURI);
+                const sp = localStorage.getItem(STORAGE_KEY_PESERTA);
+                if (sj) dataJuri = JSON.parse(sj);
+                if (sp) dataPeserta = JSON.parse(sp);
+                switchTab(activeTab);
+            }
         }
 
         function autoDetectRuang() {
@@ -1418,13 +1488,16 @@
             if (!inputId) return;
 
             const btn = document.getElementById('login-btn');
+            const errEl = document.getElementById('login-error');
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Memverifikasi...';
+            errEl.classList.add('hidden');
 
             try {
                 const { ok, data } = await apiRequest('/api/login', 'POST', { id: inputId });
                 if (!ok || !data.success) {
-                    alert(data.message || "ID tidak ditemukan!");
+                    errEl.textContent = data.message || "ID tidak ditemukan!";
+                    errEl.classList.remove('hidden');
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk';
                     return;
@@ -1437,7 +1510,8 @@
                 
                 showMainApp();
             } catch (err) {
-                alert("Gagal terhubung ke database!");
+                errEl.textContent = 'Gagal terhubung ke database!';
+                errEl.classList.remove('hidden');
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-2"></i> Masuk';
             }
@@ -1510,7 +1584,7 @@
 
             const j = dataJuri.find(jj => jj.id === inputId);
             if (!j) {
-                alert(`ID ${inputId} tidak ditemukan dalam data juri.`);
+                showScanResult(`ID ${inputId} tidak ditemukan dalam data juri.`, false);
                 return;
             }
 
@@ -1519,13 +1593,13 @@
             if (!j.absenMasuk) {
                 j.absenMasuk = now;
                 await saveJuriAbsen(j.id, j.absenMasuk, j.absenPulang, j.manualStatus);
-                alert(`Absen MASUK Berhasil: ${j.nama} (${now})`);
+                showScanResult(`✅ Absen MASUK: ${j.nama} — ${now}`, true);
             } else if (!j.absenPulang) {
                 j.absenPulang = now;
                 await saveJuriAbsen(j.id, j.absenMasuk, j.absenPulang, j.manualStatus);
-                alert(`Absen PULANG Berhasil: ${j.nama} (${now})`);
+                showScanResult(`✅ Absen PULANG: ${j.nama} — ${now}`, true);
             } else {
-                alert(`${j.nama} sudah absen masuk & pulang.`);
+                showScanResult(`ℹ️ ${j.nama} sudah absen masuk & pulang.`, false);
             }
 
             const inp = document.getElementById('manual-qr-input');
@@ -1533,9 +1607,19 @@
             renderOperatorViews();
         }
 
+        function showScanResult(msg, success) {
+            const box = document.getElementById('scan-result-box');
+            const txt = document.getElementById('scan-result-msg');
+            if (!box || !txt) return;
+            txt.textContent = msg;
+            box.classList.remove('hidden', 'bg-slate-100', 'bg-emerald-50', 'bg-rose-50');
+            box.classList.add(success ? 'bg-emerald-50' : 'bg-rose-50');
+            showToast(msg, success ? 'success' : 'warning');
+        }
+
         async function forceSyncOnline() {
             await syncToCloud();
-            alert('Sinkronisasi cloud selesai!');
+            showToast('Sinkronisasi cloud selesai!', 'success');
         }
 
         setInterval(() => { if (currentToken) fetchFromCloud(); }, 30000);
