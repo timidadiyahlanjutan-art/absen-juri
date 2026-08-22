@@ -1,74 +1,110 @@
+// functions/api/_middleware.js
+// Otomatis berjalan SEBELUM semua endpoint di /api/
+// kecuali /api/login yang di-whitelist di bawah
+
+const PUBLIC_PATHS = ['/api/login'];
+
+// Decode base64url
+function b64urlDecode(str) {
+    str = str.replace(/-/g, '+').replace(/_/g, '/');
+    while (str.length % 4) str += '=';
+    return Uint8Array.from(atob(str), c => c.charCodeAt(0));
+}
+
+// Verifikasi JWT yang dibuat oleh login.js (generateJWT)
 async function verifyJWT(token, secret) {
-    try {
-        const parts = token.split(".");
-        if (parts.length !== 3) return null;
+    const parts = token.split('.');
+    if (parts.length !== 3) throw new Error('Format token tidak valid');
 
-        const [headerB64, payloadB64, sigB64] = parts;
-        const dataToSign = `${headerB64}.${payloadB64}`;
-        const enc = new TextEncoder();
+    const [headerB64, payloadB64, sigB64] = parts;
+    const enc = new TextEncoder();
 
-        const key = await crypto.subtle.importKey(
-            "raw",
-            enc.encode(secret),
-            { name: "HMAC", hash: "SHA-256" },
-            false,
-            ["verify"]
-        );
+    // Verifikasi signature
+    const key = await crypto.subtle.importKey(
+        'raw',
+        enc.encode(secret),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['verify']
+    );
 
-        // Decode Base64URL
-        const binSig = atob(sigB64.replace(/-/g, "+").replace(/_/g, "/"));
-        const sigArr = new Uint8Array(binSig.length);
-        for (let i = 0; i < binSig.length; i++) sigArr[i] = binSig.charCodeAt(i);
+    const valid = await crypto.subtle.verify(
+        'HMAC',
+        key,
+        b64urlDecode(sigB64),
+        enc.encode(`${headerB64}.${payloadB64}`)
+    );
 
-        const isValid = await crypto.subtle.verify("HMAC", key, sigArr, enc.encode(dataToSign));
-        if (!isValid) return null;
+    if (!valid) throw new Error('Token tidak valid, akses ditolak');
 
-        const payloadJson = atob(payloadB64.replace(/-/g, "+").replace(/_/g, "/"));
-        const payload = JSON.parse(payloadJson);
+    // Decode payload — login.js pakai btoa(JSON.stringify(obj))
+    // jadi decode-nya: atob lalu JSON.parse
+    const payloadJson = atob(
+        payloadB64.replace(/-/g, '+').replace(/_/g, '/') +
+        '=='.slice(0, (4 - payloadB64.length % 4) % 4)
+    );
+    const payload = JSON.parse(payloadJson);
 
-        if (payload.exp && Math.floor(Date.now() / 1000) > payload.exp) {
-            return null; // Token kedaluwarsa
-        }
-
-        return payload;
-    } catch (e) {
-        return null;
+    // Cek expired
+    if (payload.exp && Math.floor(Date.now() / 1000) > payload.exp) {
+        throw new Error('Sesi habis, silakan login ulang');
     }
+
+    return payload;
 }
 
 export async function onRequest(context) {
     const { request, env, next } = context;
     const url = new URL(request.url);
 
-    // Bypass autentikasi khusus untuk endpoint login
-    if (url.pathname === "/api/login") {
+    // Lewatkan endpoint publik (login)
+    if (PUBLIC_PATHS.includes(url.pathname)) {
         return next();
     }
 
-    const authHeader = request.headers.get("Authorization") || "";
-    const match = authHeader.match(/^Bearer\s+(.+)$/i);
-
-    if (!match) {
-        return new Response(JSON.stringify({ error: "Unauthorized: Token Bearer tidak ditemukan" }), {
-            status: 401,
-            headers: { "Content-Type": "application/json" }
+    // Lewatkan CORS preflight
+    if (request.method === 'OPTIONS') {
+        return new Response(null, {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+            }
         });
     }
 
-    const token = match[1];
-    const jwtSecret = env.JWT_SECRET || "default_jwt_secret_ujian_secure_key_2026";
-    const decodedUser = await verifyJWT(token, jwtSecret);
+    // Ambil token dari header
+    const authHeader = request.headers.get('Authorization') || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
-    if (!decodedUser) {
-        return new Response(JSON.stringify({ error: "Unauthorized: Token tidak valid atau kedaluwarsa" }), {
-            status: 401,
-            headers: { "Content-Type": "application/json" }
-        });
+    if (!token) {
+        return errorResponse('Akses ditolak: token tidak ditemukan', 401);
     }
 
-    // Teruskan data user terverifikasi ke context API berikutnya
-    context.data = context.data || {};
-    context.data.user = decodedUser;
+    const jwtSecret = env.JWT_SECRET;
+    if (!jwtSecret) {
+        return errorResponse('JWT_SECRET belum dikonfigurasi', 500);
+    }
 
-    return next();
+    try {
+        const payload = await verifyJWT(token, jwtSecret);
+
+        // Sisipkan data user ke context — bisa dipakai di juri.js & peserta.js
+        // dengan context.data.user
+        context.data.user = payload;
+
+        return next();
+    } catch (err) {
+        return errorResponse(err.message, 401);
+    }
+}
+
+function errorResponse(message, status) {
+    return new Response(JSON.stringify({ success: false, message }), {
+        status,
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }
+    });
 }
