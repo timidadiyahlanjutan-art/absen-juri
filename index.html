@@ -1271,26 +1271,73 @@
             XLSX.writeFile(workbook, "MENTAHAN_PESERTA.xlsx");
         }
 
+        // --- FUNGSI EXPORT LENGKAP & RINCIAN NILAI ---
         function exportNilai() {
-            const exportData = dataPeserta.map((p, idx) => ({
-                "NO": p.no || (idx + 1),
-                "IDPPS": p.idpps,
-                "NAMA": p.nama,
-                "DOM": p.dom,
-                "KELAS": p.kelas,
-                "GURU": p.guru,
-                "RUANG SORE": p.ruangSore,
-                "TES": p.tes,
-                "jml ket tes": p.jmlKetTes,
-                "JURI": p.juriKode,
-                "RUANG TES": p.ruangTes,
-                "STATUS": p.status,
-                "TOTAL_KESALAHAN": calculateTotalErrors(p.scores)
-            }));
+            if (!dataPeserta || dataPeserta.length === 0) {
+                showToast("Tidak ada data peserta untuk diekspor!", "warning");
+                return;
+            }
+
+            const exportData = dataPeserta.map((p, idx) => {
+                const k1 = p.scores?.k1 || {};
+                const k2 = p.scores?.k2 || {};
+
+                const k1_lafadz   = parseInt(k1.lafadz) || 0;
+                const k1_makna    = parseInt(k1.makna) || 0;
+                const k1_terjemah = parseInt(k1.terjemah) || 0;
+                const k1_tasrif   = parseInt(k1.tasrif) || 0;
+                const k1_taktek   = parseInt(k1.taktek) || 0;
+                const total_k1    = k1_lafadz + k1_makna + k1_terjemah + k1_tasrif + k1_taktek;
+
+                const k2_lafadz   = parseInt(k2.lafadz) || 0;
+                const k2_makna    = parseInt(k2.makna) || 0;
+                const k2_terjemah = parseInt(k2.terjemah) || 0;
+                const k2_tasrif   = parseInt(k2.tasrif) || 0;
+                const k2_nadhom   = parseInt(k2.nadhom) || 0;
+                const total_k2    = k2_lafadz + k2_makna + k2_terjemah + k2_tasrif + k2_nadhom;
+
+                const total_semua = total_k1 + total_k2;
+
+                return {
+                    "NO": p.no || (idx + 1),
+                    "IDPPS": p.idpps,
+                    "NAMA": p.nama,
+                    "DOM": p.dom || "-",
+                    "KELAS": p.kelas || "-",
+                    "GURU": p.guru || "-",
+                    "RUANG SORE": p.ruangSore || "-",
+                    "TES": p.tes || "-",
+                    "JML KET TES": p.jmlKetTes || 1,
+                    "KODE JURI": p.juriKode || "-",
+                    "RUANG TES": p.ruangTes || "-",
+                    "STATUS": p.status || "HADIR",
+                    
+                    // --- RINCIAN KESALAHAN KITAB 1 ---
+                    "K1_LAFADZ": k1_lafadz,
+                    "K1_MAKNA": k1_makna,
+                    "K1_TERJEMAH": k1_terjemah,
+                    "K1_TASRIF": k1_tasrif,
+                    "K1_TAKTEK": k1_taktek,
+                    "TOTAL_ERR_K1": total_k1,
+
+                    // --- RINCIAN KESALAHAN KITAB 2 ---
+                    "K2_LAFADZ": k2_lafadz,
+                    "K2_MAKNA": k2_makna,
+                    "K2_TERJEMAH": k2_terjemah,
+                    "K2_TASRIF": k2_tasrif,
+                    "K2_NADHOM": k2_nadhom,
+                    "TOTAL_ERR_K2": total_k2,
+
+                    // --- TOTAL KESELURUHAN ---
+                    "TOTAL_KESALAHAN_AKHIR": total_semua
+                };
+            });
+
             const worksheet = XLSX.utils.json_to_sheet(exportData);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "KOLOM NILAI");
-            XLSX.writeFile(workbook, "REKAP_NILAI_PESERTA.xlsx");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "REKAP LENGKAP NILAI");
+            XLSX.writeFile(workbook, "REKAP_RINCIAN_NILAI_PESERTA.xlsx");
+            showToast("File Rekap Nilai Rinci berhasil diunduh!", "success");
         }
 
         function renderJuriDashboard() {
