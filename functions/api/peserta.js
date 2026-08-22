@@ -3,12 +3,11 @@ export async function onRequest(context) {
     const dbUrl = env.DATABASE_URL;
 
     if (!dbUrl) {
-        return new Response(JSON.stringify({ error: "DATABASE_URL not configured" }), { status: 500 });
+        return jsonResponse({ success: false, message: "DATABASE_URL belum dikonfigurasi di Cloudflare!" }, 500);
     }
 
     const cleanDbUrl = dbUrl.trim();
-    const parsedUrl = new URL(cleanDbUrl.replace(/^postgres(ql)?:\/\//, 'http://'));
-    const host = parsedUrl.hostname;
+    const host = new URL(cleanDbUrl.replace(/^postgres(ql)?:\/\//, 'http://')).hostname;
 
     // GET: Ambil master data peserta
     if (request.method === "GET") {
@@ -39,11 +38,9 @@ export async function onRequest(context) {
                 status: r.status || 'HADIR',
                 scores: typeof r.scores === 'string' ? JSON.parse(r.scores) : (r.scores || {})
             }));
-            return new Response(JSON.stringify({ success: true, data: rows }), {
-                headers: { "Content-Type": "application/json" }
-            });
+            return jsonResponse({ success: true, data: rows });
         } catch (e) {
-            return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+            return jsonResponse({ success: false, message: e.message }, 500);
         }
     }
 
@@ -52,7 +49,7 @@ export async function onRequest(context) {
         try {
             const pesertaList = await request.json();
             if (!Array.isArray(pesertaList) || pesertaList.length === 0) {
-                return new Response(JSON.stringify({ success: true }), { status: 200 });
+                return jsonResponse({ success: true });
             }
 
             const chunkSize = 50;
@@ -110,20 +107,20 @@ export async function onRequest(context) {
                 });
             }
 
-            return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } });
+            return jsonResponse({ success: true });
         } catch (e) {
-            return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+            return jsonResponse({ success: false, message: e.message }, 500);
         }
     }
 
-    // PUT: Update Skor Kesalahan Satuan Peserta (Input Nilai Juri)
+    // PUT: Update Skor Kesalahan Satuan (Input Nilai Juri)
     if (request.method === "PUT") {
         try {
             const body = await request.json();
             const { idpps, scores } = body;
 
             if (!idpps) {
-                return new Response(JSON.stringify({ error: "IDPPS wajib disertakan" }), { status: 400 });
+                return jsonResponse({ success: false, message: "IDPPS wajib disertakan" }, 400);
             }
 
             await fetch(`https://${host}/sql`, {
@@ -138,11 +135,21 @@ export async function onRequest(context) {
                 })
             });
 
-            return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } });
+            return jsonResponse({ success: true });
         } catch (e) {
-            return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+            return jsonResponse({ success: false, message: e.message }, 500);
         }
     }
 
-    return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
+    return jsonResponse({ error: "Method not allowed" }, 405);
+}
+
+function jsonResponse(data, status = 200) {
+    return new Response(JSON.stringify(data), {
+        status,
+        headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*"
+        }
+    });
 }
