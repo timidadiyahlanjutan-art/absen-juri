@@ -87,7 +87,7 @@
         <!-- MOBILE BACKDROP OVERLAY -->
         <div id="mobile-sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden md:hidden"></div>
 
-        <!-- SIDEBAR NAVIGATION (RESPONSIVE DRAWER) -->
+        <!-- SIDEBAR NAVIGATION -->
         <aside id="sidebar-nav" class="fixed inset-y-0 left-0 -translate-x-full md:translate-x-0 md:static w-64 bg-slate-900 text-white flex-shrink-0 flex flex-col justify-between shadow-2xl md:shadow-xl z-50 md:h-screen">
             <div>
                 <div class="p-5 border-b border-slate-800 flex items-center justify-between">
@@ -252,7 +252,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 2: 👨‍⚖️ DATA JURI (GRID & STATUS) -->
+                <!-- TAB 2: 👨‍⚖️ DATA JURI -->
                 <div id="tab-juri" class="tab-pane space-y-6 hidden">
                     <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-xs">
                         <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
@@ -263,15 +263,16 @@
                             </div>
                         </div>
                         <div class="overflow-x-auto -mx-4 md:mx-0">
-                            <table class="w-full text-left text-xs text-slate-600 min-w-[650px]">
+                            <table class="w-full text-left text-xs text-slate-600 min-w-[700px]">
                                 <thead class="bg-slate-100 text-slate-700 uppercase">
                                     <tr>
                                         <th class="p-3">ID Juri</th>
                                         <th class="p-3">Nama Juri</th>
                                         <th class="p-3 text-center">Grid</th>
                                         <th class="p-3">Kode / Ruang</th>
-                                        <th class="p-3">Jam Masuk</th>
-                                        <th class="p-3">Jam Pulang</th>
+                                        <th class="p-3">Datang</th>
+                                        <th class="p-3">Pulang</th>
+                                        <th class="p-3 text-center">Durasi</th>
                                         <th class="p-3 text-center">Aksi</th>
                                     </tr>
                                 </thead>
@@ -282,7 +283,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 3: 👥 DATA PESERTA (DENGAN PENCARIAN & AKSI EDIT/HAPUS) -->
+                <!-- TAB 3: 👥 DATA PESERTA -->
                 <div id="tab-peserta" class="tab-pane space-y-6 hidden">
                     <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-xs">
                         <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b">
@@ -440,12 +441,25 @@
                     </div>
                 </div>
 
-                <!-- TAB 6: 🕒 PRESENSI JURI -->
+                <!-- TAB 6: 🕒 PRESENSI JURI (DENGAN TOMBOL DATANG, PULANG, ALPA/IZIN, & STATUS) -->
                 <div id="tab-presensi" class="tab-pane space-y-6 hidden">
-                    <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-200 flex flex-wrap justify-between items-center gap-4">
-                        <div>
-                            <h3 class="text-sm md:text-base font-bold text-slate-800">Presensi & Monitoring Absensi Juri</h3>
-                            <p class="text-xs text-slate-500">Scan QR Code atau ketik ID Juri untuk absensi otomatis.</p>
+                    <!-- SUMMARY STATS PRESENSI -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-slate-100 text-slate-700 rounded-lg flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-users"></i></div>
+                            <div><p class="text-[10px] font-bold text-slate-400 uppercase">Total Juri</p><h4 class="text-xl font-black text-slate-800 mt-0.5" id="pres-stat-total">0</h4></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-user-check"></i></div>
+                            <div><p class="text-[10px] font-bold text-emerald-600 uppercase">Sudah Hadir</p><h4 class="text-xl font-black text-emerald-600 mt-0.5" id="pres-stat-hadir">0</h4></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-user-clock"></i></div>
+                            <div><p class="text-[10px] font-bold text-rose-600 uppercase">Belum Hadir</p><h4 class="text-xl font-black text-rose-600 mt-0.5" id="pres-stat-belum">0</h4></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-user-xmark"></i></div>
+                            <div><p class="text-[10px] font-bold text-amber-600 uppercase">Izin / Alpa</p><h4 class="text-xl font-black text-amber-600 mt-0.5" id="pres-stat-izin">0</h4></div>
                         </div>
                     </div>
 
@@ -470,16 +484,23 @@
                         </div>
 
                         <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 md:col-span-2">
-                            <div class="overflow-x-auto max-h-[320px] overflow-y-auto -mx-4 md:mx-0">
-                                <table class="w-full text-left text-xs min-w-[500px]">
-                                    <thead class="bg-slate-100 uppercase sticky top-0 z-10">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-bold text-xs text-slate-700 uppercase">Daftar Kehadiran & Kontrol Presensi</h4>
+                                <span class="text-[11px] text-slate-400">Klik tombol untuk absen manual</span>
+                            </div>
+                            <div class="overflow-x-auto max-h-[420px] overflow-y-auto -mx-4 md:mx-0">
+                                <table class="w-full text-left text-xs min-w-[700px]">
+                                    <thead class="bg-slate-100 uppercase sticky top-0 z-10 text-slate-700">
                                         <tr>
-                                            <th class="p-2">ID</th>
-                                            <th class="p-2">Nama Juri</th>
-                                            <th class="p-2 text-center">Grid</th>
-                                            <th class="p-2">Kode / Ruang</th>
-                                            <th class="p-2">Datang</th>
-                                            <th class="p-2">Pulang</th>
+                                            <th class="p-2.5">ID</th>
+                                            <th class="p-2.5">Nama Juri</th>
+                                            <th class="p-2.5 text-center">Grid</th>
+                                            <th class="p-2.5">Kode/Ruang</th>
+                                            <th class="p-2.5">Datang</th>
+                                            <th class="p-2.5">Pulang</th>
+                                            <th class="p-2.5 text-center">Durasi</th>
+                                            <th class="p-2.5 text-center">Status</th>
+                                            <th class="p-2.5 text-center">Aksi Operator</th>
                                         </tr>
                                     </thead>
                                     <tbody id="table-operator-juri-status" class="divide-y divide-slate-200">
@@ -490,7 +511,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 7: 📊 REKAP NILAI (DENGAN KOLOM GURU & PENCARIAN GURU) -->
+                <!-- TAB 7: 📊 REKAP NILAI -->
                 <div id="tab-rekap" class="tab-pane space-y-6 hidden">
                     <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-xs">
                         <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b">
@@ -552,7 +573,7 @@
                             <h4 class="font-bold text-sm text-slate-800 border-b pb-2"><i class="fa-solid fa-users text-emerald-600 mr-2"></i> Kelola Data Peserta (Excel)</h4>
                             <div class="flex flex-col sm:flex-row gap-2">
                                 <label class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold cursor-pointer text-center transition">
-                                    <i class="fa-solid fa-file-import mr-1.5"></i> Impor Peserta (.xlsx)
+                                    <i class="fa-solid fa-file-import mr-1.5"></i> Impor Peserta Baru (.xlsx)
                                     <input type="file" accept=".xlsx, .xls" onchange="importPeserta(event)" class="hidden">
                                 </label>
                                 <button onclick="exportPesertaOnly()" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition">
@@ -565,8 +586,45 @@
 
                 <!-- TAB 9: ⚙️ PENGATURAN -->
                 <div id="tab-pengaturan" class="tab-pane space-y-6 hidden">
+                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-xs">
+                        <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b">
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800">
+                                    <i class="fa-solid fa-door-open text-emerald-600 mr-2"></i> Manajemen Ruang Ujian
+                                </h4>
+                                <p class="text-xs text-slate-500 mt-0.5">Tambah, edit, atau hapus ruang. Tentukan berapa juri per ruang. Kode abjad otomatis digenerate.</p>
+                            </div>
+                            <button onclick="openTambahRuangModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition flex items-center gap-2 shadow-sm">
+                                <i class="fa-solid fa-plus"></i> Tambah Ruang
+                            </button>
+                        </div>
+
+                        <div class="mb-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <p class="text-xs font-bold text-slate-600 mb-2"><i class="fa-solid fa-circle-info text-sky-500 mr-1"></i> Peta kode abjad aktif:</p>
+                            <div id="peta-kode-preview" class="text-xs text-slate-600 font-mono leading-relaxed"></div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left">
+                                <thead class="bg-slate-100 text-slate-700 uppercase">
+                                    <tr>
+                                        <th class="p-3">Nama Ruang / Gedung</th>
+                                        <th class="p-3 text-center">Kapasitas Juri</th>
+                                        <th class="p-3">Kode Abjad</th>
+                                        <th class="p-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-ruang" class="divide-y divide-slate-200"></tbody>
+                            </table>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-3 italic">
+                            <i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i>
+                            Urutan ruang menentukan urutan kode abjad. Gunakan tombol panah untuk mengubah urutan.
+                        </p>
+                    </div>
+
                     <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4 max-w-xl">
-                        <h4 class="font-bold text-sm text-slate-800 border-b pb-2"><i class="fa-solid fa-sliders text-slate-600 mr-2"></i> Pengaturan Aplikasi & Sistem</h4>
+                        <h4 class="font-bold text-sm text-slate-800 border-b pb-2"><i class="fa-solid fa-sliders text-slate-600 mr-2"></i> Pengaturan Sistem</h4>
                         <div class="space-y-3 text-xs">
                             <button onclick="resetAllPenugasan()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-lg transition flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-rotate-left"></i> Reset / Kosongkan Penugasan Juri Saja
@@ -597,8 +655,8 @@
                     <input type="text" id="assign-kode" oninput="autoDetectRuang()" class="w-full border rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none uppercase font-bold text-slate-800" placeholder="Ketik Kode Abjad...">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Ruang Ujian (Otomatis Terisi)</label>
-                    <input type="text" id="assign-ruang" class="w-full border rounded-lg p-2.5 bg-slate-100 focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-700" placeholder="Ruang akan otomatis muncul">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Ruang Ujian (Bisa diubah bebas)</label>
+                    <input type="text" id="assign-ruang" class="w-full border rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-emerald-700" placeholder="Ketik atau biarkan terisi otomatis...">
                 </div>
             </div>
 
@@ -687,6 +745,45 @@
         </div>
     </div>
 
+    <!-- MODAL TAMBAH / EDIT RUANG -->
+    <div id="modal-ruang" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b">
+                <h3 class="text-base font-bold text-slate-800" id="modal-ruang-title">
+                    <i class="fa-solid fa-door-open text-emerald-600 mr-2"></i> Tambah Ruang
+                </h3>
+                <button onclick="closeRuangModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-4 text-xs">
+                <input type="hidden" id="edit-ruang-index" value="-1">
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-1 uppercase">Nama Ruang / Gedung</label>
+                    <input type="text" id="input-ruang-nama" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 outline-none font-bold text-slate-800 uppercase" placeholder="Contoh: AL-GHAZALI 1.02 atau AULA BARAT">
+                    <p class="text-slate-400 mt-1">Bebas nama gedung apa saja (tidak harus Al-Ghazali).</p>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-1 uppercase">Jumlah Juri di Ruang Ini</label>
+                    <div class="flex items-center gap-3">
+                        <button type="button" onclick="ubahKapasitas(-1)" class="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-lg text-slate-700 transition flex items-center justify-center">−</button>
+                        <input type="number" id="input-ruang-kapasitas" min="1" max="20" value="6" class="w-20 border rounded-lg p-2 text-center font-black text-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                        <button type="button" onclick="ubahKapasitas(1)" class="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-lg text-slate-700 transition flex items-center justify-center">+</button>
+                        <span class="text-slate-400">juri</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                    <p class="font-semibold text-emerald-800 mb-1">Preview kode abjad yang digenerate:</p>
+                    <p id="preview-kode-modal" class="font-mono font-bold text-emerald-700 text-sm"></p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-5 pt-3 border-t">
+                <button onclick="closeRuangModal()" class="px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 font-semibold text-xs">Batal</button>
+                <button onclick="simpanRuang()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs shadow">Simpan Ruang</button>
+            </div>
+        </div>
+    </div>
+
     <!-- JAVASCRIPT APP LOGIC & BACKEND SYNC -->
     <script>
         let currentUser  = null;
@@ -702,16 +799,216 @@
         const STORAGE_KEY_TOKEN   = 'ujian_sessionToken';
         const STORAGE_KEY_JURI    = 'ujian_dataJuri';
         const STORAGE_KEY_PESERTA = 'ujian_dataPeserta';
+        const STORAGE_KEY_RUANG   = 'ujian_dataRuang';
 
-        const mapKodeToRuang = {
-            'A':'AL-GHAZALI 1.02','B':'AL-GHAZALI 1.02','C':'AL-GHAZALI 1.02','D':'AL-GHAZALI 1.02','E':'AL-GHAZALI 1.02','F':'AL-GHAZALI 1.02',
-            'G':'AL-GHAZALI 1.05','H':'AL-GHAZALI 1.05','I':'AL-GHAZALI 1.05','J':'AL-GHAZALI 1.05','K':'AL-GHAZALI 1.05','L':'AL-GHAZALI 1.05',
-            'M':'AL-GHAZALI 1.06','N':'AL-GHAZALI 1.06','O':'AL-GHAZALI 1.06','P':'AL-GHAZALI 1.06','Q':'AL-GHAZALI 1.06','R':'AL-GHAZALI 1.06',
-            'S':'AL-GHAZALI 1.07','T':'AL-GHAZALI 1.07','U':'AL-GHAZALI 1.07','V':'AL-GHAZALI 1.07','W':'AL-GHAZALI 1.07','X':'AL-GHAZALI 1.07',
-            'Y':'AL-GHAZALI 1.08','Z':'AL-GHAZALI 1.08','AA':'AL-GHAZALI 1.08','AB':'AL-GHAZALI 1.08','AC':'AL-GHAZALI 1.08','AD':'AL-GHAZALI 1.08',
-            'AE':'AL-GHAZALI 1.09','AF':'AL-GHAZALI 1.09','AG':'AL-GHAZALI 1.09','AH':'AL-GHAZALI 1.09','AI':'AL-GHAZALI 1.09','AJ':'AL-GHAZALI 1.09',
-            'AK':'AL-GHAZALI 3.01','AL':'AL-GHAZALI 3.01'
-        };
+        // ---- MANAJEMEN RUANG DINAMIS ----
+        let dataRuang = [];
+
+        function generateAbjad(index) {
+            const huruf = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (index < 26) return huruf[index];
+            const first = Math.floor(index / 26) - 1;
+            const second = index % 26;
+            return huruf[first] + huruf[second];
+        }
+
+        function buildMapKodeToRuang() {
+            const map = {};
+            let kodeIndex = 0;
+            dataRuang.forEach(ruang => {
+                const kap = parseInt(ruang.kapasitas) || 6;
+                for (let i = 0; i < kap; i++) {
+                    map[generateAbjad(kodeIndex)] = ruang.nama;
+                    kodeIndex++;
+                }
+            });
+            return map;
+        }
+
+        function getMapKode() {
+            return buildMapKodeToRuang();
+        }
+
+        function loadDataRuang() {
+            const saved = localStorage.getItem(STORAGE_KEY_RUANG);
+            if (saved) {
+                try { dataRuang = JSON.parse(saved); return; } catch(e) {}
+            }
+            dataRuang = [
+                { nama: 'AL-GHAZALI 1.02', kapasitas: 6 },
+                { nama: 'AL-GHAZALI 1.05', kapasitas: 6 },
+                { nama: 'AL-GHAZALI 1.06', kapasitas: 6 },
+                { nama: 'AL-GHAZALI 1.07', kapasitas: 6 },
+                { nama: 'AL-GHAZALI 1.08', kapasitas: 6 },
+                { nama: 'AL-GHAZALI 1.09', kapasitas: 6 },
+                { nama: 'AL-GHAZALI 2.01', kapasitas: 6 },
+                { nama: 'AL-GHAZALI 2.02', kapasitas: 6 },
+            ];
+            saveDataRuang();
+        }
+
+        function saveDataRuang() {
+            localStorage.setItem(STORAGE_KEY_RUANG, JSON.stringify(dataRuang));
+        }
+
+        function renderTableRuang() {
+            const tbody = document.getElementById('table-ruang');
+            if (!tbody) return;
+
+            let kodeIndex = 0;
+            if (!dataRuang.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-xs text-slate-400 italic">Belum ada ruang. Klik "Tambah Ruang" untuk mulai.</td></tr>';
+                renderPetaKodePreview();
+                return;
+            }
+
+            tbody.innerHTML = dataRuang.map((ruang, idx) => {
+                const kap = parseInt(ruang.kapasitas) || 6;
+                const kodeList = [];
+                for (let i = 0; i < kap; i++) {
+                    kodeList.push(generateAbjad(kodeIndex + i));
+                }
+                kodeIndex += kap;
+                const kodeStr = kodeList.join(' · ');
+                return `<tr class="hover:bg-slate-50">
+                    <td class="p-3 font-bold text-slate-800">${ruang.nama}</td>
+                    <td class="p-3 text-center">
+                        <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full font-black text-xs">${kap} juri</span>
+                    </td>
+                    <td class="p-3 font-mono text-xs text-indigo-700 font-semibold">${kodeStr}</td>
+                    <td class="p-3 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="pindahRuang(${idx}, -1)" ${idx===0?'disabled':''} 
+                                class="p-1.5 bg-slate-100 hover:bg-slate-200 rounded text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition" title="Naikan urutan">
+                                <i class="fa-solid fa-arrow-up text-xs"></i>
+                            </button>
+                            <button onclick="pindahRuang(${idx}, 1)" ${idx===dataRuang.length-1?'disabled':''} 
+                                class="p-1.5 bg-slate-100 hover:bg-slate-200 rounded text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition" title="Turunkan urutan">
+                                <i class="fa-solid fa-arrow-down text-xs"></i>
+                            </button>
+                            <button onclick="editRuang(${idx})" 
+                                class="p-1.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white rounded transition" title="Edit">
+                                <i class="fa-solid fa-pen-to-square text-xs"></i>
+                            </button>
+                            <button onclick="hapusRuang(${idx})" 
+                                class="p-1.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded transition" title="Hapus">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            renderPetaKodePreview();
+        }
+
+        function renderPetaKodePreview() {
+            const el = document.getElementById('peta-kode-preview');
+            if (!el) return;
+            const map = buildMapKodeToRuang();
+            const grup = {};
+            Object.entries(map).forEach(([kode, ruang]) => {
+                if (!grup[ruang]) grup[ruang] = [];
+                grup[ruang].push(kode);
+            });
+            const totalKode = Object.keys(map).length;
+            el.innerHTML = Object.entries(grup).map(([ruang, kodes]) =>
+                `<span class="inline-block mr-4 mb-1"><b class="text-slate-800">${ruang}:</b> ${kodes.join(', ')}</span>`
+            ).join('') + `<br><span class="text-slate-400 mt-1 inline-block">Total: ${totalKode} kode abjad untuk ${dataRuang.length} ruang</span>`;
+        }
+
+        function openTambahRuangModal() {
+            document.getElementById('modal-ruang-title').innerHTML = '<i class="fa-solid fa-plus text-emerald-600 mr-2"></i> Tambah Ruang Baru';
+            document.getElementById('edit-ruang-index').value = -1;
+            document.getElementById('input-ruang-nama').value = '';
+            document.getElementById('input-ruang-kapasitas').value = 6;
+            updatePreviewKodeModal();
+            document.getElementById('modal-ruang').classList.remove('hidden');
+            setTimeout(() => document.getElementById('input-ruang-nama').focus(), 100);
+        }
+
+        function editRuang(idx) {
+            const ruang = dataRuang[idx];
+            document.getElementById('modal-ruang-title').innerHTML = '<i class="fa-solid fa-pen-to-square text-indigo-600 mr-2"></i> Edit Ruang';
+            document.getElementById('edit-ruang-index').value = idx;
+            document.getElementById('input-ruang-nama').value = ruang.nama;
+            document.getElementById('input-ruang-kapasitas').value = ruang.kapasitas;
+            updatePreviewKodeModal();
+            document.getElementById('modal-ruang').classList.remove('hidden');
+        }
+
+        function closeRuangModal() {
+            document.getElementById('modal-ruang').classList.add('hidden');
+        }
+
+        function ubahKapasitas(delta) {
+            const inp = document.getElementById('input-ruang-kapasitas');
+            const val = Math.min(20, Math.max(1, (parseInt(inp.value) || 6) + delta));
+            inp.value = val;
+            updatePreviewKodeModal();
+        }
+
+        function updatePreviewKodeModal() {
+            const idx = parseInt(document.getElementById('edit-ruang-index').value);
+            const kap = parseInt(document.getElementById('input-ruang-kapasitas').value) || 6;
+            const preEl = document.getElementById('preview-kode-modal');
+            if (!preEl) return;
+
+            let offset = 0;
+            if (idx === -1) {
+                offset = dataRuang.reduce((s, r) => s + (parseInt(r.kapasitas) || 6), 0);
+            } else {
+                for (let i = 0; i < idx; i++) offset += (parseInt(dataRuang[i].kapasitas) || 6);
+            }
+
+            const kodes = [];
+            for (let i = 0; i < kap; i++) kodes.push(generateAbjad(offset + i));
+            preEl.textContent = kodes.join(' · ');
+        }
+
+        function simpanRuang() {
+            const nama = document.getElementById('input-ruang-nama').value.trim().toUpperCase();
+            const kap  = parseInt(document.getElementById('input-ruang-kapasitas').value) || 6;
+            const idx  = parseInt(document.getElementById('edit-ruang-index').value);
+
+            if (!nama) { showToast('Nama ruang tidak boleh kosong!', 'warning'); return; }
+            if (kap < 1 || kap > 20) { showToast('Kapasitas harus antara 1-20 juri.', 'warning'); return; }
+
+            if (idx === -1) {
+                dataRuang.push({ nama, kapasitas: kap });
+                showToast(`Ruang "${nama}" berhasil ditambahkan!`, 'success');
+            } else {
+                dataRuang[idx] = { nama, kapasitas: kap };
+                showToast(`Ruang "${nama}" berhasil diperbarui!`, 'success');
+            }
+
+            saveDataRuang();
+            closeRuangModal();
+            renderTableRuang();
+        }
+
+        function hapusRuang(idx) {
+            const ruang = dataRuang[idx];
+            if (!confirm(`Yakin hapus ruang "${ruang.nama}"?\n\nKode abjad semua ruang lain akan bergeser secara otomatis.`)) return;
+            dataRuang.splice(idx, 1);
+            saveDataRuang();
+            renderTableRuang();
+            showToast(`Ruang "${ruang.nama}" dihapus.`, 'info');
+        }
+
+        function pindahRuang(idx, arah) {
+            const targetIdx = idx + arah;
+            if (targetIdx < 0 || targetIdx >= dataRuang.length) return;
+            [dataRuang[idx], dataRuang[targetIdx]] = [dataRuang[targetIdx], dataRuang[idx]];
+            saveDataRuang();
+            renderTableRuang();
+        }
+
+        document.addEventListener('input', function(e) {
+            if (e.target.id === 'input-ruang-kapasitas' || e.target.id === 'input-ruang-nama') {
+                updatePreviewKodeModal();
+            }
+        });
 
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar-nav');
@@ -800,6 +1097,7 @@
             if (tabName === 'presensi') renderOperatorViews();
             if (tabName === 'penilaian') renderJuriDashboard();
             if (tabName === 'rekap') renderRekapTable();
+            if (tabName === 'pengaturan') renderTableRuang();
         }
 
         function updateDashboardStats() {
@@ -906,6 +1204,19 @@
             showToast("Penugasan juri berhasil dikosongkan.", "info");
         }
 
+        function hitungDurasiJuri(masuk, pulang) {
+            if (!masuk || !pulang || masuk === '--:--' || pulang === '--:--') return '-';
+            try {
+                const [mh, mm] = masuk.split(':').map(Number);
+                const [ph, pm] = pulang.split(':').map(Number);
+                const selisih = (ph * 60 + pm) - (mh * 60 + mm);
+                if (selisih <= 0) return '-';
+                const jam = Math.floor(selisih / 60);
+                const menit = selisih % 60;
+                return `${jam > 0 ? jam + 'j ' : ''}${menit}m`;
+            } catch(e) { return '-'; }
+        }
+
         function renderAdminJuriTable() {
             const query = document.getElementById('search-juri') ? document.getElementById('search-juri').value.toLowerCase() : '';
             const tbody = document.getElementById('table-admin-juri');
@@ -921,6 +1232,7 @@
                     <td class="p-3 text-emerald-700 font-semibold text-xs"><span class="px-1.5 py-0.5 bg-slate-100 text-slate-800 rounded font-bold">${j.kode || '-'}</span> ${j.ruang || '-'}</td>
                     <td class="p-3 text-xs font-bold text-emerald-600">${j.absenMasuk || '--:--'}</td>
                     <td class="p-3 text-xs font-bold text-indigo-600">${j.absenPulang || '--:--'}</td>
+                    <td class="p-3 text-center font-bold text-slate-700 text-xs">${hitungDurasiJuri(j.absenMasuk, j.absenPulang)}</td>
                     <td class="p-3 text-center">
                         <button onclick="openAssignModal('${j.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold">Tugaskan</button>
                     </td>
@@ -982,7 +1294,6 @@
             `}).join('');
         }
 
-        // --- TAB REKAP NILAI (LENGKAP DENGAN KOLOM GURU & SEARCH GURU) ---
         function renderRekapTable() {
             const tbody = document.getElementById('table-rekap-nilai-body');
             if (!tbody) return;
@@ -1023,7 +1334,6 @@
             `}).join('');
         }
 
-        // --- FUNGSI EDIT SANTRI ---
         function openEditPesertaModal(idpps) {
             const p = dataPeserta.find(item => item.idpps === idpps);
             if (!p) return;
@@ -1048,8 +1358,23 @@
 
         function autoDetectRuangForPeserta() {
             const kodeInput = document.getElementById('edit-peserta-juri').value.trim().toUpperCase();
-            if (mapKodeToRuang[kodeInput]) {
-                document.getElementById('edit-peserta-ruangtes').value = mapKodeToRuang[kodeInput];
+            if (!kodeInput) return;
+
+            const _map = getMapKode();
+            if (_map[kodeInput]) {
+                document.getElementById('edit-peserta-ruangtes').value = _map[kodeInput];
+                return;
+            }
+
+            const juriTerkait = dataJuri.find(j => j.kode && j.kode.trim().toUpperCase() === kodeInput);
+            if (juriTerkait && juriTerkait.ruang) {
+                document.getElementById('edit-peserta-ruangtes').value = juriTerkait.ruang;
+                return;
+            }
+
+            const temanSekode = dataPeserta.find(p => p.juriKode && p.juriKode.trim().toUpperCase() === kodeInput && p.ruangTes);
+            if (temanSekode && temanSekode.ruangTes) {
+                document.getElementById('edit-peserta-ruangtes').value = temanSekode.ruangTes;
             }
         }
 
@@ -1099,8 +1424,21 @@
             selectedJuriIdForModal = juriId;
             const juri = dataJuri.find(j => j.id === juriId);
             document.getElementById('modal-juri-nama').innerText = juri ? `${juri.nama} (GRID ${juri.grid || 'B'})` : '';
-            document.getElementById('assign-kode').value = juri ? (juri.kode || '') : '';
-            document.getElementById('assign-ruang').value = juri ? (juri.ruang || '') : '';
+            
+            const kodeJuri = juri ? (juri.kode || '') : '';
+            document.getElementById('assign-kode').value = kodeJuri;
+
+            let ruangJuri = juri ? (juri.ruang || '') : '';
+            if (!ruangJuri && kodeJuri) {
+                const _map = getMapKode();
+                if (_map[kodeJuri.toUpperCase()]) ruangJuri = _map[kodeJuri.toUpperCase()];
+                else {
+                    const pesertaSekode = dataPeserta.find(p => p.juriKode && p.juriKode.trim().toUpperCase() === kodeJuri.toUpperCase() && p.ruangTes);
+                    if (pesertaSekode) ruangJuri = pesertaSekode.ruangTes;
+                }
+            }
+
+            document.getElementById('assign-ruang').value = ruangJuri;
             document.getElementById('modal-assign').classList.remove('hidden');
         }
 
@@ -1108,29 +1446,63 @@
             document.getElementById('modal-assign').classList.add('hidden');
         }
 
-        async function submitAssignment() {
-            const kode = document.getElementById('assign-kode').value.trim().toUpperCase();
-            const ruang = document.getElementById('assign-ruang').value.trim();
-
-            if (!kode || !ruang) {
-                showToast("Harap isi kode juri!", "warning");
+        function autoDetectRuang() {
+            const kodeInput = document.getElementById('assign-kode').value.trim().toUpperCase();
+            if (!kodeInput) {
+                document.getElementById('assign-ruang').value = '';
                 return;
             }
 
-            const juri = dataJuri.find(j => j.id === selectedJuriIdForModal);
-            if (juri) {
-                juri.kode = kode;
-                juri.ruang = ruang;
+            const _map = getMapKode();
+            if (_map[kodeInput]) {
+                document.getElementById('assign-ruang').value = _map[kodeInput];
+                return;
+            }
+
+            const pesertaSekode = dataPeserta.find(p => p.juriKode && p.juriKode.trim().toUpperCase() === kodeInput && p.ruangTes);
+            if (pesertaSekode && pesertaSekode.ruangTes) {
+                document.getElementById('assign-ruang').value = pesertaSekode.ruangTes;
+                return;
+            }
+
+            const juriLain = dataJuri.find(j => j.kode && j.kode.trim().toUpperCase() === kodeInput && j.ruang);
+            if (juriLain && juriLain.ruang) {
+                document.getElementById('assign-ruang').value = juriLain.ruang;
+            }
+        }
+
+        async function submitAssignment() {
+            const kode  = document.getElementById('assign-kode').value.trim().toUpperCase();
+            const ruang = document.getElementById('assign-ruang').value.trim();
+
+            if (!kode || !ruang) {
+                showToast("Harap isi kode juri dan ruang ujian!", "warning");
+                return;
+            }
+
+            const bentrok = dataJuri.find(j => j.id !== selectedJuriIdForModal && j.kode && j.kode.trim().toUpperCase() === kode);
+            if (bentrok) {
+                if (!confirm(`⚠️ PERHATIAN:\nKode "${kode}" saat ini SUDAH DITUGASKAN ke ${bentrok.nama} (${bentrok.id}).\n\nTetap simpan dan timpa penugasan?`)) {
+                    return;
+                }
+            }
+
+            const j = dataJuri.find(jj => jj.id === selectedJuriIdForModal);
+            if (j) {
+                j.kode = kode;
+                j.ruang = ruang;
             }
 
             dataPeserta.forEach(p => {
-                if (p.juriKode === kode) p.ruangTes = ruang;
+                if (p.juriKode && p.juriKode.trim().toUpperCase() === kode) {
+                    p.ruangTes = ruang;
+                }
             });
 
             await syncToCloud();
             closeAssignModal();
             switchTab(activeTab);
-            showToast("Penugasan juri berhasil disimpan!", "success");
+            showToast(`Penugasan Kode ${kode} (${ruang}) berhasil disimpan!`, "success");
         }
 
         async function importJuri(e) {
@@ -1189,15 +1561,15 @@
             XLSX.writeFile(workbook, "MENTAHAN_JURI.xlsx");
         }
 
+        // IMPOR PESERTA OTOMATIS MENGGANTI 100% DATA BARU
         async function importPeserta(e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            const resetScores = confirm(
-                "Apakah ini SESI UJIAN BARU?\n\n" +
-                "• Klik [OK] untuk SESI BARU (Semua nilai kesalahan santri akan di-reset jadi 0).\n" +
-                "• Klik [BATAL] jika hanya ingin memperbarui data santri tanpa menghapus nilai kesalahan yang sudah diinput juri."
-            );
+            if (!confirm("Impor ini akan MENGGANTI seluruh data santri lama dengan data dari file Excel baru. Lanjutkan?")) {
+                e.target.value = '';
+                return;
+            }
 
             const reader = new FileReader();
             reader.onload = async function(evt) {
@@ -1207,22 +1579,13 @@
                 const json = XLSX.utils.sheet_to_json(worksheet);
 
                 if (json.length > 0) {
-                    const existingMap = {};
-                    dataPeserta.forEach(p => { if (p.idpps) existingMap[p.idpps] = p; });
+                    const _map = getMapKode();
+                    const emptyScores = { k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0}, k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0} };
 
                     dataPeserta = json.map((row, idx) => {
                         const rawId = String(row['IDPPS'] || row['ID'] || `P${idx+1}`).trim();
                         const kodeJuri = String(row['JURI'] || row['KODE JURI'] || row['Kode Juri'] || '').trim().toUpperCase();
                         const ruangUjian = String(row['RUANG TES'] || row['RUANG'] || row['Ruang Tes'] || '').trim().toUpperCase();
-                        const existing = existingMap[rawId];
-
-                        let targetScores = { k1:{lafadz:0,makna:0,terjemah:0,tasrif:0,taktek:0}, k2:{lafadz:0,makna:0,terjemah:0,tasrif:0,nadhom:0} };
-                        let targetStatus = 'HADIR';
-
-                        if (!resetScores && existing) {
-                            if (existing.scores) targetScores = existing.scores;
-                            if (existing.status) targetStatus = existing.status;
-                        }
 
                         return {
                             no: row['NO'] || (idx + 1),
@@ -1235,16 +1598,16 @@
                             tes: String(row['TES'] || '-').trim(),
                             jmlKetTes: row['jml ket tes'] || 1,
                             juriKode: kodeJuri,
-                            ruangTes: ruangUjian || (mapKodeToRuang[kodeJuri] || ''),
-                            status: targetStatus,
-                            scores: targetScores
+                            ruangTes: ruangUjian || (_map[kodeJuri] || ''),
+                            status: 'HADIR',
+                            scores: emptyScores
                         };
                     });
 
                     await syncToCloud();
                     switchTab('peserta');
                     renderRekapTable();
-                    showToast(`Berhasil mengimpor ${json.length} data peserta! ${resetScores ? '(Nilai di-reset ke 0)' : '(Nilai lama aman)'}`, "success");
+                    showToast(`Berhasil mengimpor ${json.length} data peserta baru!`, "success");
                 }
                 e.target.value = '';
             };
@@ -1271,7 +1634,6 @@
             XLSX.writeFile(workbook, "MENTAHAN_PESERTA.xlsx");
         }
 
-        // --- FUNGSI EXPORT LENGKAP & RINCIAN NILAI ---
         function exportNilai() {
             if (!dataPeserta || dataPeserta.length === 0) {
                 showToast("Tidak ada data peserta untuk diekspor!", "warning");
@@ -1312,7 +1674,6 @@
                     "RUANG TES": p.ruangTes || "-",
                     "STATUS": p.status || "HADIR",
                     
-                    // --- RINCIAN KESALAHAN KITAB 1 ---
                     "K1_LAFADZ": k1_lafadz,
                     "K1_MAKNA": k1_makna,
                     "K1_TERJEMAH": k1_terjemah,
@@ -1320,7 +1681,6 @@
                     "K1_TAKTEK": k1_taktek,
                     "TOTAL_ERR_K1": total_k1,
 
-                    // --- RINCIAN KESALAHAN KITAB 2 ---
                     "K2_LAFADZ": k2_lafadz,
                     "K2_MAKNA": k2_makna,
                     "K2_TERJEMAH": k2_terjemah,
@@ -1328,7 +1688,6 @@
                     "K2_NADHOM": k2_nadhom,
                     "TOTAL_ERR_K2": total_k2,
 
-                    // --- TOTAL KESELURUHAN ---
                     "TOTAL_KESALAHAN_AKHIR": total_semua
                 };
             });
@@ -1443,10 +1802,12 @@
             if (!confirm('Yakin ingin mereset seluruh data lokal?\n\nData di server tidak akan terhapus.')) return;
             localStorage.removeItem(STORAGE_KEY_JURI);
             localStorage.removeItem(STORAGE_KEY_PESERTA);
+            localStorage.removeItem(STORAGE_KEY_RUANG);
             sessionStorage.removeItem(STORAGE_KEY_AUTH);
             sessionStorage.removeItem(STORAGE_KEY_TOKEN);
             dataJuri = [];
             dataPeserta = [];
+            dataRuang = [];
             showToast("Data lokal telah dibersihkan.", "info");
             switchTab(activeTab);
         }
@@ -1529,11 +1890,6 @@
             }
         }
 
-        function autoDetectRuang() {
-            const kodeInput = document.getElementById('assign-kode').value.trim().toUpperCase();
-            document.getElementById('assign-ruang').value = mapKodeToRuang[kodeInput] || '';
-        }
-
         async function handleLogin(e) {
             e.preventDefault();
             const inputId = document.getElementById('login-password').value.trim();
@@ -1599,21 +1955,99 @@
             document.getElementById('login-password').value = '';
         }
 
+        // RENDER VIEW TAB PRESENSI DENGAN KONTROL LENGKAP & STATISTIK
         function renderOperatorViews() {
             const tbody = document.getElementById('table-operator-juri-status');
             if (!tbody) return;
+
             const list = dataJuri.filter(j => j.status === 'JURI');
-            tbody.innerHTML = list.map(j => `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-2 font-mono text-xs font-bold text-slate-700">${j.id}</td>
-                    <td class="p-2 font-semibold text-slate-800">${j.nama}</td>
-                    <td class="p-2 text-center">${getGridBadge(j.grid)}</td>
-                    <td class="p-2 text-xs"><span class="px-1.5 py-0.5 bg-slate-100 font-bold rounded">${j.kode || '-'}</span> ${j.ruang || '-'}</td>
-                    <td class="p-2 text-xs font-bold text-emerald-600">${j.absenMasuk || '--:--'}</td>
-                    <td class="p-2 text-xs font-bold text-indigo-600">${j.absenPulang || '--:--'}</td>
-                </tr>
-            `).join('');
+
+            const total = list.length;
+            const hadir = list.filter(j => j.absenMasuk && !j.manualStatus).length;
+            const izinAlpa = list.filter(j => j.manualStatus === 'IZIN' || j.manualStatus === 'ALPA').length;
+            const belum = total - hadir - izinAlpa;
+
+            document.getElementById('pres-stat-total').innerText = total;
+            document.getElementById('pres-stat-hadir').innerText = hadir;
+            document.getElementById('pres-stat-belum').innerText = Math.max(0, belum);
+            document.getElementById('pres-stat-izin').innerText  = izinAlpa;
+
+            tbody.innerHTML = list.map(j => {
+                let statusBadge = '<span class="px-2 py-0.5 text-[11px] rounded-full font-bold bg-slate-100 text-slate-600">BELUM</span>';
+                if (j.manualStatus === 'IZIN') {
+                    statusBadge = '<span class="px-2 py-0.5 text-[11px] rounded-full font-bold bg-amber-100 text-amber-800">IZIN</span>';
+                } else if (j.manualStatus === 'ALPA') {
+                    statusBadge = '<span class="px-2 py-0.5 text-[11px] rounded-full font-bold bg-rose-100 text-rose-800">ALPA</span>';
+                } else if (j.absenMasuk) {
+                    statusBadge = '<span class="px-2 py-0.5 text-[11px] rounded-full font-bold bg-emerald-100 text-emerald-800">HADIR</span>';
+                }
+
+                const durasi = hitungDurasiJuri(j.absenMasuk, j.absenPulang);
+
+                return `<tr class="hover:bg-slate-50">
+                    <td class="p-2.5 font-mono text-xs font-bold text-slate-700">${j.id}</td>
+                    <td class="p-2.5 font-semibold text-slate-800">${j.nama}</td>
+                    <td class="p-2.5 text-center">${getGridBadge(j.grid)}</td>
+                    <td class="p-2.5 text-xs"><span class="px-1.5 py-0.5 bg-slate-100 font-bold rounded">${j.kode || '-'}</span> ${j.ruang || '-'}</td>
+                    <td class="p-2.5 text-xs font-bold text-emerald-600">${j.absenMasuk || '--:--'}</td>
+                    <td class="p-2.5 text-xs font-bold text-indigo-600">${j.absenPulang || '--:--'}</td>
+                    <td class="p-2.5 text-center font-bold text-slate-700 text-xs">${durasi}</td>
+                    <td class="p-2.5 text-center">${statusBadge}</td>
+                    <td class="p-2.5 text-center">
+                        <div class="flex items-center justify-center gap-1">
+                            <button onclick="setAbsenDatang('${j.id}')" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-bold shadow-xs" title="Absen Datang">Datang</button>
+                            <button onclick="setAbsenPulang('${j.id}')" class="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-[10px] font-bold shadow-xs" title="Absen Pulang">Pulang</button>
+                            <button onclick="setManualStatusJuri('${j.id}', 'ALPA')" class="px-2 py-1 bg-rose-500 hover:bg-rose-600 text-white rounded text-[10px] font-bold shadow-xs" title="Tandai Alpa">Alpa</button>
+                            <button onclick="setManualStatusJuri('${j.id}', 'IZIN')" class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-[10px] font-bold shadow-xs" title="Tandai Izin">Izin</button>
+                            <button onclick="resetAbsenSingle('${j.id}')" class="p-1 text-slate-400 hover:text-rose-600 rounded text-xs" title="Reset Absen"><i class="fa-solid fa-rotate-left"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+
             startQrScanner();
+        }
+
+        async function setAbsenDatang(id) {
+            const j = dataJuri.find(jj => jj.id === id);
+            if (!j) return;
+            const now = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+            j.absenMasuk = now;
+            j.manualStatus = null;
+            await saveJuriAbsen(j.id, j.absenMasuk, j.absenPulang, j.manualStatus);
+            renderOperatorViews();
+            showToast(`${j.nama} tercatat DATANG (${now})`, 'success');
+        }
+
+        async function setAbsenPulang(id) {
+            const j = dataJuri.find(jj => jj.id === id);
+            if (!j) return;
+            const now = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+            j.absenPulang = now;
+            await saveJuriAbsen(j.id, j.absenMasuk, j.absenPulang, j.manualStatus);
+            renderOperatorViews();
+            showToast(`${j.nama} tercatat PULANG (${now})`, 'info');
+        }
+
+        async function setManualStatusJuri(id, status) {
+            const j = dataJuri.find(jj => jj.id === id);
+            if (!j) return;
+            j.manualStatus = status;
+            await saveJuriAbsen(j.id, j.absenMasuk, j.absenPulang, j.manualStatus);
+            renderOperatorViews();
+            showToast(`Status ${j.nama} disetel ke ${status}`, 'warning');
+        }
+
+        async function resetAbsenSingle(id) {
+            const j = dataJuri.find(jj => jj.id === id);
+            if (!j) return;
+            if (!confirm(`Reset kehadiran juri "${j.nama}"?`)) return;
+            j.absenMasuk = null;
+            j.absenPulang = null;
+            j.manualStatus = null;
+            await saveJuriAbsen(j.id, null, null, null);
+            renderOperatorViews();
+            showToast(`Absensi ${j.nama} berhasil direset.`, 'info');
         }
 
         function startQrScanner() {
@@ -1644,6 +2078,7 @@
 
             if (!j.absenMasuk) {
                 j.absenMasuk = now;
+                j.manualStatus = null;
                 await saveJuriAbsen(j.id, j.absenMasuk, j.absenPulang, j.manualStatus);
                 showScanResult(`✅ Absen MASUK: ${j.nama} — ${now}`, true);
             } else if (!j.absenPulang) {
@@ -1677,6 +2112,7 @@
         setInterval(() => { if (currentToken) fetchFromCloud(); }, 30000);
 
         window.addEventListener('DOMContentLoaded', () => { 
+            loadDataRuang();
             const savedSession = sessionStorage.getItem(STORAGE_KEY_AUTH);
             const savedToken   = sessionStorage.getItem(STORAGE_KEY_TOKEN);
             if (savedSession && savedToken) {
