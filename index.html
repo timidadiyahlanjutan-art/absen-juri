@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- HTML5 QR Code Scanner & QR Code Generator -->
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- SheetJS (XLSX) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
@@ -585,7 +585,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 9: ⚙️ PENGATURAN -->
+                <!-- TAB 9: ⚙️ PENGATURAN (DENGAN INPUT ABJAD AWAL) -->
                 <div id="tab-pengaturan" class="tab-pane space-y-6 hidden">
                     <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-xs">
                         <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b">
@@ -595,9 +595,25 @@
                                 </h4>
                                 <p class="text-xs text-slate-500 mt-0.5">Tambah, edit, atau hapus ruang. Tentukan berapa juri per ruang. Kode abjad otomatis digenerate.</p>
                             </div>
-                            <button onclick="openTambahRuangModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition flex items-center gap-2 shadow-sm">
-                                <i class="fa-solid fa-plus"></i> Tambah Ruang
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <button onclick="openTambahRuangModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition flex items-center gap-2 shadow-sm">
+                                    <i class="fa-solid fa-plus"></i> Tambah Ruang
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- INPUT ABJAD AWAL -->
+                        <div class="mb-4 p-3.5 bg-indigo-50/70 rounded-xl border border-indigo-200 flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-base">🔤</span>
+                                <div>
+                                    <p class="text-xs font-bold text-indigo-900">Mulai Kode Abjad Pertama Dari:</p>
+                                    <p class="text-[10px] text-indigo-700">Ubah jika ujian sesi ini tidak dimulai dari 'A' (Contoh: G, M, AA, AQ).</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="text" id="input-start-abjad" maxlength="3" oninput="updateStartAbjad(this.value)" class="w-20 border border-indigo-300 rounded-lg p-2 font-bold text-center text-indigo-900 uppercase bg-white outline-none focus:ring-2 focus:ring-indigo-500 shadow-2xs" placeholder="A">
+                            </div>
                         </div>
 
                         <div class="mb-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
@@ -795,16 +811,35 @@
         let activeSelectedPesertaId = null;
         let selectedJuriIdForModal  = null;
         let html5QrScanner = null;
-        let currentPresensiMode = 'MASUK'; // 'MASUK' atau 'KELUAR'
+        let currentPresensiMode = 'MASUK';
+        let startingAbjadOffset = 0; // Offset awal abjad (Default 0 = 'A')
 
         const STORAGE_KEY_AUTH    = 'ujian_sessionUser';
         const STORAGE_KEY_TOKEN   = 'ujian_sessionToken';
         const STORAGE_KEY_JURI    = 'ujian_dataJuri';
         const STORAGE_KEY_PESERTA = 'ujian_dataPeserta';
         const STORAGE_KEY_RUANG   = 'ujian_dataRuang';
+        const STORAGE_KEY_START_ABJAD = 'ujian_startAbjad';
 
         // ---- MANAJEMEN RUANG DINAMIS ----
         let dataRuang = [];
+
+        function parseAbjadToIndex(str) {
+            if (!str) return 0;
+            const s = String(str).trim().toUpperCase();
+            if (s.length === 1) {
+                const c = s.charCodeAt(0) - 65;
+                return c >= 0 && c < 26 ? c : 0;
+            }
+            if (s.length === 2) {
+                const c1 = s.charCodeAt(0) - 65;
+                const c2 = s.charCodeAt(1) - 65;
+                if (c1 >= 0 && c1 < 26 && c2 >= 0 && c2 < 26) {
+                    return (c1 + 1) * 26 + c2;
+                }
+            }
+            return 0;
+        }
 
         function generateAbjad(index) {
             const huruf = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -816,7 +851,7 @@
 
         function buildMapKodeToRuang() {
             const map = {};
-            let kodeIndex = 0;
+            let kodeIndex = startingAbjadOffset;
             dataRuang.forEach(ruang => {
                 const kap = parseInt(ruang.kapasitas) || 6;
                 for (let i = 0; i < kap; i++) {
@@ -831,7 +866,18 @@
             return buildMapKodeToRuang();
         }
 
+        function updateStartAbjad(val) {
+            startingAbjadOffset = parseAbjadToIndex(val);
+            localStorage.setItem(STORAGE_KEY_START_ABJAD, String(val || 'A').toUpperCase());
+            renderTableRuang();
+        }
+
         function loadDataRuang() {
+            const savedStart = localStorage.getItem(STORAGE_KEY_START_ABJAD) || 'A';
+            startingAbjadOffset = parseAbjadToIndex(savedStart);
+            const inputStart = document.getElementById('input-start-abjad');
+            if (inputStart) inputStart.value = savedStart;
+
             const saved = localStorage.getItem(STORAGE_KEY_RUANG);
             if (saved) {
                 try { dataRuang = JSON.parse(saved); return; } catch(e) {}
@@ -857,7 +903,7 @@
             const tbody = document.getElementById('table-ruang');
             if (!tbody) return;
 
-            let kodeIndex = 0;
+            let kodeIndex = startingAbjadOffset;
             if (!dataRuang.length) {
                 tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-xs text-slate-400 italic">Belum ada ruang. Klik "Tambah Ruang" untuk mulai.</td></tr>';
                 renderPetaKodePreview();
@@ -956,9 +1002,9 @@
             const preEl = document.getElementById('preview-kode-modal');
             if (!preEl) return;
 
-            let offset = 0;
+            let offset = startingAbjadOffset;
             if (idx === -1) {
-                offset = dataRuang.reduce((s, r) => s + (parseInt(r.kapasitas) || 6), 0);
+                offset += dataRuang.reduce((s, r) => s + (parseInt(r.kapasitas) || 6), 0);
             } else {
                 for (let i = 0; i < idx; i++) offset += (parseInt(dataRuang[i].kapasitas) || 6);
             }
@@ -1117,9 +1163,6 @@
             document.getElementById('dash-total-ruang').innerText = uniqueRuang.size;
         }
 
-        // ============================================================
-        // PENUGASAN JURI (SUDAH DILENGKAPI STATUS ALPA/IZIN/HADIR)
-        // ============================================================
         function renderPenugasanList() {
             const container = document.getElementById('penugasan-container-list');
             if (!container) return;
@@ -1145,7 +1188,6 @@
 
                 const isAssigned = (j.kode && j.kode.trim() !== '') || (j.ruang && j.ruang.trim() !== '');
 
-                // BADGE RIWAYAT / STATUS PRESENSI JURI
                 let statusBadgePenugasan = '';
                 if (j.manualStatus === 'ALPA') {
                     statusBadgePenugasan = '<span class="px-2 py-0.5 bg-rose-600 text-white rounded font-black text-[10px] uppercase shadow-xs">ALPA</span>';
@@ -1818,6 +1860,7 @@
             localStorage.removeItem(STORAGE_KEY_JURI);
             localStorage.removeItem(STORAGE_KEY_PESERTA);
             localStorage.removeItem(STORAGE_KEY_RUANG);
+            localStorage.removeItem(STORAGE_KEY_START_ABJAD);
             sessionStorage.removeItem(STORAGE_KEY_AUTH);
             sessionStorage.removeItem(STORAGE_KEY_TOKEN);
             dataJuri = [];
