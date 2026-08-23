@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- HTML5 QR Code Scanner & QR Code Generator -->
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- SheetJS (XLSX) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
@@ -441,15 +441,13 @@
                     </div>
                 </div>
 
-                <!-- TAB 6: 🕒 PRESENSI JURI (DESAIN MODERN LENGKAP: SCAN MASUK/KELUAR + DAFTAR JURI BERTUGAS) -->
+                <!-- TAB 6: 🕒 PRESENSI JURI -->
                 <div id="tab-presensi" class="tab-pane space-y-6 hidden">
-                    
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         
-                        <!-- KOLOM KIRI: SCANNER, TOGGLE MODE, & INPUT (8 KOLOM) -->
+                        <!-- KOLOM KIRI: SCANNER, TOGGLE MODE, & INPUT -->
                         <div class="lg:col-span-8 space-y-4">
                             
-                            <!-- INFO BANNER -->
                             <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
                                 <i class="fa-solid fa-triangle-exclamation text-blue-600 text-lg mt-0.5"></i>
                                 <div class="text-xs text-blue-900">
@@ -478,13 +476,11 @@
 
                             <!-- AREA ALTERNATIF & INPUT MANUAL -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- ALTERNATIF DARI FILE FOTO -->
                                 <div class="bg-indigo-50/60 border border-indigo-100 p-4 rounded-xl">
                                     <label class="block text-[11px] font-bold text-indigo-900 uppercase tracking-wide mb-2">Alternatif Kamera (Paling Aman)</label>
                                     <input type="file" accept="image/*" capture="environment" onchange="scanFromImageFile(event)" id="qr-input-file" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
                                 </div>
 
-                                <!-- INPUT MANUAL / SCANNER FISIK -->
                                 <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
                                     <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wide mb-2">Input Manual ID (Scan Fisik)</label>
                                     <div class="flex gap-2">
@@ -496,27 +492,24 @@
 
                         </div>
 
-                        <!-- KOLOM KANAN: DAFTAR JURI BERTUGAS & MONITORING STATUS (4 KOLOM) -->
-                        <div class="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                        <!-- KOLOM KANAN: DAFTAR JURI BERTUGAS -->
+                        <div class="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col h-[600px]">
                             <div class="flex justify-between items-center border-b pb-3">
                                 <h3 class="font-bold text-sm text-slate-800">Daftar Juri Bertugas</h3>
                                 <span class="bg-blue-100 text-blue-800 text-[11px] font-black px-2.5 py-0.5 rounded-full" id="pres-total-juri-badge">0 Orang</span>
                             </div>
 
-                            <!-- FILTER SUB-STATUS (BELUM SCAN / SUDAH SCAN) -->
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-rose-600 uppercase flex items-center gap-1.5" id="pres-sub-header">
                                     <i class="fa-solid fa-circle-xmark"></i> BELUM SCAN (<span id="pres-count-belum">0</span>)
                                 </span>
                             </div>
 
-                            <!-- LIST JURI CARDS -->
-                            <div id="presensi-juri-card-list" class="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
+                            <div id="presensi-juri-card-list" class="space-y-2.5 overflow-y-auto flex-1 pr-1">
                             </div>
                         </div>
 
                     </div>
-
                 </div>
 
                 <!-- TAB 7: 📊 REKAP NILAI -->
@@ -1124,6 +1117,9 @@
             document.getElementById('dash-total-ruang').innerText = uniqueRuang.size;
         }
 
+        // ============================================================
+        // PENUGASAN JURI (SUDAH DILENGKAPI STATUS ALPA/IZIN/HADIR)
+        // ============================================================
         function renderPenugasanList() {
             const container = document.getElementById('penugasan-container-list');
             if (!container) return;
@@ -1149,13 +1145,24 @@
 
                 const isAssigned = (j.kode && j.kode.trim() !== '') || (j.ruang && j.ruang.trim() !== '');
 
+                // BADGE RIWAYAT / STATUS PRESENSI JURI
+                let statusBadgePenugasan = '';
+                if (j.manualStatus === 'ALPA') {
+                    statusBadgePenugasan = '<span class="px-2 py-0.5 bg-rose-600 text-white rounded font-black text-[10px] uppercase shadow-xs">ALPA</span>';
+                } else if (j.manualStatus === 'IZIN') {
+                    statusBadgePenugasan = '<span class="px-2 py-0.5 bg-amber-500 text-white rounded font-black text-[10px] uppercase shadow-xs">IZIN</span>';
+                } else if (j.absenMasuk) {
+                    statusBadgePenugasan = `<span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded font-bold text-[10px]">HADIR (${j.absenMasuk})</span>`;
+                }
+
                 return `
-                <div class="p-4 bg-white rounded-xl border ${isAssigned ? 'border-emerald-300 bg-emerald-50/10' : 'border-slate-200'} shadow-xs flex flex-wrap justify-between items-center gap-3 hover:border-emerald-400 transition">
+                <div class="p-4 bg-white rounded-xl border ${j.manualStatus === 'ALPA' ? 'border-rose-400 bg-rose-50/20' : (isAssigned ? 'border-emerald-300 bg-emerald-50/10' : 'border-slate-200')} shadow-xs flex flex-wrap justify-between items-center gap-3 hover:border-emerald-400 transition">
                     <div>
                         <div class="flex items-center space-x-2">
                             <span class="font-mono font-bold text-slate-500 text-xs">${j.id}</span>
                             <p class="font-bold text-slate-800 text-sm">${j.nama}</p>
                             ${getGridBadge(j.grid)}
+                            ${statusBadgePenugasan}
                         </div>
                         <div class="flex flex-wrap items-center gap-1.5 text-xs text-slate-500 mt-1.5">
                             <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 font-bold border border-indigo-100 rounded-md text-[11px]">
@@ -1989,7 +1996,6 @@
             const total = listBertugas.length;
 
             const subHeader = document.getElementById('pres-sub-header');
-            const countBelum = document.getElementById('pres-count-belum');
             document.getElementById('pres-total-juri-badge').innerText = `${total} Orang`;
 
             let displayList = [];
