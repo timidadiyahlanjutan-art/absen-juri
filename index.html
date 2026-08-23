@@ -441,80 +441,82 @@
                     </div>
                 </div>
 
-                <!-- TAB 6: 🕒 PRESENSI JURI (SESUAI REFERENSI TAMPILAN) -->
+                <!-- TAB 6: 🕒 PRESENSI JURI (DESAIN MODERN LENGKAP: SCAN MASUK/KELUAR + DAFTAR JURI BERTUGAS) -->
                 <div id="tab-presensi" class="tab-pane space-y-6 hidden">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         
-                        <!-- KOLOM KIRI: SCANNER & KONTROL MASUK/KELUAR -->
-                        <div class="lg:col-span-2 space-y-4">
+                        <!-- KOLOM KIRI: SCANNER, TOGGLE MODE, & INPUT (8 KOLOM) -->
+                        <div class="lg:col-span-8 space-y-4">
                             
-                            <!-- INFO BANNER PERMISSION -->
-                            <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-xs text-blue-800 flex items-start space-x-3 shadow-xs">
+                            <!-- INFO BANNER -->
+                            <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
                                 <i class="fa-solid fa-triangle-exclamation text-blue-600 text-lg mt-0.5"></i>
-                                <div>
-                                    <h4 class="font-bold text-sm text-blue-900">Kamera Error / Permission Denied?</h4>
-                                    <p class="mt-1 text-slate-600 leading-relaxed">Browser sering membatasi akses kamera langsung. Pilih tombol ungu <b>"Pilih File QR"</b> di bawah untuk membuka kamera atau upload foto QR secara aman tanpa diblokir.</p>
+                                <div class="text-xs text-blue-900">
+                                    <p class="font-bold">Kamera Error / Permission Denied?</p>
+                                    <p class="text-blue-700 mt-0.5">Browser sering membatasi akses kamera langsung. Pilih tombol <b>"Pilih File / Ambil Foto"</b> di bawah untuk membuka kamera secara aman tanpa diblokir.</p>
                                 </div>
                             </div>
 
-                            <!-- TOGGLE SCAN MASUK / SCAN KELUAR -->
+                            <!-- TOGGLE TOMBOL MODE SCAN: MASUK ATAU KELUAR -->
                             <div class="grid grid-cols-2 gap-3">
-                                <button onclick="setScanMode('MASUK')" id="btn-mode-masuk" class="py-3 rounded-xl font-black text-sm transition shadow-sm bg-emerald-600 text-white flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Scan MASUK
+                                <button onclick="setPresensiMode('MASUK')" id="btn-mode-masuk" class="py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm flex items-center justify-center gap-2 bg-emerald-600 text-white">
+                                    <i class="fa-solid fa-right-to-bracket"></i> Scan MASUK
                                 </button>
-                                <button onclick="setScanMode('KELUAR')" id="btn-mode-keluar" class="py-3 rounded-xl font-bold text-sm transition bg-slate-200 text-slate-600 hover:bg-slate-300 flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Scan KELUAR
+                                <button onclick="setPresensiMode('KELUAR')" id="btn-mode-keluar" class="py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm flex items-center justify-center gap-2 bg-slate-200 text-slate-700 hover:bg-slate-300">
+                                    <i class="fa-solid fa-right-from-bracket"></i> Scan KELUAR
                                 </button>
                             </div>
 
-                            <!-- LIVE CAMERA SCANNER BOX -->
-                            <div class="bg-slate-900 rounded-2xl overflow-hidden border border-slate-300 relative p-4 flex flex-col items-center justify-center min-h-[260px]">
-                                <div id="qr-reader" class="w-full max-w-md"></div>
-                            </div>
-
-                            <div id="scan-result-box" class="p-3.5 rounded-xl text-xs bg-slate-100 text-slate-600 hidden font-bold text-center">
-                                <i class="fa-solid fa-info-circle mr-1"></i> <span id="scan-result-msg">Menunggu scan...</span>
-                            </div>
-
-                            <!-- ALTERNATIF KAMERA & INPUT MANUAL ID -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-                                <div>
-                                    <label class="block text-[10px] font-extrabold uppercase text-indigo-700 tracking-wider mb-2">Alternatif Kamera (Paling Aman)</label>
-                                    <label class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition shadow-xs w-full justify-center">
-                                        <i class="fa-solid fa-image"></i> Pilih File Foto QR
-                                        <input type="file" accept="image/*" onchange="scanQrFromFile(event)" class="hidden">
-                                    </label>
+                            <!-- SCANNER CAMERA BOX -->
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden">
+                                <div id="qr-reader" class="w-full max-w-sm rounded-xl overflow-hidden"></div>
+                                <div id="scan-result-box" class="w-full mt-3 p-3 rounded-lg text-xs hidden font-bold text-center">
+                                    <span id="scan-result-msg">Menunggu scan...</span>
                                 </div>
-                                <div>
-                                    <label class="block text-[10px] font-extrabold uppercase text-slate-500 tracking-wider mb-2">Input Manual ID (Scan Fisik)</label>
-                                    <div class="flex space-x-2">
-                                        <input type="text" id="manual-qr-input" onkeypress="if(event.key==='Enter') processQrCode(this.value)" placeholder="Ketik/Scan ID Juri..." class="w-full border rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-emerald-500 outline-none font-mono font-bold bg-slate-50">
-                                        <button onclick="processQrCode(document.getElementById('manual-qr-input').value)" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-xs">
-                                            Input
-                                        </button>
+                            </div>
+
+                            <!-- AREA ALTERNATIF & INPUT MANUAL -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- ALTERNATIF DARI FILE FOTO -->
+                                <div class="bg-indigo-50/60 border border-indigo-100 p-4 rounded-xl">
+                                    <label class="block text-[11px] font-bold text-indigo-900 uppercase tracking-wide mb-2">Alternatif Kamera (Paling Aman)</label>
+                                    <input type="file" accept="image/*" capture="environment" onchange="scanFromImageFile(event)" id="qr-input-file" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
+                                </div>
+
+                                <!-- INPUT MANUAL / SCANNER FISIK -->
+                                <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                                    <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wide mb-2">Input Manual ID (Scan Fisik)</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="manual-qr-input" onkeypress="if(event.key==='Enter') processQrCode(this.value)" placeholder="Ketik/Scan ID..." class="w-full border rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                        <button onclick="processQrCode(document.getElementById('manual-qr-input').value)" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-bold transition">Input</button>
                                     </div>
                                 </div>
                             </div>
 
                         </div>
 
-                        <!-- KOLOM KANAN: DAFTAR KARTU JURI BERTUGAS -->
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col h-[600px]">
-                            <div class="flex justify-between items-center pb-3 border-b mb-3">
-                                <h4 class="font-bold text-sm text-slate-800">Daftar Juri Bertugas</h4>
-                                <span class="px-2.5 py-0.5 bg-blue-100 text-blue-800 rounded-full font-bold text-xs" id="presensi-juri-count-badge">0 Orang</span>
+                        <!-- KOLOM KANAN: DAFTAR JURI BERTUGAS & MONITORING STATUS (4 KOLOM) -->
+                        <div class="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+                            <div class="flex justify-between items-center border-b pb-3">
+                                <h3 class="font-bold text-sm text-slate-800">Daftar Juri Bertugas</h3>
+                                <span class="bg-blue-100 text-blue-800 text-[11px] font-black px-2.5 py-0.5 rounded-full" id="pres-total-juri-badge">0 Orang</span>
                             </div>
 
-                            <p class="text-[11px] font-extrabold uppercase text-rose-600 mb-2 flex items-center gap-1.5" id="presensi-belum-header">
-                                <i class="fa-regular fa-circle-xmark"></i> BELUM SCAN MASUK (<span id="presensi-belum-count">0</span>)
-                            </p>
+                            <!-- FILTER SUB-STATUS (BELUM SCAN / SUDAH SCAN) -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-rose-600 uppercase flex items-center gap-1.5" id="pres-sub-header">
+                                    <i class="fa-solid fa-circle-xmark"></i> BELUM SCAN (<span id="pres-count-belum">0</span>)
+                                </span>
+                            </div>
 
-                            <!-- LIST KARTU JURI -->
-                            <div id="presensi-juri-card-list" class="space-y-2.5 overflow-y-auto flex-1 pr-1">
+                            <!-- LIST JURI CARDS -->
+                            <div id="presensi-juri-card-list" class="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
                             </div>
                         </div>
 
                     </div>
+
                 </div>
 
                 <!-- TAB 7: 📊 REKAP NILAI -->
@@ -579,7 +581,7 @@
                             <h4 class="font-bold text-sm text-slate-800 border-b pb-2"><i class="fa-solid fa-users text-emerald-600 mr-2"></i> Kelola Data Peserta (Excel)</h4>
                             <div class="flex flex-col sm:flex-row gap-2">
                                 <label class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold cursor-pointer text-center transition">
-                                    <i class="fa-solid fa-file-import mr-1.5"></i> Impor Peserta Baru (.xlsx)
+                                    <i class="fa-solid fa-file-import mr-1.5"></i> Impor Peserta (.xlsx)
                                     <input type="file" accept=".xlsx, .xls" onchange="importPeserta(event)" class="hidden">
                                 </label>
                                 <button onclick="exportPesertaOnly()" class="flex-1 bg-teal-700 hover:bg-teal-800 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition">
@@ -800,7 +802,7 @@
         let activeSelectedPesertaId = null;
         let selectedJuriIdForModal  = null;
         let html5QrScanner = null;
-        let scanMode     = 'MASUK'; // 'MASUK' atau 'KELUAR'
+        let currentPresensiMode = 'MASUK'; // 'MASUK' atau 'KELUAR'
 
         const STORAGE_KEY_AUTH    = 'ujian_sessionUser';
         const STORAGE_KEY_TOKEN   = 'ujian_sessionToken';
@@ -1962,73 +1964,103 @@
         }
 
         // ============================================================
-        // PRESENSI VIEW (SESUAI TAMPILAN JURI IDADIYAH)
+        // PRESENSI JURI: MODE TOGGLE & PANEL JURI
         // ============================================================
-        function setScanMode(mode) {
-            scanMode = mode;
-            const btnMasuk = document.getElementById('btn-mode-masuk');
+        function setPresensiMode(mode) {
+            currentPresensiMode = mode;
+            const btnMasuk  = document.getElementById('btn-mode-masuk');
             const btnKeluar = document.getElementById('btn-mode-keluar');
+
             if (mode === 'MASUK') {
-                btnMasuk.className = 'py-3 rounded-xl font-black text-sm transition shadow-sm bg-emerald-600 text-white flex items-center justify-center gap-2';
-                btnKeluar.className = 'py-3 rounded-xl font-bold text-sm transition bg-slate-200 text-slate-600 hover:bg-slate-300 flex items-center justify-center gap-2';
+                btnMasuk.className  = 'py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm flex items-center justify-center gap-2 bg-emerald-600 text-white';
+                btnKeluar.className = 'py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm flex items-center justify-center gap-2 bg-slate-200 text-slate-700 hover:bg-slate-300';
             } else {
-                btnKeluar.className = 'py-3 rounded-xl font-black text-sm transition shadow-sm bg-indigo-600 text-white flex items-center justify-center gap-2';
-                btnMasuk.className = 'py-3 rounded-xl font-bold text-sm transition bg-slate-200 text-slate-600 hover:bg-slate-300 flex items-center justify-center gap-2';
+                btnKeluar.className = 'py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm flex items-center justify-center gap-2 bg-indigo-600 text-white';
+                btnMasuk.className  = 'py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm flex items-center justify-center gap-2 bg-slate-200 text-slate-700 hover:bg-slate-300';
             }
-            showToast(`Mode Scan disetel ke: ${mode}`, 'info');
+            renderOperatorViews();
         }
 
         function renderOperatorViews() {
-            const listContainer = document.getElementById('presensi-juri-card-list');
-            if (!listContainer) return;
+            const container = document.getElementById('presensi-juri-card-list');
+            if (!container) return;
 
-            const juriBertugas = dataJuri.filter(j => j.status === 'JURI' && (j.kode || j.ruang));
-            const belumScan = juriBertugas.filter(j => !j.absenMasuk && !j.manualStatus);
+            const listBertugas = dataJuri.filter(j => j.status === 'JURI');
+            const total = listBertugas.length;
 
-            document.getElementById('presensi-juri-count-badge').innerText = `${juriBertugas.length} Orang`;
-            document.getElementById('presensi-belum-count').innerText = belumScan.length;
+            const subHeader = document.getElementById('pres-sub-header');
+            const countBelum = document.getElementById('pres-count-belum');
+            document.getElementById('pres-total-juri-badge').innerText = `${total} Orang`;
 
-            if (juriBertugas.length === 0) {
-                listContainer.innerHTML = '<p class="text-xs text-slate-400 italic p-4 text-center">Belum ada juri yang ditugaskan kode/ruang.</p>';
-                return;
+            let displayList = [];
+
+            if (currentPresensiMode === 'MASUK') {
+                displayList = listBertugas.filter(j => !j.absenMasuk && !j.manualStatus);
+                if (subHeader) subHeader.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> BELUM SCAN MASUK (<span id="pres-count-belum">${displayList.length}</span>)`;
+            } else {
+                displayList = listBertugas.filter(j => j.absenMasuk && !j.absenPulang);
+                if (subHeader) subHeader.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> SUDAH MASUK / BELUM PULANG (<span id="pres-count-belum">${displayList.length}</span>)`;
             }
 
-            // Urutkan: yang belum scan masuk ditaruh di atas
-            const sorted = [...juriBertugas].sort((a,b) => {
-                if (!a.absenMasuk && b.absenMasuk) return -1;
-                if (a.absenMasuk && !b.absenMasuk) return 1;
-                return (a.kode||'').localeCompare(b.kode||'');
-            });
-
-            listContainer.innerHTML = sorted.map(j => {
-                const isHadir = Boolean(j.absenMasuk);
-                const inisial = (j.nama || 'J').charAt(0).toUpperCase();
-
-                let statusInfo = '<span class="text-[11px] text-rose-500 font-bold">Belum Masuk</span>';
-                if (j.manualStatus === 'IZIN') statusInfo = '<span class="text-[11px] text-amber-600 font-bold">IZIN</span>';
-                else if (j.manualStatus === 'ALPA') statusInfo = '<span class="text-[11px] text-rose-700 font-bold">ALPA</span>';
-                else if (j.absenMasuk && j.absenPulang) statusInfo = `<span class="text-[11px] text-indigo-600 font-bold">Selesai (${j.absenPulang})</span>`;
-                else if (j.absenMasuk) statusInfo = `<span class="text-[11px] text-emerald-600 font-bold">Hadir (${j.absenMasuk})</span>`;
-
-                return `
-                <div class="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between hover:border-slate-300 transition shadow-2xs">
-                    <div class="flex items-center space-x-3 min-w-0">
-                        <div class="w-9 h-9 rounded-full ${isHadir ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'} font-black text-sm flex items-center justify-center shrink-0">
-                            ${inisial}
+            if (displayList.length === 0) {
+                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400 italic bg-slate-50 rounded-xl border border-dashed">Semua dewan juri sudah menyelesaikan presensi ${currentPresensiMode.toLowerCase()}.</div>`;
+            } else {
+                container.innerHTML = displayList.map(j => {
+                    const inisial = (j.nama || 'J').charAt(0).toUpperCase();
+                    return `
+                    <div class="p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200/80 transition flex items-center justify-between gap-3">
+                        <div class="flex items-center space-x-3 min-w-0">
+                            <div class="w-10 h-10 rounded-xl bg-slate-200 text-slate-700 font-bold text-sm flex items-center justify-center shrink-0">
+                                ${inisial}
+                            </div>
+                            <div class="truncate">
+                                <p class="font-bold text-xs text-slate-800 truncate">${j.nama}</p>
+                                <p class="text-[10px] text-slate-500 font-mono mt-0.5">
+                                    <span class="px-1.5 py-0.2 bg-white border border-slate-200 font-bold rounded">${j.kode || '-'}</span> 
+                                    <span>• ${j.ruang || 'Ruang -'}</span>
+                                </p>
+                            </div>
                         </div>
-                        <div class="min-w-0">
-                            <h5 class="text-xs font-bold text-slate-800 truncate">${j.nama}</h5>
-                            <p class="text-[10px] text-slate-500 font-mono font-semibold">${j.kode || '-'} • ${j.ruang || '-'}</p>
+                        <div class="flex items-center space-x-1.5 shrink-0">
+                            <button onclick="setManualAbsenSingle('${j.id}')" class="px-2.5 py-1.5 ${currentPresensiMode==='MASUK' ? 'bg-emerald-600 hover:bg-emerald-700':'bg-indigo-600 hover:bg-indigo-700'} text-white text-[11px] font-bold rounded-lg shadow-xs transition">
+                                ${currentPresensiMode}
+                            </button>
+                            <button onclick="setManualStatusJuri('${j.id}', 'ALPA')" class="p-1.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded-lg text-xs transition" title="Set Alpa">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
                         </div>
-                    </div>
-                    <div class="text-right shrink-0">
-                        ${statusInfo}
-                    </div>
-                </div>
-                `;
-            }).join('');
+                    </div>`;
+                }).join('');
+            }
 
             startQrScanner();
+        }
+
+        async function setManualAbsenSingle(id) {
+            const j = dataJuri.find(jj => jj.id === id);
+            if (!j) return;
+            const now = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+
+            if (currentPresensiMode === 'MASUK') {
+                j.absenMasuk = now;
+                j.manualStatus = null;
+                await saveJuriAbsen(j.id, j.absenMasuk, j.absenPulang, j.manualStatus);
+                showScanResult(`✅ Absen MASUK: ${j.nama} (${now})`, true);
+            } else {
+                j.absenPulang = now;
+                await saveJuriAbsen(j.id, j.absenMasuk, j.absenPulang, j.manualStatus);
+                showScanResult(`✅ Absen PULANG: ${j.nama} (${now})`, true);
+            }
+            renderOperatorViews();
+        }
+
+        async function setManualStatusJuri(id, status) {
+            const j = dataJuri.find(jj => jj.id === id);
+            if (!j) return;
+            j.manualStatus = status;
+            await saveJuriAbsen(j.id, j.absenMasuk, j.absenPulang, j.manualStatus);
+            renderOperatorViews();
+            showToast(`Status ${j.nama} disetel ke ${status}`, 'warning');
         }
 
         function startQrScanner() {
@@ -2045,20 +2077,15 @@
             }).catch(() => {});
         }
 
-        // ALTERNATIF SCAN DARI FILE FOTO/GAMBAR
-        async function scanQrFromFile(e) {
+        async function scanFromImageFile(e) {
             const file = e.target.files[0];
-            if (!file) return;
-
-            if (!html5QrScanner) {
-                html5QrScanner = new Html5Qrcode('qr-reader');
-            }
-
+            if (!file || typeof Html5Qrcode === 'undefined') return;
+            const qrScanner = new Html5Qrcode("qr-reader");
             try {
-                const decodedText = await html5QrScanner.scanFile(file, true);
-                processQrCode(decodedText);
-            } catch (err) {
-                showScanResult('Tidak dapat menemukan QR Code pada gambar tersebut.', false);
+                const text = await qrScanner.scanFile(file, true);
+                processQrCode(text);
+            } catch(err) {
+                showScanResult("QR Code tidak terdeteksi pada gambar.", false);
             }
             e.target.value = '';
         }
@@ -2069,26 +2096,29 @@
 
             const j = dataJuri.find(jj => jj.id === inputId);
             if (!j) {
-                showScanResult(`ID ${inputId} tidak ditemukan dalam database juri.`, false);
+                showScanResult(`ID "${inputId}" tidak ditemukan dalam data juri!`, false);
                 return;
             }
 
             const now = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
 
-            if (scanMode === 'MASUK') {
+            if (currentPresensiMode === 'MASUK') {
+                if (j.absenMasuk) {
+                    showScanResult(`ℹ️ ${j.nama} sudah absen MASUK pukul ${j.absenMasuk}`, false);
+                    return;
+                }
                 j.absenMasuk = now;
                 j.manualStatus = null;
                 await saveJuriAbsen(j.id, j.absenMasuk, j.absenPulang, j.manualStatus);
-                showScanResult(`✅ Absen MASUK: ${j.nama} (${now})`, true);
+                showScanResult(`✅ Berhasil Scan MASUK: ${j.nama} (${now})`, true);
             } else {
-                // Mode Scan KELUAR
                 if (!j.absenMasuk) {
-                    showScanResult(`⚠️ ${j.nama} belum tercatat absen Masuk!`, false);
+                    showScanResult(`⚠️ ${j.nama} belum pernah absen masuk!`, false);
                     return;
                 }
                 j.absenPulang = now;
                 await saveJuriAbsen(j.id, j.absenMasuk, j.absenPulang, j.manualStatus);
-                showScanResult(`✅ Absen KELUAR: ${j.nama} (${now})`, true);
+                showScanResult(`✅ Berhasil Scan KELUAR: ${j.nama} (${now})`, true);
             }
 
             const inp = document.getElementById('manual-qr-input');
@@ -2101,8 +2131,8 @@
             const txt = document.getElementById('scan-result-msg');
             if (!box || !txt) return;
             txt.textContent = msg;
-            box.classList.remove('hidden', 'bg-slate-100', 'bg-emerald-50', 'bg-rose-50', 'text-slate-600', 'text-emerald-800', 'text-rose-800');
-            box.classList.add(success ? 'bg-emerald-50' : 'bg-rose-50');
+            box.classList.remove('hidden', 'bg-slate-100', 'bg-emerald-100', 'bg-rose-100', 'text-emerald-800', 'text-rose-800');
+            box.classList.add(success ? 'bg-emerald-100' : 'bg-rose-100');
             box.classList.add(success ? 'text-emerald-800' : 'text-rose-800');
             showToast(msg, success ? 'success' : 'warning');
         }
