@@ -8,9 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- HTML5 QR Code Scanner & QR Code Generator -->
+    <!-- HTML5 QR Code Scanner -->
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- SheetJS (XLSX) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
@@ -49,6 +48,11 @@
         .toast-warning { background: #d97706; }
         #sidebar-nav {
             transition: transform 0.3s ease-in-out;
+        }
+        #qr-reader video {
+            width: 100% !important;
+            height: auto !important;
+            border-radius: 0.75rem;
         }
     </style>
 </head>
@@ -97,7 +101,7 @@
                         </div>
                         <div>
                             <h1 class="text-sm font-bold tracking-wide text-white">SISTEM UJIAN</h1>
-                            <p class="text-[10px] text-emerald-400 font-semibold" id="sidebar-role-badge">ADMIN</p>
+                            <p class="text-[10px] text-emerald-400 font-semibold uppercase" id="sidebar-role-badge">ADMIN</p>
                         </div>
                     </div>
                     <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">
@@ -191,7 +195,7 @@
 
             <main class="p-4 md:p-6 flex-1 overflow-y-auto space-y-6">
 
-                <!-- TAB 1: 🏠 DASHBOARD (DENGAN JAM & TANGGAL LIVE) -->
+                <!-- TAB 1: 🏠 DASHBOARD -->
                 <div id="tab-dashboard" class="tab-pane space-y-6">
                     <div class="bg-gradient-to-r from-emerald-800 to-slate-900 rounded-2xl p-5 md:p-6 text-white shadow-md flex flex-wrap justify-between items-center gap-4">
                         <div>
@@ -455,22 +459,22 @@
                     </div>
                 </div>
 
-                <!-- TAB 6: 🕒 PRESENSI JURI -->
+                <!-- TAB 6: 🕒 PRESENSI JURI (SESUAI DESAIN & PERBAIKAN FILTER) -->
                 <div id="tab-presensi" class="tab-pane space-y-6 hidden">
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         
                         <!-- KOLOM KIRI: SCANNER, TOGGLE MODE, & INPUT -->
                         <div class="lg:col-span-8 space-y-4">
                             
-                            <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
+                            <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3 shadow-xs">
                                 <i class="fa-solid fa-triangle-exclamation text-blue-600 text-lg mt-0.5"></i>
                                 <div class="text-xs text-blue-900">
                                     <p class="font-bold">Kamera Error / Permission Denied?</p>
-                                    <p class="text-blue-700 mt-0.5">Browser sering membatasi akses kamera langsung. Pilih tombol <b>"Pilih File / Ambil Foto"</b> di bawah untuk membuka kamera secara aman tanpa diblokir.</p>
+                                    <p class="text-blue-700 mt-0.5">Browser sering membatasi akses kamera langsung. Pilih tombol <b>"Pilih File / Ambil Foto QR"</b> di bawah untuk membuka kamera secara aman tanpa diblokir.</p>
                                 </div>
                             </div>
 
-                            <!-- TOGGLE TOMBOL MODE SCAN: MASUK ATAU KELUAR -->
+                            <!-- TOGGLE TOMBOL MODE SCAN -->
                             <div class="grid grid-cols-2 gap-3">
                                 <button onclick="setPresensiMode('MASUK')" id="btn-mode-masuk" class="py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm flex items-center justify-center gap-2 bg-emerald-600 text-white">
                                     <i class="fa-solid fa-right-to-bracket"></i> Scan MASUK
@@ -481,8 +485,8 @@
                             </div>
 
                             <!-- SCANNER CAMERA BOX -->
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden">
-                                <div id="qr-reader" class="w-full max-w-sm rounded-xl overflow-hidden"></div>
+                            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-300 shadow-xs flex flex-col items-center justify-center min-h-[280px] relative">
+                                <div id="qr-reader" class="w-full max-w-sm rounded-xl overflow-hidden bg-slate-950"></div>
                                 <div id="scan-result-box" class="w-full mt-3 p-3 rounded-lg text-xs hidden font-bold text-center">
                                     <span id="scan-result-msg">Menunggu scan...</span>
                                 </div>
@@ -490,15 +494,15 @@
 
                             <!-- AREA ALTERNATIF & INPUT MANUAL -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div class="bg-indigo-50/60 border border-indigo-100 p-4 rounded-xl">
+                                <div class="bg-indigo-50/70 border border-indigo-200 p-4 rounded-xl flex flex-col justify-between">
                                     <label class="block text-[11px] font-bold text-indigo-900 uppercase tracking-wide mb-2">Alternatif Kamera (Paling Aman)</label>
                                     <input type="file" accept="image/*" capture="environment" onchange="scanFromImageFile(event)" id="qr-input-file" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
                                 </div>
 
-                                <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                                <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col justify-between">
                                     <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wide mb-2">Input Manual ID (Scan Fisik)</label>
                                     <div class="flex gap-2">
-                                        <input type="text" id="manual-qr-input" onkeypress="if(event.key==='Enter') processQrCode(this.value)" placeholder="Ketik/Scan ID..." class="w-full border rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                                        <input type="text" id="manual-qr-input" onkeypress="if(event.key==='Enter') processQrCode(this.value)" placeholder="Ketik/Scan ID..." class="w-full border rounded-lg p-2 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
                                         <button onclick="processQrCode(document.getElementById('manual-qr-input').value)" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-bold transition">Input</button>
                                     </div>
                                 </div>
@@ -506,14 +510,14 @@
 
                         </div>
 
-                        <!-- KOLOM KANAN: DAFTAR KARTU JURI BERTUGAS -->
-                        <div class="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col h-[600px]">
-                            <div class="flex justify-between items-center border-b pb-3">
+                        <!-- KOLOM KANAN: DAFTAR JURI BERTUGAS -->
+                        <div class="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col h-[580px]">
+                            <div class="flex justify-between items-center border-b pb-3 mb-3">
                                 <h3 class="font-bold text-sm text-slate-800">Daftar Juri Bertugas</h3>
                                 <span class="bg-blue-100 text-blue-800 text-[11px] font-black px-2.5 py-0.5 rounded-full" id="pres-total-juri-badge">0 Orang</span>
                             </div>
 
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-center justify-between mb-2">
                                 <span class="text-xs font-bold text-rose-600 uppercase flex items-center gap-1.5" id="pres-sub-header">
                                     <i class="fa-solid fa-circle-xmark"></i> BELUM SCAN MASUK (<span id="pres-count-belum">0</span>)
                                 </span>
@@ -701,7 +705,7 @@
         </div>
     </div>
 
-    <!-- MODAL EDIT DATA PESERTA (SANTRI) -->
+    <!-- MODAL EDIT DATA PESERTA -->
     <div id="modal-edit-peserta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl shadow-2xl p-5 md:p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 pb-2 border-b">
@@ -1165,7 +1169,7 @@
                 document.getElementById('dash-user-title').innerText = currentUser.nama || 'User';
             }
             document.getElementById('dash-total-peserta').innerText = dataPeserta.length;
-            const juriBertugas = dataJuri.filter(j => j.status === 'JURI' && (j.ruang || j.kode));
+            const juriBertugas = dataJuri.filter(j => j.status === 'JURI');
             document.getElementById('dash-total-juri').innerText = juriBertugas.length;
 
             const cntHadir = juriBertugas.filter(j => j.absenMasuk && !j.manualStatus).length;
@@ -1175,9 +1179,6 @@
             document.getElementById('dash-total-ruang').innerText = uniqueRuang.size;
         }
 
-        // ============================================================
-        // WIDGET JAM & TANGGAL REAL-TIME
-        // ============================================================
         function updateLiveDateTime() {
             const now = new Date();
             const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
@@ -1192,9 +1193,6 @@
         }
         setInterval(updateLiveDateTime, 1000);
 
-        // ============================================================
-        // PENUGASAN JURI
-        // ============================================================
         function renderPenugasanList() {
             const container = document.getElementById('penugasan-container-list');
             if (!container) return;
@@ -1294,7 +1292,6 @@
             showToast("Penugasan juri berhasil dikosongkan.", "info");
         }
 
-        // FUNGSI HITUNG DURASI AKURAT (MENGATASI NAN)
         function hitungDurasiJuri(masuk, pulang) {
             if (!masuk || !pulang || masuk.includes('-') || pulang.includes('-')) return '-';
             try {
@@ -2053,7 +2050,7 @@
         }
 
         // ============================================================
-        // PRESENSI JURI: HANYA JURI BERTUGAS
+        // PRESENSI JURI: TAMPILAN RESMI SELURUH DEWAN JURI
         // ============================================================
         function setPresensiMode(mode) {
             currentPresensiMode = mode;
@@ -2074,64 +2071,52 @@
             const container = document.getElementById('presensi-juri-card-list');
             if (!container) return;
 
-            const listBertugas = dataJuri.filter(j => {
-                const isJuri = j.status === 'JURI';
-                const hasTugas = (j.kode && j.kode.trim() !== '' && j.kode !== '-') || 
-                                 (j.ruang && j.ruang.trim() !== '' && j.ruang !== '-');
-                return isJuri && hasTugas;
-            });
-
-            const total = listBertugas.length;
-            const hadir = listBertugas.filter(j => j.absenMasuk && !j.manualStatus).length;
-            const izinAlpa = listBertugas.filter(j => j.manualStatus === 'IZIN' || j.manualStatus === 'ALPA').length;
-            const belum = total - hadir - izinAlpa;
-
-            document.getElementById('pres-stat-total').innerText = total;
-            document.getElementById('pres-stat-hadir').innerText = hadir;
-            document.getElementById('pres-stat-belum').innerText = Math.max(0, belum);
-            document.getElementById('pres-stat-izin').innerText  = izinAlpa;
+            // TAMPILKAN SEMUA MASTER JURI
+            const listJuri = dataJuri.filter(j => j.status === 'JURI');
+            const total = listJuri.length;
 
             const subHeader = document.getElementById('pres-sub-header');
-            document.getElementById('pres-total-juri-badge').innerText = `${total} Orang`;
+            const badgeTotal = document.getElementById('pres-total-juri-badge');
+            if (badgeTotal) badgeTotal.innerText = `${total} Orang`;
 
             let displayList = [];
 
             if (currentPresensiMode === 'MASUK') {
-                displayList = listBertugas.filter(j => !j.absenMasuk && !j.manualStatus);
-                if (subHeader) subHeader.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> BELUM SCAN MASUK (<span id="pres-count-belum">${displayList.length}</span>)`;
+                displayList = listJuri.filter(j => !j.absenMasuk && !j.manualStatus);
+                if (subHeader) subHeader.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> BELUM SCAN MASUK ( ${displayList.length} )`;
             } else {
-                displayList = listBertugas.filter(j => j.absenMasuk && !j.absenPulang);
-                if (subHeader) subHeader.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> SUDAH MASUK / BELUM PULANG (<span id="pres-count-belum">${displayList.length}</span>)`;
+                displayList = listJuri.filter(j => j.absenMasuk && !j.absenPulang);
+                if (subHeader) subHeader.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> SUDAH MASUK / BELUM PULANG ( ${displayList.length} )`;
             }
 
             if (total === 0) {
-                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400 italic bg-slate-50 rounded-xl border border-dashed">Belum ada juri yang ditugaskan kode/ruang untuk sesi ini.</div>`;
+                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400 italic bg-slate-50 rounded-xl border border-dashed">Belum ada data juri di sistem.</div>`;
                 return;
             }
 
             if (displayList.length === 0) {
-                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400 italic bg-slate-50 rounded-xl border border-dashed">Semua juri yang bertugas sudah menyelesaikan presensi ${currentPresensiMode.toLowerCase()}.</div>`;
+                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400 italic bg-slate-50 rounded-xl border border-dashed">Semua dewan juri (${total} orang) sudah menyelesaikan presensi ${currentPresensiMode.toLowerCase()}.</div>`;
                 return;
             }
 
             container.innerHTML = displayList.map(j => {
                 const inisial = (j.nama || 'J').charAt(0).toUpperCase();
                 return `
-                <div class="p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200/80 transition flex items-center justify-between gap-3">
+                <div class="p-3.5 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200/80 transition flex items-center justify-between gap-3 shadow-2xs">
                     <div class="flex items-center space-x-3 min-w-0">
-                        <div class="w-10 h-10 rounded-xl bg-slate-200 text-slate-700 font-bold text-sm flex items-center justify-center shrink-0">
+                        <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">
                             ${inisial}
                         </div>
                         <div class="truncate">
                             <p class="font-bold text-xs text-slate-800 truncate">${j.nama}</p>
                             <p class="text-[10px] text-slate-500 font-mono mt-0.5">
-                                <span class="px-1.5 py-0.5 bg-white border border-slate-200 font-bold rounded text-indigo-700">${j.kode || '-'}</span> 
-                                <span>• ${j.ruang || 'Ruang -'}</span>
+                                <span class="font-bold text-slate-700">${j.kode || j.id}</span> 
+                                <span>• ${j.ruang || j.grid || 'Juri'}</span>
                             </p>
                         </div>
                     </div>
                     <div class="flex items-center space-x-1.5 shrink-0">
-                        <button onclick="setManualAbsenSingle('${j.id}')" class="px-2.5 py-1.5 ${currentPresensiMode==='MASUK' ? 'bg-emerald-600 hover:bg-emerald-700':'bg-indigo-600 hover:bg-indigo-700'} text-white text-[11px] font-bold rounded-lg shadow-xs transition">
+                        <button onclick="setManualAbsenSingle('${j.id}')" class="px-3 py-1.5 ${currentPresensiMode==='MASUK' ? 'bg-emerald-600 hover:bg-emerald-700':'bg-indigo-600 hover:bg-indigo-700'} text-white text-[11px] font-bold rounded-lg shadow-xs transition">
                             ${currentPresensiMode}
                         </button>
                         <button onclick="setManualStatusJuri('${j.id}', 'ALPA')" class="p-1.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded-lg text-xs transition" title="Set Alpa">
@@ -2147,7 +2132,7 @@
         async function setManualAbsenSingle(id) {
             const j = dataJuri.find(jj => jj.id === id);
             if (!j) return;
-            const now = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+            const now = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' }).replace(/\./g, ':');
 
             if (currentPresensiMode === 'MASUK') {
                 j.absenMasuk = now;
@@ -2208,14 +2193,7 @@
                 return;
             }
 
-            const hasTugas = (j.kode && j.kode.trim() !== '' && j.kode !== '-') || 
-                             (j.ruang && j.ruang.trim() !== '' && j.ruang !== '-');
-            if (!hasTugas) {
-                showScanResult(`⚠️ ${j.nama} TIDAK BERTUGAS pada sesi ini (Belum diberi Kode/Ruang).`, false);
-                return;
-            }
-
-            const now = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+            const now = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' }).replace(/\./g, ':');
 
             if (currentPresensiMode === 'MASUK') {
                 if (j.absenMasuk) {
@@ -2260,6 +2238,7 @@
         setInterval(() => { if (currentToken) fetchFromCloud(); }, 30000);
 
         window.addEventListener('DOMContentLoaded', () => { 
+            updateLiveDateTime();
             loadDataRuang();
             const savedSession = sessionStorage.getItem(STORAGE_KEY_AUTH);
             const savedToken   = sessionStorage.getItem(STORAGE_KEY_TOKEN);
