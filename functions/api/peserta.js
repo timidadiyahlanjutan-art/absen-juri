@@ -1,3 +1,5 @@
+// functions/api/peserta.js
+
 export async function onRequest(context) {
     const { request, env } = context;
     const dbUrl = env.DATABASE_URL;
@@ -44,7 +46,7 @@ export async function onRequest(context) {
         }
     }
 
-    // POST: Batch Sync / Import Master Data Peserta
+    // POST: Ganti 100% Master Data Peserta Baru (Bersihkan data lama di database)
     if (request.method === "POST") {
         try {
             const pesertaList = await request.json();
@@ -52,6 +54,17 @@ export async function onRequest(context) {
                 return jsonResponse({ success: true });
             }
 
+            // 1. KOSONGKAN TABEL PESERTA LAMA AGAR TIDAK GABUNG/BENTROK
+            await fetch(`https://${host}/sql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Neon-Connection-String': cleanDbUrl
+                },
+                body: JSON.stringify({ query: 'TRUNCATE TABLE peserta;' })
+            });
+
+            // 2. MASUKKAN DATA PESERTA BARU SECARA BERTAHAP
             const chunkSize = 50;
             for (let i = 0; i < pesertaList.length; i += chunkSize) {
                 const chunk = pesertaList.slice(i, i + chunkSize);
@@ -81,20 +94,7 @@ export async function onRequest(context) {
 
                 const queryText = `
                     INSERT INTO peserta (no, idpps, nama, dom, kelas, guru, ruang_sore, tes, jml_ket_tes, juri_kode, ruang_tes, status, scores)
-                    VALUES ${valueClauses.join(', ')}
-                    ON CONFLICT (idpps) DO UPDATE SET
-                        no = EXCLUDED.no,
-                        nama = EXCLUDED.nama,
-                        dom = EXCLUDED.dom,
-                        kelas = EXCLUDED.kelas,
-                        guru = EXCLUDED.guru,
-                        ruang_sore = EXCLUDED.ruang_sore,
-                        tes = EXCLUDED.tes,
-                        jml_ket_tes = EXCLUDED.jml_ket_tes,
-                        juri_kode = EXCLUDED.juri_kode,
-                        ruang_tes = EXCLUDED.ruang_tes,
-                        status = EXCLUDED.status,
-                        scores = EXCLUDED.scores;
+                    VALUES ${valueClauses.join(', ')};
                 `;
 
                 await fetch(`https://${host}/sql`, {
