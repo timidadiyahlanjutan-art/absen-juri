@@ -459,8 +459,29 @@
                     </div>
                 </div>
 
-                <!-- TAB 6: 🕒 PRESENSI JURI (SESUAI DESAIN & PERBAIKAN FILTER) -->
+                <!-- TAB 6: 🕒 PRESENSI JURI (HANYA JURI BERTUGAS) -->
                 <div id="tab-presensi" class="tab-pane space-y-6 hidden">
+                    
+                    <!-- RINGKASAN STATISTIK PRESENSI -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-slate-100 text-slate-700 rounded-lg flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-users"></i></div>
+                            <div><p class="text-[10px] font-bold text-slate-400 uppercase">Juri Bertugas</p><h4 class="text-xl font-black text-slate-800 mt-0.5" id="pres-stat-total">0</h4></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-user-check"></i></div>
+                            <div><p class="text-[10px] font-bold text-emerald-600 uppercase">Sudah Hadir</p><h4 class="text-xl font-black text-emerald-600 mt-0.5" id="pres-stat-hadir">0</h4></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-user-clock"></i></div>
+                            <div><p class="text-[10px] font-bold text-rose-600 uppercase">Belum Hadir</p><h4 class="text-xl font-black text-rose-600 mt-0.5" id="pres-stat-belum">0</h4></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-user-xmark"></i></div>
+                            <div><p class="text-[10px] font-bold text-amber-600 uppercase">Izin / Alpa</p><h4 class="text-xl font-black text-amber-600 mt-0.5" id="pres-stat-izin">0</h4></div>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         
                         <!-- KOLOM KIRI: SCANNER, TOGGLE MODE, & INPUT -->
@@ -510,7 +531,7 @@
 
                         </div>
 
-                        <!-- KOLOM KANAN: DAFTAR JURI BERTUGAS -->
+                        <!-- KOLOM KANAN: DAFTAR KARTU JURI BERTUGAS -->
                         <div class="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col h-[580px]">
                             <div class="flex justify-between items-center border-b pb-3 mb-3">
                                 <h3 class="font-bold text-sm text-slate-800">Daftar Juri Bertugas</h3>
@@ -837,6 +858,14 @@
         const STORAGE_KEY_RUANG   = 'ujian_dataRuang';
         const STORAGE_KEY_START_ABJAD = 'ujian_startAbjad';
 
+        // Helper untuk memeriksa apakah juri benar-benar ditugaskan oleh Admin
+        function isJuriDitugaskan(j) {
+            if (!j || j.status !== 'JURI') return false;
+            const kode = String(j.kode || '').trim();
+            const ruang = String(j.ruang || '').trim();
+            return (kode !== '' && kode !== '-') || (ruang !== '' && ruang !== '-');
+        }
+
         // ---- MANAJEMEN RUANG DINAMIS ----
         let dataRuang = [];
 
@@ -1094,7 +1123,7 @@
             toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info}"></i><span>${message}</span>`;
             container.appendChild(toast);
             requestAnimationFrame(() => toast.classList.add('show'));
-            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3500);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 3500); }, 3500);
         }
 
         function getGridBadge(grid) {
@@ -1169,7 +1198,7 @@
                 document.getElementById('dash-user-title').innerText = currentUser.nama || 'User';
             }
             document.getElementById('dash-total-peserta').innerText = dataPeserta.length;
-            const juriBertugas = dataJuri.filter(j => j.status === 'JURI');
+            const juriBertugas = dataJuri.filter(isJuriDitugaskan);
             document.getElementById('dash-total-juri').innerText = juriBertugas.length;
 
             const cntHadir = juriBertugas.filter(j => j.absenMasuk && !j.manualStatus).length;
@@ -1216,7 +1245,7 @@
                 const totalPesertaJuri = dataPeserta.filter(p => p.juriKode && j.kode && String(p.juriKode).toUpperCase() === String(j.kode).toUpperCase());
                 const totalTugasCount = totalPesertaJuri.filter(p => calculateTotalErrors(p.scores) > 0).length;
 
-                const isAssigned = (j.kode && j.kode.trim() !== '') || (j.ruang && j.ruang.trim() !== '');
+                const isAssigned = isJuriDitugaskan(j);
 
                 let statusBadgePenugasan = '';
                 if (j.manualStatus === 'ALPA') {
@@ -2050,7 +2079,7 @@
         }
 
         // ============================================================
-        // PRESENSI JURI: TAMPILAN RESMI SELURUH DEWAN JURI
+        // PRESENSI JURI (HANYA JURI YANG SUDAH DITUGASKAN OLEH ADMIN)
         // ============================================================
         function setPresensiMode(mode) {
             currentPresensiMode = mode;
@@ -2071,9 +2100,24 @@
             const container = document.getElementById('presensi-juri-card-list');
             if (!container) return;
 
-            // TAMPILKAN SEMUA MASTER JURI
-            const listJuri = dataJuri.filter(j => j.status === 'JURI');
-            const total = listJuri.length;
+            // Filter HANYA Juri yang sudah bertugas (punya kode atau ruang yang valid)
+            const listBertugas = dataJuri.filter(isJuriDitugaskan);
+
+            const total = listBertugas.length;
+            const hadir = listBertugas.filter(j => j.absenMasuk && !j.manualStatus).length;
+            const izinAlpa = listBertugas.filter(j => j.manualStatus === 'IZIN' || j.manualStatus === 'ALPA').length;
+            const belum = total - hadir - izinAlpa;
+
+            // Update statistik
+            const statTotal = document.getElementById('pres-stat-total');
+            const statHadir = document.getElementById('pres-stat-hadir');
+            const statBelum = document.getElementById('pres-stat-belum');
+            const statIzin  = document.getElementById('pres-stat-izin');
+
+            if (statTotal) statTotal.innerText = total;
+            if (statHadir) statHadir.innerText = hadir;
+            if (statBelum) statBelum.innerText = Math.max(0, belum);
+            if (statIzin)  statIzin.innerText  = izinAlpa;
 
             const subHeader = document.getElementById('pres-sub-header');
             const badgeTotal = document.getElementById('pres-total-juri-badge');
@@ -2082,49 +2126,49 @@
             let displayList = [];
 
             if (currentPresensiMode === 'MASUK') {
-                displayList = listJuri.filter(j => !j.absenMasuk && !j.manualStatus);
+                displayList = listBertugas.filter(j => !j.absenMasuk && !j.manualStatus);
                 if (subHeader) subHeader.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> BELUM SCAN MASUK ( ${displayList.length} )`;
             } else {
-                displayList = listJuri.filter(j => j.absenMasuk && !j.absenPulang);
+                displayList = listBertugas.filter(j => j.absenMasuk && !j.absenPulang);
                 if (subHeader) subHeader.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> SUDAH MASUK / BELUM PULANG ( ${displayList.length} )`;
             }
 
             if (total === 0) {
-                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400 italic bg-slate-50 rounded-xl border border-dashed">Belum ada data juri di sistem.</div>`;
+                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400 italic bg-slate-50 rounded-xl border border-dashed">Belum ada juri yang ditugaskan kode/ruang oleh Admin.</div>`;
+                startQrScanner();
                 return;
             }
 
             if (displayList.length === 0) {
-                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400 italic bg-slate-50 rounded-xl border border-dashed">Semua dewan juri (${total} orang) sudah menyelesaikan presensi ${currentPresensiMode.toLowerCase()}.</div>`;
-                return;
+                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400 italic bg-slate-50 rounded-xl border border-dashed">Semua juri yang bertugas (${total} orang) sudah menyelesaikan presensi ${currentPresensiMode.toLowerCase()}.</div>`;
+            } else {
+                container.innerHTML = displayList.map(j => {
+                    const inisial = (j.nama || 'J').charAt(0).toUpperCase();
+                    return `
+                    <div class="p-3.5 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200/80 transition flex items-center justify-between gap-3 shadow-2xs">
+                        <div class="flex items-center space-x-3 min-w-0">
+                            <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">
+                                ${inisial}
+                            </div>
+                            <div class="truncate">
+                                <p class="font-bold text-xs text-slate-800 truncate">${j.nama}</p>
+                                <p class="text-[10px] text-slate-500 font-mono mt-0.5">
+                                    <span class="px-1.5 py-0.5 bg-white border border-slate-200 font-bold rounded text-indigo-700">${j.kode || '-'}</span> 
+                                    <span>• ${j.ruang || 'Ruang -'}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-1.5 shrink-0">
+                            <button onclick="setManualAbsenSingle('${j.id}')" class="px-3 py-1.5 ${currentPresensiMode==='MASUK' ? 'bg-emerald-600 hover:bg-emerald-700':'bg-indigo-600 hover:bg-indigo-700'} text-white text-[11px] font-bold rounded-lg shadow-xs transition">
+                                ${currentPresensiMode}
+                            </button>
+                            <button onclick="setManualStatusJuri('${j.id}', 'ALPA')" class="p-1.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded-lg text-xs transition" title="Set Alpa">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>`;
+                }).join('');
             }
-
-            container.innerHTML = displayList.map(j => {
-                const inisial = (j.nama || 'J').charAt(0).toUpperCase();
-                return `
-                <div class="p-3.5 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200/80 transition flex items-center justify-between gap-3 shadow-2xs">
-                    <div class="flex items-center space-x-3 min-w-0">
-                        <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">
-                            ${inisial}
-                        </div>
-                        <div class="truncate">
-                            <p class="font-bold text-xs text-slate-800 truncate">${j.nama}</p>
-                            <p class="text-[10px] text-slate-500 font-mono mt-0.5">
-                                <span class="font-bold text-slate-700">${j.kode || j.id}</span> 
-                                <span>• ${j.ruang || j.grid || 'Juri'}</span>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-1.5 shrink-0">
-                        <button onclick="setManualAbsenSingle('${j.id}')" class="px-3 py-1.5 ${currentPresensiMode==='MASUK' ? 'bg-emerald-600 hover:bg-emerald-700':'bg-indigo-600 hover:bg-indigo-700'} text-white text-[11px] font-bold rounded-lg shadow-xs transition">
-                            ${currentPresensiMode}
-                        </button>
-                        <button onclick="setManualStatusJuri('${j.id}', 'ALPA')" class="p-1.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded-lg text-xs transition" title="Set Alpa">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-                </div>`;
-            }).join('');
 
             startQrScanner();
         }
@@ -2190,6 +2234,12 @@
             const j = dataJuri.find(jj => jj.id === inputId);
             if (!j) {
                 showScanResult(`ID "${inputId}" tidak ditemukan dalam data juri!`, false);
+                return;
+            }
+
+            // Validasi: Hanya proses jika juri sudah ditugaskan
+            if (!isJuriDitugaskan(j)) {
+                showScanResult(`⚠️ ${j.nama} TIDAK BERTUGAS pada sesi ini (Belum diberi Kode/Ruang oleh Admin).`, false);
                 return;
             }
 
